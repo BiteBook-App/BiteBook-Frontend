@@ -1,5 +1,8 @@
 import { View } from "react-native";
 import "@/global.css";
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
@@ -10,27 +13,55 @@ import { Image } from "@/components/ui/image";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
 
+SplashScreen.preventAutoHideAsync();
+
 export default function Login() {
+  // Load custom font
+  const [loaded, error] = useFonts({
+    'Rashfield': require('assets/fonts/VVDSRashfield-Normal.ttf'),
+  });
+
+  useEffect(() => {
+    if (loaded || error) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded, error]);
+
+  if (!loaded && !error) {
+    return null;
+  }
+
   return (
     <View
-      className="bg-background-dark px-5"
+      className="bg-background-dark px-5 lg:px-40"
       style={{
         flex: 1,
         justifyContent: "center",
         width: "100%", 
       }}
     >
-      <VStack space="4xl">
+      <VStack space="3xl">
+        {/* Heading */}
         <HStack className="justify-center items-center" space="lg" reversed={false} >
           <Image
-            size="md"
+            size="lg"
             source={{
               uri: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
             }}
             alt="bitebook logo"
           />
-          <Heading size="4xl" className="text-primary-900">Welcome to BiteBook!</Heading>
+          <VStack className="mt-8 lg:mt-3" space="xs">
+            <Text className="font-light" size="4xl">Welcome to</Text>
+            <Text 
+              className="font-[Rashfield] leading-[69px] lg:leading-[55px]"
+              size="5xl" 
+            >
+                BiteBook
+            </Text>
+          </VStack>
         </HStack>
+
+        {/* Manual Sign In */}
         <FormControl>
           <VStack space="lg">
             <Input
@@ -65,6 +96,7 @@ export default function Login() {
           </VStack>
         </FormControl>
 
+        {/* Additional Sign In Options */}
         <HStack className="items-center space-x-4" space="md">
           <View className="flex-1 h-px bg-background-100" />
           <Text className="text-background-300">OR</Text>
@@ -80,8 +112,9 @@ export default function Login() {
           </Button>
         </VStack>
 
-        <Text className="text-center">Don't have an account? Sign Up</Text>
-
+        <Text className="text-center">
+          Don't have an account? <Text className="font-bold">Sign Up</Text>
+        </Text>
       </VStack>
 
     </View>

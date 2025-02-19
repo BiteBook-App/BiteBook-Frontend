@@ -33,7 +33,12 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-font"
+      [
+        "expo-font",
+        {
+          "fonts": ["assets/fonts/VVDSRashfield-Normal.ttf"]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
