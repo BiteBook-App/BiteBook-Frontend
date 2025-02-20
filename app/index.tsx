@@ -12,11 +12,14 @@ import { Image } from "@/components/ui/image";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
 import { LinearGradient } from 'expo-linear-gradient';
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function Login() {
-  // Hide password functionality
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   // Load custom font
@@ -33,6 +36,35 @@ export default function Login() {
   if (!loaded && !error) {
     return null;
   }
+
+  // Firebase config - TO DO: Move somewhere else?
+  const firebaseConfig = {
+    apiKey: process.env.EXPO_PUBLIC_API_KEY,
+    authDomain: process.env.EXPO_PUBLIC_AUTH_DOMAIN,
+    databaseURL: process.env.EXPO_PUBLIC_DATABASE_URL,
+    projectId: process.env.EXPO_PUBLIC_PROJECT_ID,
+    storageBucket: process.env.EXPO_PUBLIC_STORAGE_BUCKET,
+    messagingSenderId: process.env.EXPO_PUBLIC_MESSAGING_SENDER_ID,
+    appId: process.env.EXPO_PUBLIC_APP_ID,
+    measurementId: process.env.EXPO_PUBLIC_MEASUREMENT_ID
+  };
+
+  const app = initializeApp(firebaseConfig);
+
+  const auth = getAuth();
+  const handleSignIn = () => {
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        console.log("user succesfully authenticated");
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorMessage);
+      });
+  };
 
   return (
     <View
@@ -64,15 +96,26 @@ export default function Login() {
       />
       <VStack space="3xl">
         {/* Heading */}
-        <HStack className="justify-center items-center" space="lg" reversed={false} >
+        <HStack 
+          className="justify-center items-center" 
+          space="lg" 
+          reversed={false} 
+        >
           <Image
             size="lg"
             source={require('../assets/images/App_Icon.png')}
             alt="bitebook logo"
             className="rounded-xl"
           />
-          <VStack className="mt-8 lg:mt-3" space="xs">
-            <Text className="font-light" size="4xl">Welcome to</Text>
+          <VStack 
+            className="mt-8 lg:mt-3" 
+            space="xs"
+          >
+            <Text 
+              className="font-light" 
+              size="4xl">
+                Welcome to
+            </Text>
             <Text 
               className="font-[Rashfield] leading-[69px] lg:leading-[55px]"
               size="5xl" 
@@ -90,9 +133,16 @@ export default function Login() {
               size="xl"
             >
               <InputSlot className="pl-4">
-                <InputIcon as={MailIcon}></InputIcon>
+                <InputIcon as={MailIcon}/>
               </InputSlot>
-              <InputField placeholder="Email"/>
+              <InputField 
+                placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                spellCheck={false}
+                autoCorrect={false}
+              />
             </Input>
 
             <VStack space="sm">
@@ -103,32 +153,62 @@ export default function Login() {
                 <InputSlot className="pl-4">
                   <InputIcon as={LockIcon}></InputIcon>
                 </InputSlot>
-                <InputField placeholder="Password" type={showPassword ? "text" : "password"}/>
-                <InputSlot className="pr-4" onPress={() => setShowPassword(!showPassword)}>
-                  <InputIcon as={showPassword ? EyeIcon : EyeOffIcon}></InputIcon>
+                <InputField 
+                  placeholder="Password" 
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChangeText={setPassword}
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  autoCorrect={false}
+                />
+                <InputSlot 
+                  className="pr-4" 
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <InputIcon as={showPassword ? EyeIcon : EyeOffIcon}/>
                 </InputSlot>
               </Input>
               <Text className="text-right">Forgot password?</Text>
             </VStack>
 
-            <Button className="rounded-xl" size="xl" variant="solid" action="primary">
+            <Button 
+              className="rounded-xl" 
+              size="xl" 
+              variant="solid" 
+              action="primary"
+              onPress={handleSignIn}
+            >
               <ButtonText>Sign in</ButtonText>
             </Button>
           </VStack>
         </FormControl>
 
         {/* Additional Sign In Options */}
-        <HStack className="items-center space-x-4" space="md">
+        <HStack 
+          className="items-center space-x-4" 
+          space="md"
+        >
           <View className="flex-1 h-px bg-background-100" />
           <Text className="text-background-300">OR</Text>
           <View className="flex-1 h-px bg-background-100" />
         </HStack>
 
         <VStack space="sm">
-          <Button className="rounded-xl" size="xl" variant="outline" action="primary">
+          <Button 
+            className="rounded-xl" 
+            size="xl" 
+            variant="outline" 
+            action="primary"
+          >
             <ButtonText>Sign in with Google</ButtonText>
           </Button>
-          <Button className="rounded-xl" size="xl" variant="outline" action="primary">
+          <Button 
+            className="rounded-xl" 
+            size="xl" 
+            variant="outline" 
+            action="primary"
+          >
             <ButtonText>Sign in with Apple</ButtonText>
           </Button>
         </VStack>
