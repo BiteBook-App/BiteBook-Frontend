@@ -2,20 +2,23 @@ import { View } from "react-native";
 import "@/global.css";
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Text } from "@/components/ui/text";
-import { Heading } from "@/components/ui/heading";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { FormControl } from "@/components/ui/form-control";
 import { VStack } from "@/components/ui/vstack";
-import { MailIcon, LockIcon, EyeOffIcon } from "@/components/ui/icon";
+import { MailIcon, LockIcon, EyeOffIcon, EyeIcon } from "@/components/ui/icon";
 import { Image } from "@/components/ui/image";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
+import { LinearGradient } from 'expo-linear-gradient';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function Login() {
+  // Hide password functionality
+  const [showPassword, setShowPassword] = useState(false);
+
   // Load custom font
   const [loaded, error] = useFonts({
     'Rashfield': require('assets/fonts/VVDSRashfield-Normal.ttf'),
@@ -40,15 +43,33 @@ export default function Login() {
         width: "100%", 
       }}
     >
+      <LinearGradient
+        colors={[
+          "#232d37", "#232b34", "#222832", "#22262f", "#21242c",
+          "#202229", "#1f2027", "#1e1e24", "#1d1c21", "#1b1a1e",
+          "#1a191c", "#181719"
+        ]}
+        locations={[0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7]}
+        start={{ x: 1, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0, // Ensures full height
+          justifyContent: 'center', // Centers content vertically
+          alignItems: 'center', // Centers content horizontally
+        }}
+      />
       <VStack space="3xl">
         {/* Heading */}
         <HStack className="justify-center items-center" space="lg" reversed={false} >
           <Image
             size="lg"
-            source={{
-              uri: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-            }}
+            source={require('../assets/images/App_Icon.png')}
             alt="bitebook logo"
+            className="rounded-xl"
           />
           <VStack className="mt-8 lg:mt-3" space="xs">
             <Text className="font-light" size="4xl">Welcome to</Text>
@@ -65,7 +86,7 @@ export default function Login() {
         <FormControl>
           <VStack space="lg">
             <Input
-              className="bg-background-50 rounded-xl border-0"
+              className="bg-background-0 rounded-xl border-0 opacity-70"
               size="xl"
             >
               <InputSlot className="pl-4">
@@ -76,15 +97,15 @@ export default function Login() {
 
             <VStack space="sm">
               <Input
-                className="bg-background-50 rounded-xl border-0"
+                className="bg-background-0 rounded-xl border-0 opacity-70"
                 size="xl"
               >
                 <InputSlot className="pl-4">
                   <InputIcon as={LockIcon}></InputIcon>
                 </InputSlot>
-                <InputField placeholder="Password"/>
-                <InputSlot className="pr-4">
-                  <InputIcon as={EyeOffIcon}></InputIcon>
+                <InputField placeholder="Password" type={showPassword ? "text" : "password"}/>
+                <InputSlot className="pr-4" onPress={() => setShowPassword(!showPassword)}>
+                  <InputIcon as={showPassword ? EyeIcon : EyeOffIcon}></InputIcon>
                 </InputSlot>
               </Input>
               <Text className="text-right">Forgot password?</Text>
