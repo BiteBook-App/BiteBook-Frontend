@@ -8,6 +8,7 @@ export default function RootLayout() {
     <GluestackUIProvider mode="dark">
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="sign-up" options={{ headerShown: false }} />
         <Stack.Screen name="home" options={{ title: 'BiteBook' }} />
         <Stack.Screen name="recipe" options={{ title: 'Recipe' }} />
       </Stack>

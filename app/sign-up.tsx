@@ -4,25 +4,24 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { Text } from "@/components/ui/text";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { FormControl } from "@/components/ui/form-control";
 import { VStack } from "@/components/ui/vstack";
-import { MailIcon, LockIcon } from "@/components/ui/icon";
-import { Image } from "@/components/ui/image";
+import { MailIcon, LockIcon, EyeOffIcon, EyeIcon } from "@/components/ui/icon";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
 import { LinearGradient } from 'expo-linear-gradient';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { useRouter } from "expo-router";
 import CustomInputField from "@/components/ui/custom-input-field"
 
 SplashScreen.preventAutoHideAsync();
 
 export default function Login() {
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
 
   // Load custom font
   const [loaded, error] = useFonts({
@@ -99,30 +98,19 @@ export default function Login() {
       <VStack space="3xl">
         {/* Heading */}
         <HStack 
-          className="justify-center items-center" 
+          className="justify-start"
           space="lg" 
           reversed={false} 
         >
-          <Image
-            size="lg"
-            source={require('../assets/images/App_Icon.png')}
-            alt="bitebook logo"
-            className="rounded-xl"
-          />
           <VStack 
             className="mt-8 lg:mt-3" 
             space="xs"
           >
             <Text 
-              className="font-light" 
-              size="4xl">
-                Welcome to
-            </Text>
-            <Text 
-              className="font-[Rashfield] leading-[69px] lg:leading-[55px]"
-              size="5xl" 
+                className="font-[Rashfield] leading-[69px] lg:leading-[55px]"
+                size="5xl"
             >
-                BiteBook
+              Sign Up
             </Text>
           </VStack>
         </HStack>
@@ -130,26 +118,27 @@ export default function Login() {
         {/* Manual Sign In */}
         <FormControl>
           <VStack space="lg">
-             <CustomInputField
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                icon={MailIcon}
-              />
-
-            <VStack space="sm">
-             <CustomInputField
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                icon={LockIcon}
-                isPassword
-                showPassword={showPassword}
-                togglePasswordVisibility={() => setShowPassword(!showPassword)}
-              />
-              <Text className="text-right">Forgot password?</Text>
-            </VStack>
-
+          <CustomInputField
+              placeholder="Username"
+              value={username}
+              onChangeText={setUsername}
+              icon={MailIcon}
+            />
+            <CustomInputField
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              icon={MailIcon}
+            />
+            <CustomInputField
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              icon={LockIcon}
+              isPassword
+              showPassword={showPassword}
+              togglePasswordVisibility={() => setShowPassword(!showPassword)}
+            />
             <Button 
               className="rounded-xl" 
               size="xl" 
@@ -161,43 +150,6 @@ export default function Login() {
             </Button>
           </VStack>
         </FormControl>
-
-        {/* Additional Sign In Options */}
-        <HStack 
-          className="items-center space-x-4" 
-          space="md"
-        >
-          <View className="flex-1 h-px bg-background-100" />
-          <Text className="text-background-300">OR</Text>
-          <View className="flex-1 h-px bg-background-100" />
-        </HStack>
-
-        <VStack space="sm">
-          <Button 
-            className="rounded-xl" 
-            size="xl" 
-            variant="outline" 
-            action="primary"
-          >
-            <ButtonText>Sign in with Google</ButtonText>
-          </Button>
-          <Button 
-            className="rounded-xl" 
-            size="xl" 
-            variant="outline" 
-            action="primary"
-          >
-            <ButtonText>Sign in with Apple</ButtonText>
-          </Button>
-        </VStack>
-
-        <Text className="text-center">
-        Don't have an account?{" "}
-          {/* this doesn't work on web */}
-          <Text className="font-bold" onPress={() => router.push("/sign-up")}>
-            Sign Up
-          </Text>
-        </Text>
       </VStack>
 
     </View>
