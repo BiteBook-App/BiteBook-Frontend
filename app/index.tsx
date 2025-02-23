@@ -4,16 +4,17 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { Text } from "@/components/ui/text";
-import { FormControl } from "@/components/ui/form-control";
+import { FormControl, FormControlError, FormControlErrorIcon, FormControlErrorText } from "@/components/ui/form-control";
 import { VStack } from "@/components/ui/vstack";
-import { MailIcon, LockIcon } from "@/components/ui/icon";
+import { MailIcon, LockIcon, CloseCircleIcon } from "@/components/ui/icon";
 import { Image } from "@/components/ui/image";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
 import { LinearGradient } from 'expo-linear-gradient';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { useRouter } from "expo-router";
+import { useRouter, Link } from "expo-router";
+import { Spinner } from "@/components/ui/spinner"
 import CustomInputField from "@/components/ui/custom-input-field"
 
 SplashScreen.preventAutoHideAsync();
@@ -22,6 +23,17 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [invalidLogin, setInvalidLogin] = useState(false); // Tracks invalid credentials to display error message
+  const [invalidForm, setInvalidForm] = useState(true); // Tracks invalid form requirements to disable log in button
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setInvalidForm(!(email.trim() && password.trim())); // invalidForm is false if both fields are non-empty - disable log in button
+
+    if (!email.trim() && !password.trim())
+      setInvalidLogin(false); // Reset error message when fields are cleared
+  }, [email, password]);
+
   const router = useRouter();
 
   // Load custom font
@@ -55,16 +67,20 @@ export default function Login() {
 
   const auth = getAuth();
   const handleSignIn = () => {
+    setLoading(true);
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        console.log("user succesfully authenticated");
+        router.push("/home");
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(errorMessage);
+        setInvalidLogin(!invalidLogin);
+      })
+      .finally(() => {
+        setLoading(false); // Hide spinner when call finishes
       });
   };
 
@@ -128,7 +144,7 @@ export default function Login() {
         </HStack>
 
         {/* Manual Sign In */}
-        <FormControl>
+        <FormControl isInvalid={invalidLogin}>
           <VStack space="lg">
              <CustomInputField
                 placeholder="Email"
@@ -156,9 +172,16 @@ export default function Login() {
               variant="solid" 
               action="primary"
               onPress={handleSignIn}
+              isDisabled={invalidForm}
             >
-              <ButtonText>Sign in</ButtonText>
+              {!loading && <ButtonText>Sign in</ButtonText>}
+              {loading && <Spinner/>}
             </Button>
+
+            <FormControlError className="justify-center">
+              <FormControlErrorIcon as={CloseCircleIcon}/>
+              <FormControlErrorText>Sorry, incorrect email or password. Please try again.</FormControlErrorText>
+            </FormControlError>
           </VStack>
         </FormControl>
 
@@ -194,9 +217,9 @@ export default function Login() {
         <Text className="text-center">
         Don't have an account?{" "}
           {/* this doesn't work on web */}
-          <Text className="font-bold" onPress={() => router.push("/sign-up")}>
+          <Link href="/sign-up" className="text-typography-950 font-bold">
             Sign Up
-          </Text>
+          </Link>
         </Text>
       </VStack>
 
