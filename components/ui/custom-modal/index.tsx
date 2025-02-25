@@ -31,7 +31,7 @@ export default function CustomModal({ isOpen, onClose }: CustomModalProps) {
         size="lg"
       >
         <ModalBackdrop />
-        <ModalContent>
+        <ModalContent className="rounded-xl border-0">
           <ModalHeader>
             <Heading size="lg" className="text-typography-950">
                 Email successfully delivered!
