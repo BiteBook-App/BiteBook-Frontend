@@ -192,7 +192,7 @@ export default function Login() {
         </VStack>
 
         <Text className="text-center">
-        Don't have an account?{" "}
+          Don't have an account?{" "}
           {/* this doesn't work on web */}
           <Text className="font-bold" onPress={() => router.push("/sign-up")}>
             Sign Up

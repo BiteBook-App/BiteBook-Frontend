@@ -4,23 +4,27 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { Text } from "@/components/ui/text";
-import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { FormControl } from "@/components/ui/form-control";
 import { VStack } from "@/components/ui/vstack";
-import { MailIcon, LockIcon, EyeOffIcon, EyeIcon } from "@/components/ui/icon";
+import { MailIcon, LockIcon } from "@/components/ui/icon";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
 import { LinearGradient } from 'expo-linear-gradient';
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import CustomInputField from "@/components/ui/custom-input-field"
+import { Feather } from '@expo/vector-icons';
+import { router } from "expo-router";
 
 SplashScreen.preventAutoHideAsync();
 
-export default function Login() {
-  const [email, setEmail] = useState("");
+export default function SignUp() {
+  const [firstName, setfirstName] = useState("");
+  const [lastName, setlastName] = useState("");
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   // Load custom font
@@ -54,14 +58,26 @@ export default function Login() {
 
   const auth = getAuth();
   const handleSignIn = () => {
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in
+
+    // Check if passwords match
+    // TODO: display to the user this alert
+    if (password !== confirmPassword) {
+      console.log("Passwords do not match!");
+      return;
+    }
+
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(async (userCredential) => {
         const user = userCredential.user;
-        console.log("user succesfully authenticated");
+        await updateProfile(user, {
+          displayName: username
+        });
+        console.log("account successfully created and authenticated");
+        const displayName = user.displayName;
+        console.log(displayName);
+        router.push('/home');
       })
       .catch((error) => {
-        const errorCode = error.code;
         const errorMessage = error.message;
         console.log(errorMessage);
       });
@@ -78,13 +94,13 @@ export default function Login() {
     >
       <LinearGradient
         colors={[
-          "#232d37", "#232b34", "#222832", "#22262f", "#21242c",
-          "#202229", "#1f2027", "#1e1e24", "#1d1c21", "#1b1a1e",
-          "#1a191c", "#181719"
+          "#181719", "#1b181c", "#1e181e", "#221820",
+          "#261821", "#2a1821", "#2e1820", "#32191f",
+          "#36191d", "#39191a", "#3b1a17", "#3d1c13"
         ]}
         locations={[0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7]}
-        start={{ x: 1, y: 0 }}
-        end={{ x: 0, y: 1 }}
+        start={{ x: 0, y: 1 }}
+        end={{ x: 1, y: 0 }}
         style={{
           position: 'absolute',
           left: 0,
@@ -117,12 +133,28 @@ export default function Login() {
 
         {/* Manual Sign In */}
         <FormControl>
-          <VStack space="lg">
-          <CustomInputField
+          <VStack space="md"> 
+            <HStack space="md">
+              <CustomInputField
+                placeholder="First Name"
+                value={firstName}
+                onChangeText={setfirstName}
+                icon={() => <Feather name="user" size={20} color="#8C8C8C" />}
+                style={{ flex: 1 }}
+              />
+              <CustomInputField
+                placeholder="Last Name"
+                value={lastName}
+                onChangeText={setlastName}
+                icon={() => <Feather name="user" size={20} color="#8C8C8C" />}
+                style={{ flex: 1 }}
+              />
+            </HStack>
+            <CustomInputField
               placeholder="Username"
               value={username}
               onChangeText={setUsername}
-              icon={MailIcon}
+              icon={() => <Feather name="user" size={20} color="#8C8C8C" />}
             />
             <CustomInputField
               placeholder="Email"
@@ -139,16 +171,26 @@ export default function Login() {
               showPassword={showPassword}
               togglePasswordVisibility={() => setShowPassword(!showPassword)}
             />
-            <Button 
-              className="rounded-xl" 
-              size="xl" 
-              variant="solid" 
-              action="primary"
-              onPress={handleSignIn}
-            >
-              <ButtonText>Sign in</ButtonText>
-            </Button>
+            <CustomInputField
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              icon={LockIcon}
+              isPassword
+              showPassword={showPassword}
+              togglePasswordVisibility={() => setShowPassword(!showPassword)}
+            />
           </VStack>
+
+          <Button 
+            className="rounded-xl mt-10"
+            size="xl" 
+            variant="solid" 
+            action="primary"
+            onPress={handleSignIn}
+          >
+            <ButtonText>Sign up</ButtonText>
+          </Button>
         </FormControl>
       </VStack>
 
