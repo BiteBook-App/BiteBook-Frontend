@@ -30,7 +30,7 @@ export default function Login() {
   useEffect(() => {
     setInvalidForm(!(email.trim() && password.trim())); // invalidForm is false if both fields are non-empty - disable log in button
 
-    if (!email.trim() && !password.trim())
+    if (!email.trim() || !password.trim())
       setInvalidLogin(false); // Reset error message when fields are cleared
   }, [email, password]);
 
