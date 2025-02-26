@@ -163,7 +163,9 @@ export default function Login() {
                 showPassword={showPassword}
                 togglePasswordVisibility={() => setShowPassword(!showPassword)}
               />
-              <Link href="/forgot-password" className="text-right text-typography-800">Forgot password?</Link>
+              <Link href={"/forgot-password" as any} className="text-right text-typography-800">
+                Forgot password?
+              </Link>
             </VStack>
 
             <Button 
