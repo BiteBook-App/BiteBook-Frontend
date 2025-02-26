@@ -134,22 +134,6 @@ export default function SignUp() {
         {/* Manual Sign In */}
         <FormControl>
           <VStack space="md"> 
-            <HStack space="md">
-              <CustomInputField
-                placeholder="First Name"
-                value={firstName}
-                onChangeText={setfirstName}
-                icon={() => <Feather name="user" size={20} color="#8C8C8C" />}
-                style={{ flex: 1 }}
-              />
-              <CustomInputField
-                placeholder="Last Name"
-                value={lastName}
-                onChangeText={setlastName}
-                icon={() => <Feather name="user" size={20} color="#8C8C8C" />}
-                style={{ flex: 1 }}
-              />
-            </HStack>
             <CustomInputField
               placeholder="Username"
               value={username}
