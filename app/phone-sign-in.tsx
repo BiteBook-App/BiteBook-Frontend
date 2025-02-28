@@ -10,14 +10,19 @@ const PhoneSignIn = () => {
     // verification code (OTP - One-Time-Passcode)
     const [code, setCode] = useState('');
 
+    const [initializing, setInitializing] = useState(true);
+    const [user, setUser] = useState();
+
     // Handle login
     function onAuthStateChanged(user) {
-        if (user) {
-            // Some Android devices can automatically process the verification code (OTP) message, and the user would NOT need to enter the code.
-            // Actually, if he/she tries to enter it, he/she will get an error message because the code was already used in the background.
-            // In this function, make sure you hide the component(s) for entering the code and/or navigate away from this screen.
-            // It is also recommended to display a message to the user informing him/her that he/she has successfully logged in.
-        }
+        // if (user) {
+        //     // Some Android devices can automatically process the verification code (OTP) message, and the user would NOT need to enter the code.
+        //     // Actually, if he/she tries to enter it, he/she will get an error message because the code was already used in the background.
+        //     // In this function, make sure you hide the component(s) for entering the code and/or navigate away from this screen.
+        //     // It is also recommended to display a message to the user informing him/her that he/she has successfully logged in.
+        // }
+        setUser(user);
+        if (initializing) setInitializing(false);
     }
 
     useEffect(() => {
@@ -39,20 +44,31 @@ const PhoneSignIn = () => {
         }
     }
 
-    if (!confirm) {
+    if(!user) {
+        if (!confirm) {
+            return (
+                <SafeAreaView>
+                    <Button title="Phone Sign In" onPress={() => signInWithPhoneNumber('+1 321-315-1583')} />
+                </SafeAreaView>
+            );
+        }
+
         return (
             <SafeAreaView>
-                <Button title="Phone Sign In" onPress={() => signInWithPhoneNumber('+1 650-555-3434')} />
+                <TextInput value={code} onChangeText={text => setCode(text)} />
+                <Button title="Confirm Code" onPress={() => confirmCode()} />
             </SafeAreaView>
         );
     }
 
     return (
-        <>
-            <TextInput value={code} onChangeText={text => setCode(text)} />
-            <Button title="Confirm Code" onPress={() => confirmCode()} />
-        </>
-    );
+        <View>
+            <Text>Welcome {user.email}</Text>
+            <TouchableOpacity onPress={() => auth().signOut()}>
+                <Text>Sign Out</Text>
+            </TouchableOpacity>
+        </View>
+    )
 }
 
 export default PhoneSignIn
