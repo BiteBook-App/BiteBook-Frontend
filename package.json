@@ -30,6 +30,7 @@
     "@gluestack-ui/spinner": "^0.1.15",
     "@gluestack-ui/toast": "^1.0.8",
     "@legendapp/motion": "^2.4.0",
+    "@react-native-async-storage/async-storage": "^2.1.1",
     "@react-native-firebase/app": "^21.11.0",
     "@react-native-firebase/auth": "^21.11.0",
     "@react-navigation/bottom-tabs": "^7.2.0",
