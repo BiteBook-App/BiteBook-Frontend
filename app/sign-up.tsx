@@ -4,9 +4,8 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { Text } from "@/components/ui/text";
-import { FormControl } from "@/components/ui/form-control";
 import { VStack } from "@/components/ui/vstack";
-import { MailIcon, LockIcon } from "@/components/ui/icon";
+import { MailIcon, LockIcon, CloseCircleIcon } from "@/components/ui/icon";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -15,17 +14,47 @@ import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase
 import CustomInputField from "@/components/ui/custom-input-field"
 import { Feather } from '@expo/vector-icons';
 import { router } from "expo-router";
+import { Spinner } from "@/components/ui/spinner"
+import { FormControl, FormControlError, FormControlErrorIcon, FormControlErrorText } from "@/components/ui/form-control";
+// @ts-ignore
+import PasswordStrengthMeterBar from 'react-native-password-strength-meter-bar';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function SignUp() {
-  const [firstName, setfirstName] = useState("");
-  const [lastName, setlastName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [invalidForm, setInvalidForm] = useState(true);
+  const [invalidPassword, setInvalidPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [existingAccountError, setExistingAccountError] = useState(false);
+  const [passwordTooShort, setPasswordTooShort] = useState(false);
+
+  useEffect(() => {
+    const isMismatch = password !== "" && confirmPassword !== "" && password !== confirmPassword;
+    setInvalidPassword(isMismatch);
+  
+    const isTooShort = password.length > 0 && password.length < 6;
+    setPasswordTooShort(isTooShort);
+  
+    const isFormValid =
+      username.trim() !== "" &&
+      email.trim() !== "" &&
+      password.trim() !== "" &&
+      confirmPassword.trim() !== "" &&
+      !isMismatch &&
+      !isTooShort;
+  
+    setInvalidForm(!isFormValid);
+  }, [username, email, password, confirmPassword]);
+
+  // Remove the "Email Already Exists" error if they edit the form again
+  useEffect(() => {
+    setExistingAccountError(false);
+  }, [username, email, password, confirmPassword]);
 
   // Load custom font
   const [loaded, error] = useFonts({
@@ -55,16 +84,11 @@ export default function SignUp() {
   };
 
   const app = initializeApp(firebaseConfig);
-
   const auth = getAuth();
-  const handleSignIn = () => {
 
-    // Check if passwords match
-    // TODO: display to the user this alert
-    if (password !== confirmPassword) {
-      console.log("Passwords do not match!");
-      return;
-    }
+  const handleSignIn = () => {
+    setLoading(true);
+    setExistingAccountError(false);
 
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
@@ -72,14 +96,17 @@ export default function SignUp() {
         await updateProfile(user, {
           displayName: username
         });
-        console.log("account successfully created and authenticated");
-        const displayName = user.displayName;
-        console.log(displayName);
+        console.log("Account successfully created and authenticated");
         router.push('/home');
       })
       .catch((error) => {
-        const errorMessage = error.message;
-        console.log(errorMessage);
+        if (error.code === "auth/email-already-in-use") {
+          setExistingAccountError(true);
+        } 
+        console.log(error.message);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -89,7 +116,7 @@ export default function SignUp() {
       style={{
         flex: 1,
         justifyContent: "center",
-        width: "100%", 
+        width: "100%",
       }}
     >
       <LinearGradient
@@ -106,34 +133,24 @@ export default function SignUp() {
           left: 0,
           right: 0,
           top: 0,
-          bottom: 0, // Ensures full height
-          justifyContent: 'center', // Centers content vertically
-          alignItems: 'center', // Centers content horizontally
+          bottom: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       />
       <VStack space="3xl">
         {/* Heading */}
-        <HStack 
-          className="justify-start"
-          space="lg" 
-          reversed={false} 
-        >
-          <VStack 
-            className="mt-8 lg:mt-3" 
-            space="xs"
-          >
-            <Text 
-                className="font-[Rashfield] leading-[69px] lg:leading-[55px]"
-                size="5xl"
-            >
+        <HStack className="justify-start" space="lg" reversed={false}>
+          <VStack className="mt-8 lg:mt-3" space="xs">
+            <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px]" size="5xl">
               Sign Up
             </Text>
           </VStack>
         </HStack>
 
         {/* Manual Sign In */}
-        <FormControl>
-          <VStack space="md"> 
+        <FormControl isInvalid={invalidPassword || passwordTooShort || existingAccountError}>
+          <VStack space="md">
             <CustomInputField
               placeholder="Username"
               value={username}
@@ -149,12 +166,29 @@ export default function SignUp() {
             <CustomInputField
               placeholder="Password"
               value={password}
-              onChangeText={setPassword}
+              onChangeText={(text) => setPassword(text)}
               icon={LockIcon}
               isPassword
               showPassword={showPassword}
               togglePasswordVisibility={() => setShowPassword(!showPassword)}
             />
+            {passwordTooShort && (
+              <FormControlError className="justify-center">
+                <FormControlErrorIcon as={CloseCircleIcon} />
+                <FormControlErrorText>
+                  Password must be at least 6 characters.
+                </FormControlErrorText>
+              </FormControlError>
+            )}
+           {password.length > 0 && (
+              <PasswordStrengthMeterBar
+                password={password}
+                showStrengthText={true}
+                minLength={6}
+                radius={8}
+                unfilledColor="rgba(20, 20, 20, 0.7)"
+              />
+            )}
             <CustomInputField
               placeholder="Confirm Password"
               value={confirmPassword}
@@ -166,18 +200,39 @@ export default function SignUp() {
             />
           </VStack>
 
-          <Button 
+          <Button
             className="rounded-xl mt-10"
-            size="xl" 
-            variant="solid" 
+            size="xl"
+            variant="solid"
             action="primary"
             onPress={handleSignIn}
+            isDisabled={invalidForm}
           >
-            <ButtonText>Sign up</ButtonText>
+            {!loading && <ButtonText>Sign in</ButtonText>}
+            {loading && <Spinner/>}
           </Button>
+
+          {/* Password mismatch error */}
+          {invalidPassword && (
+            <FormControlError className="justify-center">
+              <FormControlErrorIcon as={CloseCircleIcon} />
+              <FormControlErrorText>
+                Passwords do not match.
+              </FormControlErrorText>
+            </FormControlError>
+          )}
+
+          {/* Email already exists error */}
+          {existingAccountError && (
+            <FormControlError className="justify-center">
+              <FormControlErrorIcon as={CloseCircleIcon} />
+              <FormControlErrorText>
+                This email is already in use. Try signing in instead.
+              </FormControlErrorText>
+            </FormControlError>
+          )}
         </FormControl>
       </VStack>
-
     </View>
   );
 }
