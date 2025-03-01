@@ -208,7 +208,7 @@ export default function SignUp() {
             onPress={handleSignIn}
             isDisabled={invalidForm}
           >
-            {!loading && <ButtonText>Sign in</ButtonText>}
+            {!loading && <ButtonText>Sign up</ButtonText>}
             {loading && <Spinner/>}
           </Button>
 
