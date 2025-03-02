@@ -11,11 +11,11 @@ import { Image } from "@/components/ui/image";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
 import { LinearGradient } from 'expo-linear-gradient';
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter, Link } from "expo-router";
-import { Spinner } from "@/components/ui/spinner"
-import CustomInputField from "@/components/ui/custom-input-field"
+import { Spinner } from "@/components/ui/spinner";
+import CustomInputField from "@/components/ui/custom-input-field";
+import { FIREBASE_AUTH } from "../configs/firebaseConfig.js"
 
 SplashScreen.preventAutoHideAsync();
 
@@ -51,21 +51,24 @@ export default function Login() {
     return null;
   }
 
-  // Firebase config - TO DO: Move somewhere else?
-  const firebaseConfig = {
-    apiKey: process.env.EXPO_PUBLIC_API_KEY,
-    authDomain: process.env.EXPO_PUBLIC_AUTH_DOMAIN,
-    databaseURL: process.env.EXPO_PUBLIC_DATABASE_URL,
-    projectId: process.env.EXPO_PUBLIC_PROJECT_ID,
-    storageBucket: process.env.EXPO_PUBLIC_STORAGE_BUCKET,
-    messagingSenderId: process.env.EXPO_PUBLIC_MESSAGING_SENDER_ID,
-    appId: process.env.EXPO_PUBLIC_APP_ID,
-    measurementId: process.env.EXPO_PUBLIC_MEASUREMENT_ID
-  };
+  // // Firebase config - TO DO: Move somewhere else?
+  // const firebaseConfig = {
+  //   apiKey: process.env.EXPO_PUBLIC_API_KEY,
+  //   authDomain: process.env.EXPO_PUBLIC_AUTH_DOMAIN,
+  //   databaseURL: process.env.EXPO_PUBLIC_DATABASE_URL,
+  //   projectId: process.env.EXPO_PUBLIC_PROJECT_ID,
+  //   storageBucket: process.env.EXPO_PUBLIC_STORAGE_BUCKET,
+  //   messagingSenderId: process.env.EXPO_PUBLIC_MESSAGING_SENDER_ID,
+  //   appId: process.env.EXPO_PUBLIC_APP_ID,
+  //   measurementId: process.env.EXPO_PUBLIC_MEASUREMENT_ID
+  // };
 
-  const app = initializeApp(firebaseConfig);
+  // const app = initializeApp(firebaseConfig);
 
-  const auth = getAuth();
+  // const auth = getAuth();
+
+  const auth = FIREBASE_AUTH;
+
   const handleSignIn = () => {
     setLoading(true);
     signInWithEmailAndPassword(auth, email, password)
