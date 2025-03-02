@@ -1,6 +1,7 @@
-import { View } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { Link } from 'expo-router';
 import { Text } from "@/components/ui/text";
+import auth from '@react-native-firebase/auth';
 
 export default function Home() {
   return (
@@ -16,6 +17,9 @@ export default function Home() {
       <Link href="/recipe" className="text-typography-800">
         Go to a recipe
       </Link>
+        <TouchableOpacity onPress={() => auth().signOut()}>
+            <Text>Sign Out</Text>
+        </TouchableOpacity>
     </View>
   );
 }
