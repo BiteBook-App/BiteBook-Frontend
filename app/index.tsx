@@ -6,17 +6,17 @@ import { useEffect, useState } from 'react';
 import { Text } from "@/components/ui/text";
 import { FormControl, FormControlError, FormControlErrorIcon, FormControlErrorText } from "@/components/ui/form-control";
 import { VStack } from "@/components/ui/vstack";
-import {MailIcon, LockIcon, CloseCircleIcon, PhoneIcon, createIcon} from "@/components/ui/icon";
+import { MailIcon, LockIcon, CloseCircleIcon, PhoneIcon, createIcon } from "@/components/ui/icon";
 import { Image } from "@/components/ui/image";
 import { HStack } from "@/components/ui/hstack";
-import {Button, ButtonIcon, ButtonText} from "@/components/ui/button";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { LinearGradient } from 'expo-linear-gradient';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter, Link } from "expo-router";
-import { Spinner } from "@/components/ui/spinner"
-import CustomInputField from "@/components/ui/custom-input-field"
-import { app, auth } from "@/config/firebase"
-import {Path} from "react-native-svg";
+import { Spinner } from "@/components/ui/spinner";
+import CustomInputField from "@/components/ui/custom-input-field";
+import { FIREBASE_AUTH } from "../configs/firebaseConfig.js"
+import { Path } from "react-native-svg";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -52,6 +52,8 @@ export default function Login() {
     return null;
   }
 
+  const auth = FIREBASE_AUTH;
+
   const handleSignIn = () => {
     setLoading(true);
     signInWithEmailAndPassword(auth, email, password)
@@ -71,13 +73,8 @@ export default function Login() {
   };
 
   const handlePhoneSignIn = async (phoneNumber) => {
-    console.log("GOT INTO PHONE SIGNIN")
-    // const confirmation = await auth().signInWithPhoneNumber("+1 321-315-1583")
-    // console.log(confirmation)
     router.push("/phone-sign-in")
   }
-
-  console.log("HIHI")
 
   const GoogleIcon = createIcon({
     viewBox: "0,0,256,256",
@@ -170,7 +167,9 @@ export default function Login() {
                 showPassword={showPassword}
                 togglePasswordVisibility={() => setShowPassword(!showPassword)}
               />
-              <Link href="/forgot-password" className="text-right text-typography-800">Forgot password?</Link>
+              <Link href={"/forgot-password" as any} className="text-right text-typography-800">
+                Forgot password?
+              </Link>
             </VStack>
 
             <Button 

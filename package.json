@@ -62,6 +62,7 @@
     "react-native-get-random-values": "^1.11.0",
     "react-native-otp-entry": "^1.8.2",
     "react-native-phone-number-input": "^2.1.0",
+    "react-native-password-strength-meter-bar": "^1.2.0",
     "react-native-radial-gradient": "^1.1.5",
     "react-native-reanimated": "~3.16.1",
     "react-native-safe-area-context": "^5.2.0",

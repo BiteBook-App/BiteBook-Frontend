@@ -1,5 +1,6 @@
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { EyeOffIcon, EyeIcon } from "@/components/ui/icon";
+import { ViewStyle } from "react-native";
 
 interface CustomInputFieldProps {
   placeholder: string;
@@ -9,6 +10,7 @@ interface CustomInputFieldProps {
   isPassword?: boolean;
   showPassword?: boolean;
   togglePasswordVisibility?: () => void;
+  style?: ViewStyle;
 }
 
 export default function CustomInputField({
@@ -19,10 +21,14 @@ export default function CustomInputField({
   isPassword = false,
   showPassword,
   togglePasswordVisibility,
+  style,
 }: CustomInputFieldProps) {
   return (
-    <Input className="bg-background-0 rounded-xl border-0 opacity-70" size="xl">
-
+    <Input
+      className="bg-background-0 rounded-xl border-0 opacity-70"
+      size="xl"
+      style={style}
+    >
       <InputSlot className="pl-4">
         <InputIcon as={IconComponent} />
       </InputSlot>
