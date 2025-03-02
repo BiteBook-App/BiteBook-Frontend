@@ -16,6 +16,7 @@ import { Feather } from '@expo/vector-icons';
 import { router } from "expo-router";
 import { Spinner } from "@/components/ui/spinner"
 import { FormControl, FormControlError, FormControlErrorIcon, FormControlErrorText } from "@/components/ui/form-control";
+import { doc, setDoc, getDocs, collection, query, where, getFirestore, serverTimestamp } from "firebase/firestore";
 // @ts-ignore
 import PasswordStrengthMeterBar from 'react-native-password-strength-meter-bar';
 
@@ -31,6 +32,8 @@ export default function SignUp() {
   const [invalidPassword, setInvalidPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [existingAccountError, setExistingAccountError] = useState(false);
+  const [duplicateUsernameError, setDuplicateUsernameError] = useState(false);
+  const [notEmailError, setNotEmailError] = useState(false);
   const [passwordTooShort, setPasswordTooShort] = useState(false);
 
   useEffect(() => {
@@ -54,6 +57,8 @@ export default function SignUp() {
   // Remove the "Email Already Exists" error if they edit the form again
   useEffect(() => {
     setExistingAccountError(false);
+    setNotEmailError(false);
+    setDuplicateUsernameError(false);
   }, [username, email, password, confirmPassword]);
 
   // Load custom font
@@ -84,30 +89,50 @@ export default function SignUp() {
   };
 
   const app = initializeApp(firebaseConfig);
+  const db = getFirestore();
   const auth = getAuth();
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     setLoading(true);
     setExistingAccountError(false);
-
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(async (userCredential) => {
-        const user = userCredential.user;
-        await updateProfile(user, {
-          displayName: username
-        });
-        console.log("Account successfully created and authenticated");
-        router.push('/home');
-      })
-      .catch((error) => {
-        if (error.code === "auth/email-already-in-use") {
-          setExistingAccountError(true);
-        } 
-        console.log(error.message);
-      })
-      .finally(() => {
+  
+    try {
+      // Step 1: Check Firestore for existing username
+      const usernameQuery = query(collection(db, "users"), where("displayName", "==", username));
+      const querySnapshot = await getDocs(usernameQuery);
+  
+      if (!querySnapshot.empty) {
+        console.log("Username already exists. Choose a different one.");
+        setDuplicateUsernameError(true);
         setLoading(false);
+        return;
+      }
+  
+      // Step 2: Create user in Firebase Auth
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
+  
+      // Step 3: Store user profile data in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        displayName: username,
+        profilePicture: "",
+        createdAt: serverTimestamp(),
       });
+  
+      console.log("Account successfully created and authenticated");
+      router.push('/home');
+  
+    } catch (error: any) {
+      if (error.code === "auth/email-already-in-use") {
+        setExistingAccountError(true);
+      } 
+      if (error.code === "auth/invalid-email") {
+        setNotEmailError(true);
+      }
+      console.log(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -149,7 +174,7 @@ export default function SignUp() {
         </HStack>
 
         {/* Manual Sign In */}
-        <FormControl isInvalid={invalidPassword || passwordTooShort || existingAccountError}>
+        <FormControl isInvalid={invalidPassword || passwordTooShort || existingAccountError || notEmailError || duplicateUsernameError}>
           <VStack space="md">
             <CustomInputField
               placeholder="Username"
@@ -214,7 +239,7 @@ export default function SignUp() {
 
           {/* Password mismatch error */}
           {invalidPassword && (
-            <FormControlError className="justify-center">
+            <FormControlError className="justify-center pt-4">
               <FormControlErrorIcon as={CloseCircleIcon} />
               <FormControlErrorText>
                 Passwords do not match.
@@ -224,10 +249,30 @@ export default function SignUp() {
 
           {/* Email already exists error */}
           {existingAccountError && (
-            <FormControlError className="justify-center">
+            <FormControlError className="justify-center pt-4">
               <FormControlErrorIcon as={CloseCircleIcon} />
               <FormControlErrorText>
                 This email is already in use. Try signing in instead.
+              </FormControlErrorText>
+            </FormControlError>
+          )}
+
+          {/* Email is not valid error */}
+          {notEmailError && (
+            <FormControlError className="justify-center pt-4">
+              <FormControlErrorIcon as={CloseCircleIcon} />
+              <FormControlErrorText>
+                Invalid email.
+              </FormControlErrorText>
+            </FormControlError>
+          )}
+
+          {/* Username already taken error */}
+          {duplicateUsernameError && (
+            <FormControlError className="justify-center pt-4">
+              <FormControlErrorIcon as={CloseCircleIcon} />
+              <FormControlErrorText>
+                Username has already been taken.
               </FormControlErrorText>
             </FormControlError>
           )}
