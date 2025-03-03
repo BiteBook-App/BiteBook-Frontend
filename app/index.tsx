@@ -22,6 +22,7 @@ import {
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
+import { useAuth } from '@/configs/authProvider';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -33,16 +34,9 @@ export default function Login() {
   const [invalidForm, setInvalidForm] = useState(true); // Tracks invalid form requirements to disable log in button
   const [loading, setLoading] = useState(false);
 
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
+  const { user, login, register, signInWithGoogle } = useAuth();
 
   const router = useRouter();
-
-  // Handle user state changes
-  function onAuthStateChanged(user) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
 
   useEffect(() => {
     setInvalidForm(!(email.trim() && password.trim())); // invalidForm is false if both fields are non-empty - disable log in button
@@ -50,11 +44,6 @@ export default function Login() {
     if (!email.trim() || !password.trim())
       setInvalidLogin(false); // Reset error message when fields are cleared
   }, [email, password]);
-
-  useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber; // unsubscribe on unmount
-  }, []);
 
   // Load custom font
   const [loaded, error] = useFonts({
@@ -71,13 +60,7 @@ export default function Login() {
     return null;
   }
 
-  if (initializing) return null;
-
   const firebaseAuth = FIREBASE_AUTH;
-
-  GoogleSignin.configure({
-    webClientId: '41319305564-lkglp2v2m1n55avq36hl5ffm43ptgm5n.apps.googleusercontent.com',
-  });
 
   const handleSignIn = () => {
     setLoading(true);
@@ -101,34 +84,6 @@ export default function Login() {
     router.push("/phone-sign-in")
   }
 
-  const signInWithGoogle = async () => {
-    try {
-      await GoogleSignin.hasPlayServices();
-      const response = await GoogleSignin.signIn();
-
-      const googleCredential = auth.GoogleAuthProvider.credential(response.data?.idToken);
-
-      return auth().signInWithCredential(googleCredential)
-    } catch (error) {
-      if (isErrorWithCode(error)) {
-        switch (error.code) {
-          case statusCodes.IN_PROGRESS:
-            // operation (eg. sign in) already in progress
-            break;
-          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-            // Android only, play services not available or outdated
-            break;
-          default:
-            // some other error happened
-            console.log(error.code)
-        }
-      } else {
-        // an error that's not related to google sign in occurred
-        console.log("ERROR: NOT WITH GOOGLE")
-      }
-    }
-  };
-
   const GoogleIcon = createIcon({
     viewBox: "0,0,256,256",
     path: ( <>
@@ -142,7 +97,7 @@ export default function Login() {
   })
 
   if (user) {
-    router.push("/home")
+    router.navigate("/home")
   }
 
   return (
