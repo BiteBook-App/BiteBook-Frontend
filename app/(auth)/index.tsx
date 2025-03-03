@@ -15,7 +15,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter, Link } from "expo-router";
 import { Spinner } from "@/components/ui/spinner";
 import CustomInputField from "@/components/ui/custom-input-field";
-import { FIREBASE_AUTH } from "../configs/firebaseConfig.js"
+import { FIREBASE_AUTH } from "../../configs/firebaseConfig.js"
 
 SplashScreen.preventAutoHideAsync();
 
@@ -75,7 +75,7 @@ export default function Login() {
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        router.replace("/home");
+        router.replace("/(tabs)");
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -124,7 +124,7 @@ export default function Login() {
         >
           <Image
             size="lg"
-            source={require('../assets/images/App_Icon.png')}
+            source={require('assets/images/App_Icon.png')}
             alt="bitebook logo"
             className="rounded-xl"
           />

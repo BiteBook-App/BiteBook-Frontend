@@ -18,8 +18,8 @@ import { FormControl, FormControlError, FormControlErrorIcon, FormControlErrorTe
 import { doc, setDoc, getDocs, collection, query, where, serverTimestamp } from "firebase/firestore";
 // @ts-ignore
 import PasswordStrengthMeterBar from 'react-native-password-strength-meter-bar';
-import { FIREBASE_AUTH } from "../configs/firebaseConfig.js"
-import { FIREBASE_DB } from "../configs/firebaseConfig.js"
+import { FIREBASE_AUTH } from "../../configs/firebaseConfig.js"
+import { FIREBASE_DB } from "../../configs/firebaseConfig.js"
 
 SplashScreen.preventAutoHideAsync();
 
@@ -108,7 +108,7 @@ export default function SignUp() {
       });
   
       console.log("Account successfully created and authenticated");
-      router.replace('/home');
+      router.replace('/(tabs)');
   
     } catch (error: any) {
       if (error.code === "auth/email-already-in-use") {
