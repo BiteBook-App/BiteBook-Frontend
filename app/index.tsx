@@ -17,11 +17,6 @@ import { Spinner } from "@/components/ui/spinner";
 import CustomInputField from "@/components/ui/custom-input-field";
 import { FIREBASE_AUTH } from "@/configs/firebaseConfig"
 import { Path } from "react-native-svg";
-import {
-  GoogleSignin, isErrorWithCode, isSuccessResponse,
-  statusCodes,
-} from '@react-native-google-signin/google-signin';
-import auth from '@react-native-firebase/auth';
 import { useAuth } from '@/configs/authProvider';
 
 SplashScreen.preventAutoHideAsync();
