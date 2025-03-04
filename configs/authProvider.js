@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from "@react-native-google-signin/google-signin";
+import {collection, doc, getDocs, query, serverTimestamp, setDoc, where} from "firebase/firestore";
+import {FIREBASE_DB} from "@/configs/firebaseConfig";
 
 const AuthContext = createContext();
 
@@ -14,6 +16,8 @@ export const AuthProvider = ({ children }) => {
 
     // For Phone Number Method
     const [confirm, setConfirm] = useState(null);
+
+    const db = FIREBASE_DB;
 
     useEffect(() => {
         const unsubscribe = auth().onAuthStateChanged(user => {
@@ -78,6 +82,20 @@ export const AuthProvider = ({ children }) => {
                 console.error("Logout error:", error);
             }
         },
+        checkUserExistance: async () => {
+            const usernameQuery = query(collection(db, "users"), where("uid", "==", user.uid));
+            const querySnapshot = await getDocs(usernameQuery);
+
+            return !querySnapshot.empty;
+        },
+        createUserDB: async (username) => {
+            await setDoc(doc(db, "users", user.uid), {
+                uid: user.uid,
+                displayName: username,
+                profilePicture: "",
+                createdAt: serverTimestamp(),
+            });
+        }
     };
     return (
         <AuthContext.Provider value={value}>
