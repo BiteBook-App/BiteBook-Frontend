@@ -7,9 +7,7 @@ export default function AuthLayout() {
   return (
     <GluestackUIProvider mode="dark">
       <Stack screenOptions={{ headerShown: false }}>
-        {/* <Stack.Screen name="index" />
-        <Stack.Screen name="sign-up" />
-        <Stack.Screen name="forgot-password" /> */}
+        <Stack.Screen name="index" />
       </Stack>
     </GluestackUIProvider>
 
