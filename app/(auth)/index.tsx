@@ -11,11 +11,9 @@ import { Image } from "@/components/ui/image";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { LinearGradient } from 'expo-linear-gradient';
-import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter, Link } from "expo-router";
 import { Spinner } from "@/components/ui/spinner";
 import CustomInputField from "@/components/ui/custom-input-field";
-import { FIREBASE_AUTH } from "@/configs/firebaseConfig"
 import { Path } from "react-native-svg";
 import { useAuth } from '@/configs/authProvider';
 
@@ -29,7 +27,7 @@ export default function Login() {
   const [invalidForm, setInvalidForm] = useState(true); // Tracks invalid form requirements to disable log in button
   const [loading, setLoading] = useState(false);
 
-  const { user, login, register, signInWithGoogle } = useAuth();
+  const { user, login, signInWithGoogle } = useAuth();
 
   const router = useRouter();
 
@@ -55,19 +53,19 @@ export default function Login() {
     return null;
   }
 
-  const firebaseAuth = FIREBASE_AUTH;
-
   const handleSignIn = () => {
     setLoading(true);
-    signInWithEmailAndPassword(firebaseAuth, email, password)
-      .then((userCredential) => {
+    login(email, password)
+      .then(() => {
         // Signed in
-        const user = userCredential.user;
         router.replace("/(app)/(tabs)");
       })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
+      .catch((error: unknown) => {
+        if (error instanceof Error) {
+          console.log(error.message);
+        } else {
+          console.log("An unknown error occurred");
+        }
         setInvalidLogin(!invalidLogin);
       })
       .finally(() => {
@@ -75,7 +73,7 @@ export default function Login() {
       });
   };
 
-  const handlePhoneSignIn = async (phoneNumber) => {
+  const handlePhoneSignIn = async () => {
     router.push("/phone-sign-in")
   }
 
@@ -90,10 +88,6 @@ export default function Login() {
       />
     </>)
   })
-
-  if (user) {
-    router.navigate("/home")
-  }
 
   return (
     <View
