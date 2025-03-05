@@ -17,7 +17,7 @@ import { FormControl, FormControlError, FormControlErrorIcon, FormControlErrorTe
 import { getDocs, collection, query, where } from "firebase/firestore";
 // @ts-ignore
 import PasswordStrengthMeterBar from 'react-native-password-strength-meter-bar';
-import { FIREBASE_DB } from "../configs/firebaseConfig.js"
+import { FIREBASE_DB } from "../../configs/firebaseConfig.js"
 import {useAuth} from "@/configs/authProvider";
 
 SplashScreen.preventAutoHideAsync();
@@ -77,9 +77,13 @@ export default function PhoneSignUp() {
       await createUserDB(username)
 
       console.log("Account successfully created and authenticated");
-      router.navigate('/home');
-    } catch (error) {
-      console.log(error.message);
+      router.push('/(app)/(tabs)');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error.message);
+      } else {
+        console.log("An unknown error occurred");
+      }
     } finally {
       setLoading(false);
     }

@@ -26,11 +26,11 @@ const PhoneSignIn = () => {
     });
 
     useEffect(() => {
-        checkUserExistance().then((userExists) => {
+        checkUserExistance().then((userExists: boolean) => {
             if (userExists) {
-                router.navigate("/home");
+                router.replace("/(app)/(tabs)");
             } else {
-                router.navigate("/phone-sign-up")
+                router.push("/phone-sign-up")
             }
         })
     }, [user]);
