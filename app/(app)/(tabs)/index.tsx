@@ -1,9 +1,12 @@
-import { View } from "react-native";
-import { Link } from 'expo-router';
+import { View, TouchableOpacity } from "react-native";
+import {Link, useRouter} from 'expo-router';
 import { Text } from "@/components/ui/text";
+import {useAuth} from "@/configs/authProvider";
 
 export default function Home() {
-  console.log("THIS IS SO ANNOYING.")
+    const { signOut } = useAuth();
+    const router = useRouter();
+
   return (
     <View
       className="bg-background-dark px-5 lg:px-40"
@@ -14,6 +17,12 @@ export default function Home() {
       }}
     >
       <Text>This is the home page</Text>
+        <TouchableOpacity onPress={async () => {
+            await signOut()
+            router.navigate("/")
+        }}>
+            <Text>Sign Out</Text>
+        </TouchableOpacity>
     </View>
   );
 }
