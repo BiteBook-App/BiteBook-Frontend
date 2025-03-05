@@ -75,7 +75,7 @@ export default function Login() {
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        router.replace("/(tabs)");
+        router.replace("/(app)/(tabs)");
       })
       .catch((error) => {
         const errorCode = error.code;

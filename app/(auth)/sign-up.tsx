@@ -108,7 +108,7 @@ export default function SignUp() {
       });
   
       console.log("Account successfully created and authenticated");
-      router.replace('/(tabs)');
+      router.replace('/(app)/(tabs)');
   
     } catch (error: any) {
       if (error.code === "auth/email-already-in-use") {

@@ -17,7 +17,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: "BiteBook",
           tabBarIcon: ({ color, size }) => (
             <Foundation name="home" size={size} color={color}/>
           ),
