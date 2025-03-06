@@ -5,7 +5,7 @@ import { Pressable } from "@/components/ui/pressable"
 import { useAuth } from "@/configs/authProvider";
 
 export default function Profile() {
-  const { user, signOut, getUserProfile } = useAuth();
+  const { user, signOut, getUserProfile, deleteUser } = useAuth();
   const [profile, setProfile] = useState({ displayName: "", profilePicture: "" });
 
   useEffect(() => {
@@ -30,6 +30,9 @@ export default function Profile() {
       <Text>{ `Username: ${ profile.displayName }` }</Text>
       <Pressable onPress={async () => await signOut()}>
         <Text>Sign Out</Text>
+      </Pressable>
+      <Pressable onPress={async () => await deleteUser()}>
+        <Text>Delete Account</Text>
       </Pressable>
     </View>
   );

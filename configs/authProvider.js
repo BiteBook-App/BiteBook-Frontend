@@ -1,8 +1,9 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from "@react-native-google-signin/google-signin";
-import {collection, doc, getDocs, query, serverTimestamp, setDoc, where} from "firebase/firestore";
+import {collection, doc, getDocs, query, serverTimestamp, setDoc, where, deleteDoc} from "firebase/firestore";
 import {FIREBASE_DB} from "@/configs/firebaseConfig";
+import { deleteUser } from '@firebase/auth';
 
 const AuthContext = createContext();
 
@@ -117,6 +118,22 @@ export const AuthProvider = ({ children }) => {
               return null; // Return null in case of an error
             }     
         },
+        deleteUser: async () => {
+            try {
+                // Delete user with associated uid from all collections
+                const userCollections = ["users"];
+                for (const col of userCollections) {
+                    await deleteDoc(doc(db, col, user.uid));
+                }
+
+                // Delete user from Firebase Authentication
+                await deleteUser(user);
+
+                setUser(null);
+            } catch (error) {
+                console.error("Error deleting user:", error);
+            }
+        }
     };
     return (
         <AuthContext.Provider value={value}>
