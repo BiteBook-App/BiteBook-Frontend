@@ -17,11 +17,6 @@ export default function Home() {
       }}
     >
       <Text>This is the home page</Text>
-        <TouchableOpacity onPress={async () => {
-            await signOut()
-        }}>
-            <Text>Sign Out</Text>
-        </TouchableOpacity>
     </View>
   );
 }
