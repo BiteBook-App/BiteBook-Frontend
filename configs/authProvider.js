@@ -95,7 +95,28 @@ export const AuthProvider = ({ children }) => {
                 profilePicture: "",
                 createdAt: serverTimestamp(),
             });
-        }
+        },
+        getUserProfile: async () => {
+            const q = query(collection(db, "users"), where("uid", "==", user.uid));
+            try {
+              const querySnapshot = await getDocs(q);
+          
+              if (querySnapshot.empty) {
+                console.log("No user found.");
+                return null; // Return null if no user is found
+              }
+          
+              const userData = querySnapshot.docs[0].data();
+              return {
+                displayName: userData.displayName,
+                profilePicture: userData.profilePicture,
+              };
+          
+            } catch (error) {
+              console.error("Error fetching user data:", error);
+              return null; // Return null in case of an error
+            }     
+        },
     };
     return (
         <AuthContext.Provider value={value}>
