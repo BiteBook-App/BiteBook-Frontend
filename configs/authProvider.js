@@ -47,7 +47,17 @@ export const AuthProvider = ({ children }) => {
 
                 const googleCredential = auth.GoogleAuthProvider.credential(response.data?.idToken);
 
-                return auth().signInWithCredential(googleCredential)
+                const userCredential = await auth().signInWithCredential(googleCredential);
+
+                if (userCredential && userCredential.additionalUserInfo.isNewUser) {
+                    console.log("New User logged in.")
+                    const username = userCredential.user.email.split("@")[0];
+                    const profilePicture = userCredential.user.photoURL;
+
+                    await value.createUserDB(username, profilePicture, userCredential.user.uid);
+
+                    console.log("New User from Google Sign In Created.")
+                }
             }
             catch (error) {
                 console.error("Google Sign In error:", error);
@@ -82,21 +92,34 @@ export const AuthProvider = ({ children }) => {
                 console.error("Logout error:", error);
             }
         },
-        checkUserExistance: async () => {
-            const usernameQuery = query(collection(db, "users"), where("uid", "==", user.uid));
+        checkUserExistance: async (uid = "") => {
+            let userUID = uid;
+
+            if (userUID === "") {
+                userUID = user.uid;
+            }
+
+            const usernameQuery = query(collection(db, "users"), where("uid", "==", userUID));
             const querySnapshot = await getDocs(usernameQuery);
 
             return !querySnapshot.empty;
         },
-        createUserDB: async (username) => {
-            await setDoc(doc(db, "users", user.uid), {
-                uid: user.uid,
+        createUserDB: async (username, profilePicture = "", uid = "") => {
+            let userUID = uid;
+
+            if (userUID === "") {
+                userUID = user.uid;
+            }
+
+            await setDoc(doc(db, "users", userUID), {
+                uid: userUID,
                 displayName: username,
-                profilePicture: "",
+                profilePicture: profilePicture,
                 createdAt: serverTimestamp(),
             });
         }
     };
+
     return (
         <AuthContext.Provider value={value}>
             {!loading && children}
