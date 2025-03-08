@@ -32,6 +32,7 @@ export const AuthProvider = ({ children }) => {
         user,
         loading,
         confirm,
+        db,
         login: async (email, password) => {
             try {
                 await auth().signInWithEmailAndPassword(email, password);
@@ -68,9 +69,11 @@ export const AuthProvider = ({ children }) => {
         },
         register: async (email, password) => {
             try {
-                await auth().createUserWithEmailAndPassword(email, password);
+                const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+                console.log("User registered successfully");
+                return userCredential.user;
             } catch (error) {
-                console.error("Registration error:", error);
+                console.error("Registration error:", error.code, error.message);
                 throw error;
             }
         },
@@ -88,9 +91,22 @@ export const AuthProvider = ({ children }) => {
 
             return !querySnapshot.empty;
         },
-        createUserDB: async (username) => {
-            await setDoc(doc(db, "users", user.uid), {
-                uid: user.uid,
+        checkDuplicateUsername: async (username) => {
+            const usernameQuery = query(collection(db, "users"), where("displayName", "==", username));
+            console.log(username);
+            const querySnapshot = await getDocs(usernameQuery);
+            console.log(querySnapshot)
+
+            return !querySnapshot.empty;
+        },
+        createUserDB: async (username, uid = null) => {
+            const userId = uid || user?.uid;
+            if (!userId) {
+                console.error("Error: No valid UID found for user.");
+                return;
+            }
+            await setDoc(doc(db, "users", userId), {
+                uid: userId,
                 displayName: username,
                 profilePicture: "",
                 createdAt: serverTimestamp(),

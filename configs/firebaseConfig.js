@@ -25,4 +25,4 @@ const persistence = Platform.OS === "web"
 
 export const FIREBASE_AUTH = initializeAuth(FIREBASE_APP, { persistence });
 
-export const FIREBASE_DB = getFirestore();
+export const FIREBASE_DB = getFirestore(FIREBASE_APP);
