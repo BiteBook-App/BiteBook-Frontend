@@ -26,11 +26,11 @@ const PhoneSignIn = () => {
     });
 
     useEffect(() => {
-        checkUserExistance().then((userExists) => {
+        checkUserExistance().then((userExists: boolean) => {
             if (userExists) {
-                router.navigate("/home");
+                router.replace("/(app)/(tabs)");
             } else {
-                router.navigate("/phone-sign-up")
+                router.push("/phone-sign-up")
             }
         })
     }, [user]);
@@ -63,7 +63,7 @@ const PhoneSignIn = () => {
                     alignItems: 'center',
                 }}
             />
-            <VStack space="3xl">
+            <VStack space="xs">
                 {/* Heading */}
                 <VStack space="xs">
                     <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px] text-white text-5xl">
@@ -109,8 +109,9 @@ const PhoneSignIn = () => {
                         </>
                         :
                         <>
+                        <VStack space="4xl">
                             <OtpInput numberOfDigits={6} focusColor="orange"
-                                      onFilled={(inputCode) => setCode(inputCode)} theme={{
+                                        onFilled={(inputCode) => setCode(inputCode)} theme={{
                                 pinCodeTextStyle: {color: "white"}
                             }}/>
                             <Button className="rounded-xl font-[Rashfield]"
@@ -121,6 +122,7 @@ const PhoneSignIn = () => {
                             }}>
                                 <ButtonText>Done!</ButtonText>
                             </Button>
+                        </VStack>
                         </>
                 }
             </VStack>
