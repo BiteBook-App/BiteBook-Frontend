@@ -92,7 +92,7 @@ export default function ForgotPassword() {
 
       <VStack space="xl">
         <Text size="xl">No worries, we'll send you reset instructions. Enter the address associated with your account.</Text>
-        <VStack space="md">
+        <VStack space="4xl">
           <CustomInputField 
             placeholder="Email"
             value={email}

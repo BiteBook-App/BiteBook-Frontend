@@ -63,7 +63,7 @@ const PhoneSignIn = () => {
                     alignItems: 'center',
                 }}
             />
-            <VStack space="3xl">
+            <VStack space="xs">
                 {/* Heading */}
                 <VStack space="xs">
                     <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px] text-white text-5xl">
