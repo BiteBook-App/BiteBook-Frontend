@@ -1,8 +1,9 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from "@react-native-google-signin/google-signin";
-import {collection, doc, getDocs, query, serverTimestamp, setDoc, where} from "firebase/firestore";
+import {collection, doc, getDocs, query, serverTimestamp, setDoc, where, deleteDoc} from "firebase/firestore";
 import {FIREBASE_DB} from "@/configs/firebaseConfig";
+import { deleteUser } from '@firebase/auth';
 
 const AuthContext = createContext();
 
@@ -111,6 +112,43 @@ export const AuthProvider = ({ children }) => {
                 profilePicture: "",
                 createdAt: serverTimestamp(),
             });
+        },
+        getUserProfile: async () => {
+            const q = query(collection(db, "users"), where("uid", "==", user.uid));
+            try {
+              const querySnapshot = await getDocs(q);
+          
+              if (querySnapshot.empty) {
+                console.log("No user found.");
+                return null; // Return null if no user is found
+              }
+          
+              const userData = querySnapshot.docs[0].data();
+              return {
+                displayName: userData.displayName,
+                profilePicture: userData.profilePicture,
+              };
+          
+            } catch (error) {
+              console.error("Error fetching user data:", error);
+              return null; // Return null in case of an error
+            }     
+        },
+        deleteUser: async () => {
+            try {
+                // Delete user with associated uid from all collections
+                const userCollections = ["users"];
+                for (const col of userCollections) {
+                    await deleteDoc(doc(db, col, user.uid));
+                }
+
+                // Delete user from Firebase Authentication
+                await deleteUser(user);
+
+                setUser(null);
+            } catch (error) {
+                console.error("Error deleting user:", error);
+            }
         }
     };
     return (
