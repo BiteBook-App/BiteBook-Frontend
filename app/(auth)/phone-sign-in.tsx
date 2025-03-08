@@ -109,8 +109,9 @@ const PhoneSignIn = () => {
                         </>
                         :
                         <>
+                        <VStack space="4xl">
                             <OtpInput numberOfDigits={6} focusColor="orange"
-                                      onFilled={(inputCode) => setCode(inputCode)} theme={{
+                                        onFilled={(inputCode) => setCode(inputCode)} theme={{
                                 pinCodeTextStyle: {color: "white"}
                             }}/>
                             <Button className="rounded-xl font-[Rashfield]"
@@ -121,6 +122,7 @@ const PhoneSignIn = () => {
                             }}>
                                 <ButtonText>Done!</ButtonText>
                             </Button>
+                        </VStack>
                         </>
                 }
             </VStack>
