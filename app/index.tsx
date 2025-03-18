@@ -2,7 +2,7 @@ import { View } from "react-native";
 import "@/global.css";
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text } from "@/components/ui/text";
 import { FormControl, FormControlError, FormControlErrorIcon, FormControlErrorText } from "@/components/ui/form-control";
 import { VStack } from "@/components/ui/vstack";
@@ -18,6 +18,8 @@ import CustomInputField from "@/components/ui/custom-input-field";
 import { FIREBASE_AUTH } from "@/configs/firebaseConfig"
 import { Path } from "react-native-svg";
 import { useAuth } from '@/configs/authProvider';
+import { Alert, AlertText, AlertIcon } from "@/components/ui/alert"
+import { InfoIcon } from "@/components/ui/icon"
 
 SplashScreen.preventAutoHideAsync();
 
@@ -29,9 +31,21 @@ export default function Login() {
   const [invalidForm, setInvalidForm] = useState(true); // Tracks invalid form requirements to disable log in button
   const [loading, setLoading] = useState(false);
 
+  // Google Sign In Error
+  const [googleError, setGoogleError] = useState(false);
+
   const { user, login, register, signInWithGoogle } = useAuth();
 
   const router = useRouter();
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+    }
+    catch (error) {
+      setGoogleError(true);
+    }
+  }
 
   useEffect(() => {
     setInvalidForm(!(email.trim() && password.trim())); // invalidForm is false if both fields are non-empty - disable log in button
@@ -224,11 +238,20 @@ export default function Login() {
             size="xl" 
             variant="outline" 
             action="primary"
-            onPress={signInWithGoogle}
+            onPress={handleGoogleSignIn}
           >
             <ButtonIcon as={GoogleIcon}></ButtonIcon>
             <ButtonText>Sign In with Google</ButtonText>
           </Button>
+
+          {
+            googleError ?
+                <Alert action="error" variant="solid">
+                  <AlertIcon as={InfoIcon} />
+                  <AlertText>Something went wrong. Please try again.</AlertText>
+                </Alert>
+                : null
+          }
         </VStack>
 
         <Text className="text-center">
