@@ -35,7 +35,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="create"
         options={{
-          title: "BiteBook",
+          title: "Add Recipe",
           tabBarIcon: ({ color, size }) => (
             <AntDesign name="pluscircleo" size={size} color={color}/>
           ),
