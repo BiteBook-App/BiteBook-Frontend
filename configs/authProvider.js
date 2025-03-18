@@ -60,20 +60,27 @@ export const AuthProvider = ({ children }) => {
                 }
             }
             catch (error) {
-                console.error("Google Sign In error:", error);
+                console.error("Unable to sign in with Google. Error: ", error);
                 throw error;
             }
         },
         signInWithPhoneNumber: async (phoneNumber) => {
-            const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-            setConfirm(confirmation);
+            try {
+                const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+                setConfirm(confirmation);
+            }
+            catch (error) {
+                console.log(`Unable to sign in with phone number. Error: ${error}`);
+                throw error;
+            }
         },
         confirmPhoneNumberCode: async (code) => {
             try {
                 await confirm.confirm(code);
                 setConfirm(null);
             } catch (error) {
-                console.log('Invalid code.');
+                console.log(`Unable to confirm code. Error: ${error}`);
+                throw error;
             }
         },
         register: async (email, password) => {
