@@ -8,6 +8,8 @@ import {useFonts} from "expo-font";
 import { OtpInput } from "react-native-otp-entry";
 import {useRouter} from "expo-router";
 import {useAuth} from "@/configs/authProvider";
+import { Alert, AlertText, AlertIcon } from "@/components/ui/alert"
+import {ArrowLeftIcon, Icon, InfoIcon} from "@/components/ui/icon"
 
 const PhoneSignIn = () => {
     // Verification Code (OTP - One-Time-Passcode)
@@ -15,6 +17,10 @@ const PhoneSignIn = () => {
 
     const phoneInput = useRef<PhoneInput>(null);
     const [phoneNumber, setPhoneNumber] = useState("");
+
+    // Errors
+    const [phoneNumberError, setphoneNumberError] = useState(false);
+    const [verificationError, setVerificationError] = useState(false);
 
     const {user, confirm, signInWithPhoneNumber, confirmPhoneNumberCode, checkUserExistance} = useAuth();
 
@@ -24,6 +30,29 @@ const PhoneSignIn = () => {
     const [loaded, error] = useFonts({
         'Rashfield': require('assets/fonts/VVDSRashfield-Normal.ttf'),
     });
+
+    const handlePhoneEntry = async () => {
+        if(phoneInput.current.isValidNumber(phoneNumber)) {
+            try{
+                await signInWithPhoneNumber(phoneNumber);
+            }
+            catch (e) {
+                setphoneNumberError(true);
+            }
+        }
+        else {
+            setphoneNumberError(true);
+        }
+    }
+
+    const handleCodeConfirmation = async () => {
+        try {
+            await confirmPhoneNumberCode(code)
+        }
+        catch (e) {
+            setVerificationError(true);
+        }
+    }
 
     useEffect(() => {
         checkUserExistance().then((userExists) => {
@@ -41,7 +70,7 @@ const PhoneSignIn = () => {
             style={{
                 flex: 1,
                 justifyContent: "center",
-                width: "100%",
+                width: "100%"
             }}
         >
             <LinearGradient
@@ -58,11 +87,13 @@ const PhoneSignIn = () => {
                     left: 0,
                     right: 0,
                     top: 0,
-                    bottom: 0,
-                    justifyContent: 'center',
-                    alignItems: 'center',
+                    bottom: 0
                 }}
             />
+                <Button size="xl" style={{position: "absolute", left: 20, top: 100,
+                    backgroundColor: 'rgba(0, 0, 0, 0.2)'}} onPress={() => {router.back()}}>
+                    <ButtonIcon as={ArrowLeftIcon} style={{color: "white"}}/>
+                </Button>
             <VStack space="3xl">
                 {/* Heading */}
                 <VStack space="xs">
@@ -94,14 +125,20 @@ const PhoneSignIn = () => {
                                     containerStyle={{borderRadius: "5%", width: "100%"}}
                                     textContainerStyle={{borderRadius: "5%"}}
                                 />
+                                {
+                                    phoneNumberError ?
+                                    <Alert action="error" variant="solid">
+                                        <AlertIcon as={InfoIcon} />
+                                        <AlertText>Phone Number is not valid. Please try again.</AlertText>
+                                    </Alert>
+                                    : null
+                                }
                                 <Button
                                     className="rounded-xl font-[Rashfield]"
                                     size="xl"
                                     variant="solid"
                                     action="primary"
-                                    onPress={async () => {
-                                        await signInWithPhoneNumber(phoneNumber)
-                                    }}
+                                    onPress={handlePhoneEntry}
                                 >
                                     <ButtonText>Sign In</ButtonText>
                                 </Button>
@@ -113,12 +150,18 @@ const PhoneSignIn = () => {
                                       onFilled={(inputCode) => setCode(inputCode)} theme={{
                                 pinCodeTextStyle: {color: "white"}
                             }}/>
+                            {
+                                verificationError ?
+                                    <Alert action="error" variant="solid">
+                                        <AlertIcon as={InfoIcon} />
+                                        <AlertText>Something went wrong. Please try again.</AlertText>
+                                    </Alert>
+                                    : null
+                            }
                             <Button className="rounded-xl font-[Rashfield]"
                                     size="xl"
                                     variant="solid"
-                                    action="primary" onPress={async () => {
-                                await confirmPhoneNumberCode(code)
-                            }}>
+                                    action="primary" onPress={handleCodeConfirmation}>
                                 <ButtonText>Done!</ButtonText>
                             </Button>
                         </>
