@@ -5,7 +5,7 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
 import CustomInputField from "@/components/ui/custom-input-field";
-import { Feather, MaterialIcons, Octicons } from "@expo/vector-icons";
+import { Feather, MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import { FormControl } from "@/components/ui/form-control";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
@@ -119,7 +119,7 @@ export default function CreateRecipe() {
                       style={{ flex: 1 }}
                     />
                     <Button className="px-4 py-2" size="md" variant="solid" action="primary">
-                      <Octicons name="upload" size={24} color="black" />
+                      <FontAwesome name="arrow-right" size={20} color="black" />
                     </Button>
                   </HStack>
                 </VStack>
@@ -175,12 +175,8 @@ export default function CreateRecipe() {
                   <View 
                     className="bg-background-0 rounded-xl border-0 opacity-70 p-5"
                   >
-                    {/* Ingredients List */}
-                    <FlatList
-                      data={ingredients}
-                      keyExtractor={(item, index) => index.toString()}
-                      renderItem={({ item, index }) => (
-                        <View
+                    {ingredients.map((item, index) => (
+                      <View
                           style={{
                             flexDirection: "row",
                             justifyContent: "space-between",
@@ -198,9 +194,8 @@ export default function CreateRecipe() {
                           <TouchableOpacity onPress={() => removeIngredient(index)}>
                             <Feather name="trash-2" size={20} color="#d93e36" />
                           </TouchableOpacity>
-                        </View>
-                      )}
-                    />
+                      </View>
+                    ))}
                     {/* Input Fields for Ingredient and Count */}
                     <View style={{ backgroundColor: "#525252", flexDirection: "row", alignItems: "center", borderRadius: 10 }}>
                     <TextInput
