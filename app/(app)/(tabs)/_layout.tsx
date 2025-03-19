@@ -5,7 +5,7 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarStyle: { backgroundColor: "#181719", borderTopWidth: 0 },
+        tabBarStyle: { backgroundColor: "#181719", borderTopWidth: 6, borderTopColor: "#181719" },
         tabBarActiveTintColor: "#fff",
         tabBarInactiveTintColor: "#888",
         tabBarShowLabel: false,
@@ -26,7 +26,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="friends"
         options={{
-          title: "Friends",
+          title: "BiteBook",
           tabBarIcon: ({ color, size }) => (
             <Feather name="users" size={size} color={color}/>
           ),
@@ -44,7 +44,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="taste"
         options={{
-          title: "Taste",
+          title: "BiteBook",
           tabBarIcon: ({ color, size }) => (
             <FontAwesome5 name="cookie-bite" size={size} color={color}/>
           ),
@@ -53,7 +53,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Profile",
+          title: "BiteBook",
           tabBarIcon: ({ color, size }) => (
             <Feather name="user" size={size} color={color}/>
           ),

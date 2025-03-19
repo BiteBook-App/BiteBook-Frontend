@@ -9,6 +9,7 @@ import { Feather, MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import { FormControl } from "@/components/ui/form-control";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function CreateRecipe() {
   const [photo, setPhoto] = useState<string | null>(null);
@@ -78,6 +79,25 @@ export default function CreateRecipe() {
       width: "100%",
       paddingBottom: 20,
     }}>
+      <LinearGradient
+        colors={[
+          "#37232f", "#34222e", "#30212c", "#2d202a", 
+          "#2a1f29", "#271e27", "#241d25", "#221c23", 
+          "#1f1b20", "#1c1a1e", "#1a181c", "#181719"
+        ]}
+        locations={[0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7]}
+        start={{ x: 0, y: 1 }}
+        end={{ x: 1, y: -0.6 }}
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0, // Ensures full height
+          justifyContent: 'center', // Centers content vertically
+          alignItems: 'center', // Centers content horizontally
+        }}
+      />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
           <VStack space="xs">
             <VStack className="mt-8 lg:mt-3" space="xs">
@@ -152,12 +172,9 @@ export default function CreateRecipe() {
                   </Text>
                   <Text className="text-xl font-medium">What are the <Text className="text-xl font-bold">ingredients</Text>? </Text>
 
-                  <View style={{ 
-                    backgroundColor: "#2C2C2E", 
-                    padding: 15, 
-                    borderRadius: 15, 
-                    marginTop: 10,
-                  }}>
+                  <View 
+                    className="bg-background-0 rounded-xl border-0 opacity-70 p-5"
+                  >
                     {ingredients.map((item, index) => (
                       <View
                           style={{
@@ -168,7 +185,7 @@ export default function CreateRecipe() {
                             paddingHorizontal: 15,
                             backgroundColor: "#525252",
                             borderRadius: 10,
-                            marginTop: 10
+                            marginBottom: 10
                           }}
                         >
                           <Text style={{ flex: 1, textAlign: "left", fontSize: 16, color: "white"}}>
@@ -180,7 +197,7 @@ export default function CreateRecipe() {
                       </View>
                     ))}
                     {/* Input Fields for Ingredient and Count */}
-                    <View style={{ backgroundColor: "#525252", flexDirection: "row", alignItems: "center", borderRadius: 10, marginTop: 10 }}>
+                    <View style={{ backgroundColor: "#525252", flexDirection: "row", alignItems: "center", borderRadius: 10 }}>
                     <TextInput
                         placeholder="Amount"
                         value={ingredientCount}
@@ -211,7 +228,7 @@ export default function CreateRecipe() {
                         placeholderTextColor="#8C8C8C"
                       />
                     </View>
-                    <Button className="rounded-xl mt-10" style={{marginTop: 20, marginBottom: 10}} size="md" variant="solid" action="primary" onPress={addIngredient}>
+                    <Button className="rounded-xl mt-5" size="md" variant="solid" action="primary" onPress={addIngredient}>
                         <Feather name="plus" size={20} color="black" />
                     </Button>
                   </View>
