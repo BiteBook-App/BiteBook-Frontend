@@ -172,11 +172,10 @@ export default function CreateRecipe() {
                             paddingHorizontal: 15,
                             backgroundColor: "#525252",
                             borderRadius: 10,
-                            marginTop: 10,
-                            height: 50,
+                            marginTop: 10
                           }}
                         >
-                          <Text style={{ flex: 1, textAlign: "left", fontSize: 16, color: "white" }}>
+                          <Text style={{ flex: 1, textAlign: "left", fontSize: 16, color: "white"}}>
                             {item.count} <Text className="font-bold" style={{fontSize: 16, color: "white"}}>{item.name}</Text>
                           </Text>
                           <TouchableOpacity onPress={() => removeIngredient(index)}>
