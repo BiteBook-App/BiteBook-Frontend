@@ -32,6 +32,7 @@ export const AuthProvider = ({ children }) => {
         user,
         loading,
         confirm,
+        db,
         login: async (email, password) => {
             try {
                 await auth().signInWithEmailAndPassword(email, password);
@@ -85,9 +86,11 @@ export const AuthProvider = ({ children }) => {
         },
         register: async (email, password) => {
             try {
-                await auth().createUserWithEmailAndPassword(email, password);
+                const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+                console.log("User registered successfully");
+                return userCredential.user;
             } catch (error) {
-                console.error("Registration error:", error);
+                console.error("Registration error:", error.code, error.message);
                 throw error;
             }
         },
@@ -111,19 +114,63 @@ export const AuthProvider = ({ children }) => {
 
             return !querySnapshot.empty;
         },
-        createUserDB: async (username, profilePicture = "", uid = "") => {
-            let userUID = uid;
+        checkDuplicateUsername: async (username) => {
+            const usernameQuery = query(collection(db, "users"), where("displayName", "==", username));
+            console.log(username);
+            const querySnapshot = await getDocs(usernameQuery);
+            console.log(querySnapshot)
 
-            if (userUID === "") {
-                userUID = user.uid;
+            return !querySnapshot.empty;
+        },
+        createUserDB: async (username, uid = null, profilePicture = "") => {
+            const userId = uid || user?.uid;
+            if (!userId) {
+                console.error("Error: No valid UID found for user.");
+                return;
             }
-
-            await setDoc(doc(db, "users", userUID), {
-                uid: userUID,
+            await setDoc(doc(db, "users", userId), {
+                uid: userId,
                 displayName: username,
                 profilePicture: profilePicture,
                 createdAt: serverTimestamp(),
             });
+        },
+        getUserProfile: async () => {
+            const q = query(collection(db, "users"), where("uid", "==", user.uid));
+            try {
+              const querySnapshot = await getDocs(q);
+
+              if (querySnapshot.empty) {
+                console.log("No user found.");
+                return null; // Return null if no user is found
+              }
+
+              const userData = querySnapshot.docs[0].data();
+              return {
+                displayName: userData.displayName,
+                profilePicture: userData.profilePicture,
+              };
+
+            } catch (error) {
+              console.error("Error fetching user data:", error);
+              return null; // Return null in case of an error
+            }
+        },
+        deleteUser: async () => {
+            try {
+                // Delete user with associated uid from all collections
+                const userCollections = ["users"];
+                for (const col of userCollections) {
+                    await deleteDoc(doc(db, col, user.uid));
+                }
+
+                // Delete user from Firebase Authentication
+                await deleteUser(user);
+
+                setUser(null);
+            } catch (error) {
+                console.error("Error deleting user:", error);
+            }
         }
     };
 

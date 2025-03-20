@@ -2,7 +2,7 @@ import { View } from "react-native";
 import "@/global.css";
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Text } from "@/components/ui/text";
 import { FormControl, FormControlError, FormControlErrorIcon, FormControlErrorText } from "@/components/ui/form-control";
 import { VStack } from "@/components/ui/vstack";
@@ -11,11 +11,9 @@ import { Image } from "@/components/ui/image";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { LinearGradient } from 'expo-linear-gradient';
-import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter, Link } from "expo-router";
 import { Spinner } from "@/components/ui/spinner";
 import CustomInputField from "@/components/ui/custom-input-field";
-import { FIREBASE_AUTH } from "@/configs/firebaseConfig"
 import { Path } from "react-native-svg";
 import { useAuth } from '@/configs/authProvider';
 import { Alert, AlertText, AlertIcon } from "@/components/ui/alert"
@@ -69,19 +67,19 @@ export default function Login() {
     return null;
   }
 
-  const firebaseAuth = FIREBASE_AUTH;
-
   const handleSignIn = () => {
     setLoading(true);
-    signInWithEmailAndPassword(firebaseAuth, email, password)
-      .then((userCredential) => {
+    login(email, password)
+      .then(() => {
         // Signed in
-        const user = userCredential.user;
-        router.push("/home");
+        router.replace("/(app)/(tabs)");
       })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
+      .catch((error: unknown) => {
+        if (error instanceof Error) {
+          console.log(error.message);
+        } else {
+          console.log("An unknown error occurred");
+        }
         setInvalidLogin(!invalidLogin);
       })
       .finally(() => {
@@ -89,7 +87,7 @@ export default function Login() {
       });
   };
 
-  const handlePhoneSignIn = async (phoneNumber) => {
+  const handlePhoneSignIn = async () => {
     router.push("/phone-sign-in")
   }
 
@@ -105,57 +103,54 @@ export default function Login() {
     </>)
   })
 
-  if (user) {
-    router.navigate("/home")
-  }
 
   return (
-      <View
-          className="bg-background-dark px-5 lg:px-40"
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            width: "100%",
-          }}
-      >
-        <LinearGradient
-            colors={[
-              "#232d37", "#232b34", "#222832", "#22262f", "#21242c",
-              "#202229", "#1f2027", "#1e1e24", "#1d1c21", "#1b1a1e",
-              "#1a191c", "#181719"
-            ]}
-            locations={[0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7]}
-            start={{x: 1, y: 0}}
-            end={{x: 0, y: 1}}
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0, // Ensures full height
-              justifyContent: 'center', // Centers content vertically
-              alignItems: 'center', // Centers content horizontally
-            }}
-        />
-        <VStack space="3xl">
-          {/* Heading */}
-          <HStack
-              className="justify-center items-center"
-              space="lg"
-              reversed={false}
+    <View
+      className="bg-background-dark px-5 lg:px-40"
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        width: "100%",
+      }}
+    >
+      <LinearGradient
+        colors={[
+          "#232d37", "#232b34", "#222832", "#22262f", "#21242c",
+          "#202229", "#1f2027", "#1e1e24", "#1d1c21", "#1b1a1e",
+          "#1a191c", "#181719"
+        ]}
+        locations={[0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7]}
+        start={{ x: 1, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0, // Ensures full height
+          justifyContent: 'center', // Centers content vertically
+          alignItems: 'center', // Centers content horizontally
+        }}
+      />
+      <VStack space="3xl">
+        {/* Heading */}
+        <HStack
+          className="justify-center items-center"
+          space="lg"
+          reversed={false}
+        >
+          <Image
+            size="lg"
+            source={require('assets/images/App_Icon.png')}
+            alt="bitebook logo"
+            className="rounded-xl"
+          />
+          <VStack
+            className="mt-8 lg:mt-3"
+            space="xs"
           >
-            <Image
-                size="lg"
-                source={require('../assets/images/App_Icon.png')}
-                alt="bitebook logo"
-                className="rounded-xl"
-            />
-            <VStack
-                className="mt-8 lg:mt-3"
-                space="xs"
-            >
-              <Text
-                  className="font-light"
+            <Text
+              className="font-light"
               size="4xl">
                 Welcome to
             </Text>

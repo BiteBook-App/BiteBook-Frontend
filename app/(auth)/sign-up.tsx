@@ -9,7 +9,6 @@ import { MailIcon, LockIcon, CloseCircleIcon } from "@/components/ui/icon";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
 import { LinearGradient } from 'expo-linear-gradient';
-import { createUserWithEmailAndPassword } from "firebase/auth";
 import CustomInputField from "@/components/ui/custom-input-field"
 import { Feather } from '@expo/vector-icons';
 import { router } from "expo-router";
@@ -18,8 +17,7 @@ import { FormControl, FormControlError, FormControlErrorIcon, FormControlErrorTe
 import { doc, setDoc, getDocs, collection, query, where, serverTimestamp } from "firebase/firestore";
 // @ts-ignore
 import PasswordStrengthMeterBar from 'react-native-password-strength-meter-bar';
-import { FIREBASE_AUTH } from "../configs/firebaseConfig.js"
-import { FIREBASE_DB } from "../configs/firebaseConfig.js"
+import { useAuth } from '@/configs/authProvider';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -36,6 +34,8 @@ export default function SignUp() {
   const [duplicateUsernameError, setDuplicateUsernameError] = useState(false);
   const [notEmailError, setNotEmailError] = useState(false);
   const [passwordTooShort, setPasswordTooShort] = useState(false);
+
+  const { checkDuplicateUsername, register, createUserDB} = useAuth();
 
   useEffect(() => {
     const isMismatch = password !== "" && confirmPassword !== "" && password !== confirmPassword;
@@ -77,49 +77,42 @@ export default function SignUp() {
     return null;
   }
 
-  const auth = FIREBASE_AUTH;
-  const db = FIREBASE_DB;
-
-  const handleSignIn = async () => {
+  const handleSignUp = async () => {
     setLoading(true);
     setExistingAccountError(false);
-  
+    setDuplicateUsernameError(false);
+    setNotEmailError(false);
+
     try {
-      // Step 1: Check Firestore for existing username
-      const usernameQuery = query(collection(db, "users"), where("displayName", "==", username));
-      const querySnapshot = await getDocs(usernameQuery);
-  
-      if (!querySnapshot.empty) {
-        console.log("Username already exists. Choose a different one.");
-        setDuplicateUsernameError(true);
-        setLoading(false);
-        return;
+      // Step 1: Check if username is already taken
+      const duplicateCheck = await checkDuplicateUsername(username);
+      if (duplicateCheck) {
+          console.log("Username already exists. Choose a different one.");
+          setDuplicateUsernameError(true);
+          setLoading(false);
+          return;
       }
-  
-      // Step 2: Create user in Firebase Auth
-      const { user } = await createUserWithEmailAndPassword(auth, email, password);
-  
-      // Step 3: Store user profile data in Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        displayName: username,
-        profilePicture: "",
-        createdAt: serverTimestamp(),
-      });
-  
+
+      // Step 2: Register user and get user object
+      const userInfo = await register(email, password);
+      const uid = userInfo?.uid;
+
+      // Step 3: Store user profile data in Firestore using uid
+      await createUserDB(username, uid);
+
       console.log("Account successfully created and authenticated");
-      router.navigate('/home');
-  
+      router.replace('/(app)/(tabs)');
+
     } catch (error: any) {
-      if (error.code === "auth/email-already-in-use") {
-        setExistingAccountError(true);
-      } 
-      if (error.code === "auth/invalid-email") {
-        setNotEmailError(true);
-      }
-      console.log(error.message);
+        if (error.code === "auth/email-already-in-use") {
+            setExistingAccountError(true);
+        } 
+        if (error.code === "auth/invalid-email") {
+            setNotEmailError(true);
+        }
+        console.log("Error:", error.message);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
   };
 
@@ -218,7 +211,7 @@ export default function SignUp() {
             size="xl"
             variant="solid"
             action="primary"
-            onPress={handleSignIn}
+            onPress={handleSignUp}
             isDisabled={invalidForm}
           >
             {!loading && <ButtonText>Sign up</ButtonText>}

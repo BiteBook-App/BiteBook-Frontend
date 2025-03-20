@@ -55,11 +55,11 @@ const PhoneSignIn = () => {
     }
 
     useEffect(() => {
-        checkUserExistance().then((userExists) => {
+        checkUserExistance().then((userExists: boolean) => {
             if (userExists) {
-                router.navigate("/home");
+                router.replace("/(app)/(tabs)");
             } else {
-                router.navigate("/phone-sign-up")
+                router.push("/phone-sign-up")
             }
         })
     }, [user]);
@@ -70,7 +70,7 @@ const PhoneSignIn = () => {
             style={{
                 flex: 1,
                 justifyContent: "center",
-                width: "100%"
+                width: "100%",
             }}
         >
             <LinearGradient
@@ -90,6 +90,7 @@ const PhoneSignIn = () => {
                     bottom: 0
                 }}
             />
+            <VStack space="xs">
                 <Button size="xl" style={{position: "absolute", left: 20, top: 100,
                     backgroundColor: 'rgba(0, 0, 0, 0.2)'}} onPress={() => {router.back()}}>
                     <ButtonIcon as={ArrowLeftIcon} style={{color: "white"}}/>
@@ -164,6 +165,7 @@ const PhoneSignIn = () => {
                                     action="primary" onPress={handleCodeConfirmation}>
                                 <ButtonText>Done!</ButtonText>
                             </Button>
+                        </VStack>
                         </>
                 }
             </VStack>
