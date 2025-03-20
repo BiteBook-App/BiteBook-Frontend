@@ -9,7 +9,9 @@ import { OtpInput } from "react-native-otp-entry";
 import {useRouter} from "expo-router";
 import {useAuth} from "@/configs/authProvider";
 import { Alert, AlertText, AlertIcon } from "@/components/ui/alert"
-import {ArrowLeftIcon, Icon, InfoIcon} from "@/components/ui/icon"
+import {InfoIcon} from "@/components/ui/icon"
+import { Spinner } from "@/components/ui/spinner"
+import colors from "tailwindcss/colors"
 
 const PhoneSignIn = () => {
     // Verification Code (OTP - One-Time-Passcode)
@@ -17,6 +19,8 @@ const PhoneSignIn = () => {
 
     const phoneInput = useRef<PhoneInput>(null);
     const [phoneNumber, setPhoneNumber] = useState("");
+
+    const [isLoading, setLoading] = useState(false);
 
     // Errors
     const [phoneNumberError, setphoneNumberError] = useState(false);
@@ -34,7 +38,9 @@ const PhoneSignIn = () => {
     const handlePhoneEntry = async () => {
         if(phoneInput.current.isValidNumber(phoneNumber)) {
             try{
+                setLoading(true);
                 await signInWithPhoneNumber(phoneNumber);
+                setLoading(false);
             }
             catch (e) {
                 setphoneNumberError(true);
@@ -47,6 +53,7 @@ const PhoneSignIn = () => {
 
     const handleCodeConfirmation = async () => {
         try {
+            setLoading(true);
             await confirmPhoneNumberCode(code)
         }
         catch (e) {
@@ -56,6 +63,8 @@ const PhoneSignIn = () => {
 
     useEffect(() => {
         checkUserExistance().then((userExists: boolean) => {
+            setLoading(false);
+
             if (userExists) {
                 router.replace("/(app)/(tabs)");
             } else {
@@ -90,85 +99,84 @@ const PhoneSignIn = () => {
                     bottom: 0
                 }}
             />
-            <VStack space="xs">
-                <Button size="xl" style={{position: "absolute", left: 20, top: 100,
-                    backgroundColor: 'rgba(0, 0, 0, 0.2)'}} onPress={() => {router.back()}}>
-                    <ButtonIcon as={ArrowLeftIcon} style={{color: "white"}}/>
-                </Button>
-            <VStack space="3xl">
-                {/* Heading */}
-                <VStack space="xs">
-                    <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px] text-white text-5xl">
-                        {
-                            !confirm ? "Phone Sign In" : "Confirm Code"
-                        }
-                    </Text>
-                    <Text className="text-white text-xl mb-8">
-                        {
-                            !confirm ? "Please input your phone number to sign in." : "Please check your messages in the phone number provided and input the code."
-                        }
-                    </Text>
-                </VStack>
-                {
-                    !confirm ?
-                        <>
-                            <VStack space="3xl">
-                                <PhoneInput
-                                    ref={phoneInput}
-                                    defaultValue={phoneNumber}
-                                    defaultCode="US"
-                                    layout="first"
-                                    onChangeFormattedText={(text) => {
-                                        setPhoneNumber(text);
-                                    }}
-                                    autoFocus
-                                    withDarkTheme
-                                    containerStyle={{borderRadius: "5%", width: "100%"}}
-                                    textContainerStyle={{borderRadius: "5%"}}
-                                />
+            {
+                isLoading ?
+                    <Spinner size="large" color={colors.orange[700]} />
+                :
+                    <VStack space="3xl">
+                        {/* Heading */}
+                        <VStack space="xs">
+                            <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px] text-white text-5xl">
                                 {
-                                    phoneNumberError ?
-                                    <Alert action="error" variant="solid">
-                                        <AlertIcon as={InfoIcon} />
-                                        <AlertText>Phone Number is not valid. Please try again.</AlertText>
-                                    </Alert>
-                                    : null
+                                    !confirm ? "Phone Sign In" : "Confirm Code"
                                 }
-                                <Button
-                                    className="rounded-xl font-[Rashfield]"
-                                    size="xl"
-                                    variant="solid"
-                                    action="primary"
-                                    onPress={handlePhoneEntry}
-                                >
-                                    <ButtonText>Sign In</ButtonText>
-                                </Button>
-                            </VStack>
-                        </>
-                        :
-                        <>
-                            <OtpInput numberOfDigits={6} focusColor="orange"
-                                      onFilled={(inputCode) => setCode(inputCode)} theme={{
-                                pinCodeTextStyle: {color: "white"}
-                            }}/>
-                            {
-                                verificationError ?
-                                    <Alert action="error" variant="solid">
-                                        <AlertIcon as={InfoIcon} />
-                                        <AlertText>Something went wrong. Please try again.</AlertText>
-                                    </Alert>
-                                    : null
-                            }
-                            <Button className="rounded-xl font-[Rashfield]"
-                                    size="xl"
-                                    variant="solid"
-                                    action="primary" onPress={handleCodeConfirmation}>
-                                <ButtonText>Done!</ButtonText>
-                            </Button>
+                            </Text>
+                            <Text className="text-white text-xl mb-8">
+                                {
+                                    !confirm ? "Please input your phone number to sign in." : "Please check your messages in the phone number provided and input the code."
+                                }
+                            </Text>
                         </VStack>
-                        </>
-                }
-            </VStack>
+                        {
+                            !confirm ?
+                                <>
+                                    <VStack space="3xl">
+                                        <PhoneInput
+                                            ref={phoneInput}
+                                            defaultValue={phoneNumber}
+                                            defaultCode="US"
+                                            layout="first"
+                                            onChangeFormattedText={(text) => {
+                                                setPhoneNumber(text);
+                                            }}
+                                            autoFocus
+                                            withDarkTheme
+                                            containerStyle={{borderRadius: "5%", width: "100%"}}
+                                            textContainerStyle={{borderRadius: "5%"}}
+                                        />
+                                        {
+                                            phoneNumberError ?
+                                                <Alert action="error" variant="solid">
+                                                    <AlertIcon as={InfoIcon} />
+                                                    <AlertText>Phone Number is not valid. Please try again.</AlertText>
+                                                </Alert>
+                                                : null
+                                        }
+                                        <Button
+                                            className="rounded-xl font-[Rashfield]"
+                                            size="xl"
+                                            variant="solid"
+                                            action="primary"
+                                            onPress={handlePhoneEntry}
+                                        >
+                                            <ButtonText>Get Verification Code</ButtonText>
+                                        </Button>
+                                    </VStack>
+                                </>
+                                :
+                                <>
+                                    <OtpInput numberOfDigits={6} focusColor="orange"
+                                              onFilled={(inputCode) => setCode(inputCode)} theme={{
+                                        pinCodeTextStyle: {color: "white"}
+                                    }}/>
+                                    {
+                                        verificationError ?
+                                            <Alert action="error" variant="solid">
+                                                <AlertIcon as={InfoIcon} />
+                                                <AlertText>Something went wrong. Please try again.</AlertText>
+                                            </Alert>
+                                            : null
+                                    }
+                                    <Button className="rounded-xl font-[Rashfield]"
+                                            size="xl"
+                                            variant="solid"
+                                            action="primary" onPress={handleCodeConfirmation}>
+                                        <ButtonText>Start Cooking!</ButtonText>
+                                    </Button>
+                                </>
+                        }
+                    </VStack>
+            }
         </View>
     )
 }
