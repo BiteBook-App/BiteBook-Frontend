@@ -10,6 +10,7 @@ import { FormControl } from "@/components/ui/form-control";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
+import { Icon, CloseIcon } from "@/components/ui/icon";
 
 export default function CreateRecipe() {
   const [photo, setPhoto] = useState<string | null>(null);
@@ -118,7 +119,7 @@ export default function CreateRecipe() {
                       icon={() => <Feather name="link" size={20} color="#8C8C8C" />}
                       style={{ flex: 1 }}
                     />
-                    <Button className="px-3 py-2" size="lg" variant="solid" action="primary">
+                    <Button className="px-3 py-2 rounded-xl" size="lg" variant="solid" action="primary">
                       <Feather name="arrow-right" size={20} color="black" />
                     </Button>
                   </HStack>
@@ -139,7 +140,7 @@ export default function CreateRecipe() {
                   <HStack space="md">
                     {/* Camera Button */}
                     <Button 
-                      className="rounded-full"
+                      className="rounded-full bg-background-0 opacity-70"
                       size="xl" 
                       variant="solid" 
                       action="secondary" 
@@ -150,7 +151,7 @@ export default function CreateRecipe() {
 
                     {/* Select from Photos Button */}
                     <Button 
-                      className="rounded-full"
+                      className="rounded-full bg-background-0 opacity-70"
                       size="xl" 
                       variant="solid" 
                       action="secondary" 
@@ -162,7 +163,7 @@ export default function CreateRecipe() {
 
                   {/* Display Selected Photo */}
                   {photo && (
-                    <Image source={{ uri: photo }} style={{ width: 350, height: 350, borderRadius: 10, alignSelf: "center" }} />
+                    <Image source={{ uri: photo }} style={{ width: '100%', height: 350, borderRadius: 10 }} />
                   )}
                 </VStack>
 
@@ -170,63 +171,64 @@ export default function CreateRecipe() {
                   <Text className="text-3xl font-medium">
                     <Text className="text-3xl font-bold">What's</Text> In It?
                   </Text>
-                  <Text className="text-xl font-medium">What are the <Text className="text-xl font-bold">ingredients</Text>? </Text>
 
                   <View 
-                    className="bg-background-0 rounded-xl border-0 opacity-70 p-5"
+                    className="bg-background-0 rounded-2xl border-0 opacity-70 p-5"
                   >
                     {ingredients.map((item, index) => (
                       <View
-                          style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            paddingVertical: 12,
-                            paddingHorizontal: 15,
-                            backgroundColor: "#525252",
-                            borderRadius: 10,
-                            marginBottom: 10
-                          }}
-                        >
+                        className="rounded-2xl bg-background-50"
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          paddingVertical: 12,
+                          paddingHorizontal: 15,
+                          marginBottom: 10
+                        }}
+                      >
                           <Text style={{ flex: 1, textAlign: "left", fontSize: 16, color: "white"}}>
-                            {item.count} <Text className="font-bold" style={{fontSize: 16, color: "white"}}>{item.name}</Text>
+                            <Text className="font-bold" style={{fontSize: 16, color: "white"}}>{item.count}</Text> {item.name} 
                           </Text>
                           <TouchableOpacity onPress={() => removeIngredient(index)}>
-                            <Feather name="trash-2" size={20} color="#d93e36" />
+                            <Icon as={CloseIcon}/>
                           </TouchableOpacity>
                       </View>
                     ))}
                     {/* Input Fields for Ingredient and Count */}
-                    <View style={{ backgroundColor: "#525252", flexDirection: "row", alignItems: "center", borderRadius: 10 }}>
-                    <TextInput
-                        placeholder="Amount"
-                        value={ingredientCount}
-                        onChangeText={setIngredientCount}
-                        keyboardType="numeric"
-                        style={{
-                          flex: 1,
-                          height: 50,
-                          marginLeft: 10,
-                          padding: 8,
-                          color: "white",
-                          fontSize: 16
-                        }}
-                        placeholderTextColor="#8C8C8C"
-                      />
+                    <View 
+                      className="rounded-2xl bg-background-50"
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
                       <TextInput
-                        placeholder="Ingredient"
-                        value={ingredientName}
-                        onChangeText={setIngredientName}
-                        style={{
-                          flex: 2,
-                          marginLeft: 10,
-                          height: 50,
-                          padding: 8,
-                          color: "white",
-                          fontSize: 16
-                        }}
-                        placeholderTextColor="#8C8C8C"
-                      />
+                          placeholder="Amount"
+                          value={ingredientCount}
+                          onChangeText={setIngredientCount}
+                          keyboardType="numeric"
+                          style={{
+                            flex: 1,
+                            height: 50,
+                            marginLeft: 10,
+                            padding: 8,
+                            color: "white",
+                            fontSize: 16
+                          }}
+                          placeholderTextColor="#8C8C8C"
+                        />
+                        <TextInput
+                          placeholder="Ingredient"
+                          value={ingredientName}
+                          onChangeText={setIngredientName}
+                          style={{
+                            flex: 2,
+                            marginLeft: 10,
+                            height: 50,
+                            padding: 8,
+                            color: "white",
+                            fontSize: 16
+                          }}
+                          placeholderTextColor="#8C8C8C"
+                        />
                     </View>
                     <Button className="rounded-xl mt-5" size="md" variant="solid" action="primary" onPress={addIngredient}>
                         <Feather name="plus" size={20} color="black" />

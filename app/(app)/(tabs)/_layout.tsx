@@ -12,6 +12,7 @@ export default function TabsLayout() {
         headerStyle: { backgroundColor: "#181719" },
         headerTintColor: "#fff",
         headerTitleStyle: { fontFamily: "VVDSRashfield-Normal", fontSize: 20 },
+        headerShadowVisible: false
       }}
     >
       <Tabs.Screen
