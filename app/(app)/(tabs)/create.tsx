@@ -230,7 +230,7 @@ export default function CreateRecipe() {
                           placeholderTextColor="#8C8C8C"
                         />
                     </View>
-                    <Button className="rounded-xl mt-5" size="md" variant="solid" action="primary" onPress={addIngredient}>
+                    <Button className="rounded-xl mt-5" size="md" variant="solid" action="primary" onPress={addIngredient} isDisabled={!ingredientName.trim() || !ingredientCount.trim()}>
                         <Feather name="plus" size={20} color="black" />
                     </Button>
                   </View>
