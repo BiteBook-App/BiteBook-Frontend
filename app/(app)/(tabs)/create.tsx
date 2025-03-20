@@ -5,7 +5,7 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
 import CustomInputField from "@/components/ui/custom-input-field";
-import { Feather, MaterialIcons, FontAwesome } from "@expo/vector-icons";
+import { Feather, MaterialIcons } from "@expo/vector-icons";
 import { FormControl } from "@/components/ui/form-control";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
@@ -118,8 +118,8 @@ export default function CreateRecipe() {
                       icon={() => <Feather name="link" size={20} color="#8C8C8C" />}
                       style={{ flex: 1 }}
                     />
-                    <Button className="px-4 py-2" size="md" variant="solid" action="primary">
-                      <FontAwesome name="arrow-right" size={20} color="black" />
+                    <Button className="px-3 py-2" size="lg" variant="solid" action="primary">
+                      <Feather name="arrow-right" size={20} color="black" />
                     </Button>
                   </HStack>
                 </VStack>
