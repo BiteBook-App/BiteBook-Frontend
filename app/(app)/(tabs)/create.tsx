@@ -8,9 +8,9 @@ import CustomInputField from "@/components/ui/custom-input-field";
 import { Feather, MaterialIcons } from "@expo/vector-icons";
 import { FormControl } from "@/components/ui/form-control";
 import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import { Icon, CloseIcon } from "@/components/ui/icon";
+import { Icon, CloseIcon, ChevronUpIcon, ChevronDownIcon } from "@/components/ui/icon";
 
 export default function CreateRecipe() {
   const [photo, setPhoto] = useState<string | null>(null);
@@ -73,6 +73,44 @@ export default function CreateRecipe() {
     setIngredients(ingredients.filter((_, i) => i !== index));
   };
 
+  const updateIngredient = (index: number, field: "count" | "name", value: string) => {
+    setIngredients((prev) =>
+      prev.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      )
+    );
+  };
+
+  const [step, setStep] = useState("");
+  const [steps, setSteps] = useState<{ text: string; expanded: boolean }[]>([]);
+  
+  const addStep = () => {
+    if (step.trim() === "") return;
+    
+    setSteps([...steps, { text: step, expanded: false }]);
+    setStep("");
+  };
+
+  const toggleStep = (index: number) => {
+    setSteps(
+      steps.map((item, i) =>
+        i === index ? { ...item, expanded: !item.expanded } : item
+      )
+    );
+  };
+
+  const removeStep = (index: number) => {
+    setSteps(steps.filter((_, i) => i !== index));
+  };
+
+  const updateStep = (index: number, text: string) => {
+    setSteps((prevSteps) =>
+      prevSteps.map((step, i) =>
+        i === index ? { ...step, text } : step
+      )
+    );
+  };
+  
   return (
     <View className="bg-background-dark px-5 lg:px-40"
     style={{
@@ -176,40 +214,43 @@ export default function CreateRecipe() {
                     className="bg-background-0 rounded-2xl border-0 opacity-70 p-5"
                   >
                     {ingredients.map((item, index) => (
-                      <View
-                        className="rounded-2xl bg-background-50"
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          paddingVertical: 12,
-                          paddingHorizontal: 15,
-                          marginBottom: 10
-                        }}
+                      <View 
+                        className="rounded-2xl bg-background-50 flex-row justify-between items-center p-4 mb-3"
                       >
-                          <Text style={{ flex: 1, textAlign: "left", fontSize: 16, color: "white"}}>
-                            <Text className="font-bold" style={{fontSize: 16, color: "white"}}>{item.count}</Text> {item.name} 
-                          </Text>
-                          <TouchableOpacity onPress={() => removeIngredient(index)}>
-                            <Icon as={CloseIcon}/>
-                          </TouchableOpacity>
+                        <TextInput
+                          placeholder="Amount"
+                          value={item.count}
+                          onChangeText={(text) => updateIngredient(index, "count", text)}
+                          multiline={true}
+                          className="text-white font-bold"
+                          style={{ width: 65, textAlign: "left", fontSize: 16 }}
+                          placeholderTextColor="#8C8C8C"
+                        />
+                        <TextInput
+                          placeholder="Ingredient"
+                          value={item.name}
+                          multiline={true}
+                          onChangeText={(text) => updateIngredient(index, "name", text)}
+                          className="text-white flex-1 ml-3"
+                          style={{ fontSize: 16 }}
+                          placeholderTextColor="#8C8C8C"
+                        />
+                        <TouchableOpacity onPress={() => removeIngredient(index)}>
+                          <Icon as={CloseIcon}/>
+                        </TouchableOpacity>
                       </View>
                     ))}
                     {/* Input Fields for Ingredient and Count */}
                     <View 
-                      className="rounded-2xl bg-background-50"
-                      style={{ flexDirection: "row", alignItems: "center" }}
+                      className="rounded-2xl bg-background-50 flex-row"
                     >
                       <TextInput
                           placeholder="Amount"
                           value={ingredientCount}
+                          multiline={true}
                           onChangeText={setIngredientCount}
-                          keyboardType="numeric"
+                          className="p-5 flex-1"
                           style={{
-                            flex: 1,
-                            height: 50,
-                            marginLeft: 10,
-                            padding: 8,
                             color: "white",
                             fontSize: 16
                           }}
@@ -218,12 +259,10 @@ export default function CreateRecipe() {
                         <TextInput
                           placeholder="Ingredient"
                           value={ingredientName}
+                          multiline={true}
                           onChangeText={setIngredientName}
+                          className="p-5 flex-1"
                           style={{
-                            flex: 2,
-                            marginLeft: 10,
-                            height: 50,
-                            padding: 8,
                             color: "white",
                             fontSize: 16
                           }}
@@ -231,6 +270,66 @@ export default function CreateRecipe() {
                         />
                     </View>
                     <Button className="rounded-xl mt-5" size="md" variant="solid" action="primary" onPress={addIngredient} isDisabled={!ingredientName.trim() || !ingredientCount.trim()}>
+                        <Feather name="plus" size={20} color="black" />
+                    </Button>
+                  </View>
+                </VStack>
+
+                <VStack space="md">
+                  <Text className="text-3xl font-medium">
+                    <Text className="text-3xl font-bold">How</Text> Do You Make It?
+                  </Text>
+                  <View 
+                    className="bg-background-0 rounded-2xl border-0 opacity-70 p-5"
+                  >
+                    {steps.map((item, index) => (
+                      <View
+                        key={index}
+                        className="rounded-2xl bg-background-50 p-4 mb-3"
+                      >
+                        <TouchableOpacity 
+                          onPress={() => toggleStep(index)} 
+                          className="flex-row justify-between items-center"
+                        >
+                          <Text className="text-lg font-bold text-white">Step {index + 1}</Text>
+                          <Icon as={item.expanded ? ChevronUpIcon : ChevronDownIcon} className="text-white" />
+                        </TouchableOpacity>
+                        {item.expanded && (
+                         <View className="mt-2 flex-row justify-between items-start">
+                         <TextInput
+                           value={item.text}
+                           onChangeText={(text) => updateStep(index, text)}
+                           multiline={true}
+                           className="text-white text-base flex-1 p-2 bg-transparent"
+                           style={{ fontSize: 16 }}
+                           placeholder="Enter step details..."
+                           placeholderTextColor="#8C8C8C"
+                         />
+                         <TouchableOpacity onPress={() => removeStep(index)} className="ml-4 mt-2">
+                           <Icon as={CloseIcon} className="text-white" />
+                         </TouchableOpacity>
+                       </View>
+                        )}
+                      </View>
+                    ))}
+                    <View 
+                      className="rounded-2xl bg-background-50"
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <TextInput
+                        placeholder="Step"
+                        value={step}
+                        onChangeText={setStep}
+                        multiline={true}
+                        className="p-5 flex-1"
+                        style={{
+                          color: "white",
+                          fontSize: 16
+                        }}
+                        placeholderTextColor="#8C8C8C"
+                      />
+                    </View>
+                    <Button className="rounded-xl mt-5" size="md" variant="solid" action="primary" onPress={addStep} isDisabled={!step.trim()}>
                         <Feather name="plus" size={20} color="black" />
                     </Button>
                   </View>
