@@ -120,13 +120,11 @@ export default function CreateRecipe() {
     }}>
       <LinearGradient
         colors={[
-          "#37232f", "#34222e", "#30212c", "#2d202a", 
-          "#2a1f29", "#271e27", "#241d25", "#221c23", 
-          "#1f1b20", "#1c1a1e", "#1a181c", "#181719"
+          "#141f30", "#151d2e", "#161b2c", "#171a2a", "#181928", "#181826", "#1a1923", "#1a1921", "#1a181f", "#1a181d", "#19181b", "#181719"
         ]}
         locations={[0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7]}
-        start={{ x: 0, y: 1 }}
-        end={{ x: 1, y: -0.6 }}
+        start={{ x: 0, y: 0.5 }}
+        end={{ x: 1, y: -0.5 }}
         style={{
           position: 'absolute',
           left: 0,
@@ -151,7 +149,7 @@ export default function CreateRecipe() {
                   <Text className="text-xl font-medium">Do you have a <Text className="text-xl font-bold">link</Text> to the recipe?</Text>
                   <HStack space="sm">
                     <CustomInputField
-                      placeholder="Recipe link"
+                      placeholder="Recipe Link"
                       value={recipeLink}
                       onChangeText={setRecipeLink}
                       icon={() => <Feather name="link" size={20} color="#8C8C8C" />}
