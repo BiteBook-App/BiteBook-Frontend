@@ -1,16 +1,16 @@
-import { View, Image, ScrollView, TextInput, FlatList, TouchableOpacity } from "react-native";
+import { View, Image, ScrollView, TextInput, TouchableOpacity } from "react-native";
 import "@/global.css";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText, ButtonIcon } from "@/components/ui/button";
-import CustomInputField from "@/components/ui/custom-input-field";
 import { Feather, MaterialIcons } from "@expo/vector-icons";
 import { FormControl } from "@/components/ui/form-control";
 import * as ImagePicker from "expo-image-picker";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { Icon, CloseIcon, ChevronUpIcon, ChevronDownIcon } from "@/components/ui/icon";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function CreateRecipe() {
   const [photo, setPhoto] = useState<string | null>(null);
@@ -26,6 +26,30 @@ export default function CreateRecipe() {
     Umami: "bg-purple-500 border-purple-500", // Purple for umami
     Spicy: "bg-red-500 border-red-500",       // Red for spicy
   };
+  const [recipeLoading, setRecipeLoading] = useState(false);
+  const [recipe, setRecipe] = useState(null);
+
+  const importRecipe = async (recipeUrl: string) => {
+    setRecipeLoading(true);
+    try {
+      const res = await fetch("http://127.0.0.1:8000/import-recipe/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: recipeUrl
+        }),      
+      });
+      const data = await res.json();
+      setRecipe(data);
+      setTitle(data.name);
+      setIngredients(data.ingredients);
+      setSteps(data.instructions);
+    } catch (error) {
+      console.error("Error calling API:", error);
+      setRecipeLoading(false)
+    }
+    setRecipeLoading(false);
+  }
 
   const toggleTasteSelection = (taste: string) => {
     // If taste is already in array, remove; otherwise, add.
@@ -165,15 +189,17 @@ export default function CreateRecipe() {
                 <VStack space="md">
                   <Text className="text-xl font-medium">Do you have a <Text className="text-xl font-bold">link</Text> to the recipe?</Text>
                   <HStack space="sm">
-                    <CustomInputField
+                    <TextInput
                       placeholder="Recipe Link"
                       value={recipeLink}
                       onChangeText={setRecipeLink}
-                      icon={() => <Feather name="link" size={20} color="#8C8C8C" />}
-                      style={{ flex: 1 }}
+                      className="text-white bg-background-0 rounded-xl opacity-70 p-3 pl-4"
+                      style={{ fontSize: 17, flex: 1 }}
+                      placeholderTextColor="#8C8C8C"
                     />
-                    <Button className="px-3 py-2 rounded-xl" size="lg" variant="solid" action="primary">
-                      <Feather name="arrow-right" size={20} color="black" />
+                    <Button className="px-3 py-2 rounded-xl" size="lg" variant="solid" action="primary" onPress={() => importRecipe(recipeLink)}>
+                      {!recipeLoading && <Feather name="arrow-right" size={20} color="black" />}
+                      {recipeLoading && <Spinner/>}
                     </Button>
                   </HStack>
                 </VStack>
@@ -181,13 +207,19 @@ export default function CreateRecipe() {
                   <Text className="text-3xl font-medium">
                     Show your <Text className="text-3xl font-bold">meal</Text>
                   </Text>
-                  <Text className="text-xl font-medium">What is the <Text className="text-xl font-bold">name</Text> of your meal?</Text>
-                  <CustomInputField
+                  <Text className="text-xl font-medium">
+                    What is the <Text className="text-xl font-bold">name</Text> of your meal?
+                  </Text>
+                  <TextInput
                     placeholder="Meal Name"
+                    multiline={true}
                     value={title}
                     onChangeText={setTitle}
-                    icon={() => <MaterialIcons name="title" size={20} color="#8C8C8C" />}
+                    className="text-white bg-background-0 rounded-xl opacity-70 p-3 pl-4"
+                    style={{ fontSize: 17 }}
+                    placeholderTextColor="#8C8C8C"
                   />
+
                   <Text className="text-xl font-medium">What does your meal <Text className="text-xl font-bold">look like</Text>? </Text>
 
                   <HStack space="md">
@@ -238,7 +270,7 @@ export default function CreateRecipe() {
                           onChangeText={(text) => updateIngredient(index, "count", text)}
                           multiline={true}
                           className="text-white font-bold"
-                          style={{ width: 65, textAlign: "left", fontSize: 16 }}
+                          style={{ width: 125, textAlign: "left", fontSize: 16 }}
                           placeholderTextColor="#8C8C8C"
                         />
                         <TextInput
@@ -246,7 +278,7 @@ export default function CreateRecipe() {
                           value={item.name}
                           multiline={true}
                           onChangeText={(text) => updateIngredient(index, "name", text)}
-                          className="text-white flex-1 ml-3"
+                          className="text-white flex-1 ml-3 p-1"
                           style={{ fontSize: 16 }}
                           placeholderTextColor="#8C8C8C"
                         />
