@@ -3,7 +3,7 @@ import "@/global.css";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonText, ButtonIcon } from "@/components/ui/button";
 import CustomInputField from "@/components/ui/custom-input-field";
 import { Feather, MaterialIcons } from "@expo/vector-icons";
 import { FormControl } from "@/components/ui/form-control";
@@ -18,6 +18,23 @@ export default function CreateRecipe() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [recipeLink, setRecipeLink] = useState("");
   const [title, setTitle] = useState("");
+  const tasteOptions = ["Salty", "Sweet", "Sour", "Bitter", "Umami", "Spicy"];
+  const [selectedTastes, setSelectedTastes] = useState<string[]>([]);
+  const tasteColors: Record<string, string> = {
+    Salty: "bg-blue-500 border-blue-500",     // Blue for salty
+    Sweet: "bg-pink-500 border-pink-500",     // Pink for sweet
+    Sour: "bg-green-500 border-green-500",    // Green for sour
+    Bitter: "bg-gray-700 border-gray-700",    // Dark gray for bitter
+    Umami: "bg-purple-500 border-purple-500", // Purple for umami
+    Spicy: "bg-red-500 border-red-500",       // Red for spicy
+  };
+
+  const toggleTasteSelection = (taste: string) => {
+    // If taste is already in array, remove; otherwise, add.
+    setSelectedTastes((prev) =>
+      prev.includes(taste) ? prev.filter((item) => item !== taste) : [...prev, taste]
+    );
+  };
 
   // Function to request permissions and open the camera
   const takePhoto = async () => {
@@ -259,7 +276,7 @@ export default function CreateRecipe() {
                 </VStack>
                 <VStack space="md">
                   <Text className="text-3xl font-medium">
-                    Show Your <Text className="text-3xl font-bold">Meal</Text>
+                    Show your <Text className="text-3xl font-bold">meal</Text>
                   </Text>
                   <Text className="text-xl font-medium">What is the <Text className="text-xl font-bold">name</Text> of your meal?</Text>
                   <CustomInputField
@@ -318,7 +335,7 @@ export default function CreateRecipe() {
 
                 <VStack space="md">
                   <Text className="text-3xl font-medium">
-                    <Text className="text-3xl font-bold">What's</Text> In It?
+                    <Text className="text-3xl font-bold">What's</Text> in it?
                   </Text>
 
                   <View 
@@ -389,7 +406,7 @@ export default function CreateRecipe() {
 
                 <VStack space="md">
                   <Text className="text-3xl font-medium">
-                    <Text className="text-3xl font-bold">How</Text> Do You Make It?
+                    How do you <Text className="text-3xl font-bold">make it</Text>?
                   </Text>
                   <View 
                     className="bg-background-0 rounded-2xl border-0 opacity-70 p-5"
@@ -446,13 +463,36 @@ export default function CreateRecipe() {
                     </Button>
                   </View>
                 </VStack>
+                <VStack space="md">
+                  <Text className="text-3xl font-medium">
+                    How does it <Text className="text-3xl font-bold">taste</Text>?
+                  </Text>
+                  <View className="bg-background-0 rounded-2xl border-0 opacity-70 p-5">
+                  <HStack space="sm" className="flex-row flex-wrap">
+                    {tasteOptions.map((taste) => {
+                      const isSelected = selectedTastes.includes(taste);
+                      const buttonColor = isSelected ? tasteColors[taste] : "border-gray-400";
+
+                      return (
+                        <Button
+                          key={taste}
+                          size="lg"
+                          variant="solid"
+                          className={`rounded-full ${buttonColor}`}
+                          onPress={() => toggleTasteSelection(taste)}
+                        >
+                          <ButtonText>{taste}</ButtonText>
+                        </Button>
+                      );
+                    })}
+                  </HStack>
+                  </View>
+                </VStack>
               </VStack>
             </FormControl>
-            <VStack space="xl">
-              <Button className="rounded-xl mt-10" size="xl" variant="solid" action="primary" onPress={submitRecipe}>
-                <ButtonText>Add Recipe!</ButtonText>
-              </Button>
-            </VStack>
+            <Button className="rounded-xl mt-10" size="xl" variant="solid" action="primary" onPress={submitRecipe}>
+              <ButtonText>Add Recipe!</ButtonText>
+            </Button>
           </VStack>
       </ScrollView>
     </View>
