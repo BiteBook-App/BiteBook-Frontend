@@ -81,7 +81,7 @@ export default function CreateRecipe() {
   const [ingredientCount, setIngredientCount] = useState("");
 
   const addIngredient = () => {
-    if (ingredientName.trim() && ingredientCount.trim()) {
+    if (ingredientName.trim()) {
       setIngredients([...ingredients, { name: ingredientName, count: ingredientCount }]);
       setIngredientName("");
       setIngredientCount("");
@@ -172,8 +172,8 @@ export default function CreateRecipe() {
       name: title.trim(),
       photoUrl: photoUrl || "",
       ingredients: ingredients
-        .filter(({ name, count }) => name.trim() || count.trim()) // Remove empty ingredients
-        .map(({ name, count }) => ({ name: name.trim(), count: count.trim() })),
+        .filter(({ name }) => name.trim())
+        .map(({ name, count }) => ({ name: name.trim(), count: count.trim() || "" })),
       steps: steps
         .map(({ text }) => ({ text: text.trim(), expanded: false }))
         .filter(({ text }) => text !== ""), // Remove empty steps
@@ -398,7 +398,7 @@ export default function CreateRecipe() {
                           placeholderTextColor="#8C8C8C"
                         />
                     </View>
-                    <Button className="rounded-xl mt-5" size="md" variant="solid" action="primary" onPress={addIngredient} isDisabled={!ingredientName.trim() || !ingredientCount.trim()}>
+                    <Button className="rounded-xl mt-5" size="md" variant="solid" action="primary" onPress={addIngredient} isDisabled={!ingredientName.trim()}>
                         <Feather name="plus" size={20} color="black" />
                     </Button>
                   </View>
