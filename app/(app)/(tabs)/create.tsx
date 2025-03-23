@@ -23,8 +23,8 @@ export default function CreateRecipe() {
   const tasteColors: Record<string, string> = {
     Salty: "bg-blue-500 border-blue-500",     // Blue for salty
     Sweet: "bg-pink-500 border-pink-500",     // Pink for sweet
-    Sour: "bg-green-500 border-green-500",    // Green for sour
-    Bitter: "bg-gray-700 border-gray-700",    // Dark gray for bitter
+    Sour: "bg-yellow-500 border-yellow-500",    // Yellow for sour
+    Bitter: "bg-green-700 border-green-700",    // Green for bitter
     Umami: "bg-purple-500 border-purple-500", // Purple for umami
     Spicy: "bg-red-500 border-red-500",       // Red for spicy
   };
