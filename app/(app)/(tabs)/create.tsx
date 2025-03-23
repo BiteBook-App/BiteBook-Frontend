@@ -175,6 +175,13 @@ export default function CreateRecipe() {
     }
   };
 
+  const canSubmitRecipe =
+  title.trim() !== "" &&
+  (photo || "").trim() !== "" &&
+  ingredients.some(({ name }) => name.trim() !== "") &&
+  steps.some(({ text }) => text.trim() !== "") &&
+  selectedTastes.length > 0;
+
   const submitRecipe = async () => {
     let photoUrl = "";
 
@@ -523,7 +530,7 @@ export default function CreateRecipe() {
                 </VStack>
               </VStack>
             </FormControl>
-            <Button className="rounded-xl mt-10" size="xl" variant="solid" action="primary" onPress={submitRecipe}>
+            <Button className="rounded-xl mt-10" size="xl" variant="solid" action="primary" onPress={submitRecipe} isDisabled={!canSubmitRecipe}>
               <ButtonText>Add Recipe!</ButtonText>
             </Button>
           </VStack>
