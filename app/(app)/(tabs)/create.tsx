@@ -1,4 +1,4 @@
-import { View, Image, ScrollView, TextInput, FlatList, TouchableOpacity } from "react-native";
+import { View, Image, ScrollView, TextInput, TouchableOpacity } from "react-native";
 import "@/global.css";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
