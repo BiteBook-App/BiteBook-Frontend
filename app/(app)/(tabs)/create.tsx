@@ -289,7 +289,7 @@ export default function CreateRecipe() {
                     ))}
                     {/* Input Fields for Ingredient and Count */}
                     <View 
-                      className="rounded-2xl bg-background-50 flex-row"
+                      className="rounded-2xl bg-background-0 flex-row"
                     >
                       <TextInput
                           placeholder="Amount"
@@ -360,7 +360,7 @@ export default function CreateRecipe() {
                       </View>
                     ))}
                     <View 
-                      className="rounded-2xl bg-background-50"
+                      className="rounded-2xl bg-background-0"
                       style={{ flexDirection: "row", alignItems: "center" }}
                     >
                       <TextInput
