@@ -177,7 +177,7 @@ export default function CreateRecipe() {
       steps: steps
         .map(({ text }) => ({ text: text.trim(), expanded: false }))
         .filter(({ text }) => text !== ""), // Remove empty steps
-      tastes: [], // Add later
+      tastes: selectedTastes, // Add later
     };
   
     // GraphQL Mutation with Variables
