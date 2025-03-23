@@ -10,6 +10,8 @@ import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { Icon, CloseIcon, ChevronUpIcon, ChevronDownIcon } from "@/components/ui/icon";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useAuth } from '@/configs/authProvider';
 import { Spinner } from "@/components/ui/spinner";
 
 export default function CreateRecipe() {
@@ -21,8 +23,8 @@ export default function CreateRecipe() {
   const tasteColors: Record<string, string> = {
     Salty: "bg-blue-500 border-blue-500",     // Blue for salty
     Sweet: "bg-pink-500 border-pink-500",     // Pink for sweet
-    Sour: "bg-green-500 border-green-500",    // Green for sour
-    Bitter: "bg-gray-700 border-gray-700",    // Dark gray for bitter
+    Sour: "bg-yellow-500 border-yellow-500",    // Yellow for sour
+    Bitter: "bg-green-700 border-green-700",    // Green for bitter
     Umami: "bg-purple-500 border-purple-500", // Purple for umami
     Spicy: "bg-red-500 border-red-500",       // Red for spicy
   };
@@ -103,7 +105,7 @@ export default function CreateRecipe() {
   const [ingredientCount, setIngredientCount] = useState("");
 
   const addIngredient = () => {
-    if (ingredientName.trim() && ingredientCount.trim()) {
+    if (ingredientName.trim()) {
       setIngredients([...ingredients, { name: ingredientName, count: ingredientCount }]);
       setIngredientName("");
       setIngredientCount("");
@@ -150,6 +152,101 @@ export default function CreateRecipe() {
         i === index ? { ...step, text } : step
       )
     );
+  };
+
+  const { storage, user } = useAuth();
+
+  const uploadImage = async (uri: string) => {
+    if (!uri) return "";
+
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const filename = `recipes/${user.uid}/${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+    const storageRef = ref(storage, filename);
+
+    try {
+        // Upload to Firebase Storage
+        await uploadBytes(storageRef, blob);
+        // Get the URL
+        return await getDownloadURL(storageRef);
+    } catch (error) {
+        console.error("Upload failed:", error);
+        return "";
+    }
+  };
+
+  const submitRecipe = async () => {
+    let photoUrl = "";
+
+    // Upload image if it exists
+    if (photo) {
+      try {
+        photoUrl = await uploadImage(photo);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        alert("Failed to upload image. Please try again.");
+        return;
+      }
+    }
+    
+    // Construct the recipeData object
+    const recipeData = {
+      userId: user.uid,
+      url: recipeLink.trim(),
+      name: title.trim(),
+      photoUrl: photoUrl || "",
+      ingredients: ingredients
+        .filter(({ name }) => name.trim())
+        .map(({ name, count }) => ({ name: name.trim(), count: count.trim() || "" })),
+      steps: steps
+        .map(({ text }) => ({ text: text.trim(), expanded: false }))
+        .filter(({ text }) => text !== ""), // Remove empty steps
+      tastes: selectedTastes, // Add later
+    };
+  
+    // GraphQL Mutation with Variables
+    const mutationQuery = {
+      query: `
+        mutation CreateRecipe($recipeData: RecipeInput!) {
+          createRecipe(recipeData: $recipeData) {
+            uid
+          }
+        }
+      `,
+      variables: { recipeData },
+    };
+  
+    try {
+      const response = await fetch("http://localhost:8000/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(mutationQuery),
+      });
+  
+      const responseData = await response.json();
+      console.log("Server Response:", responseData);
+  
+      if (responseData.errors) {
+        alert("Error submitting recipe: " + responseData.errors[0].message);
+        return;
+      }
+  
+      // TODO: Have a more proper success screen
+      alert("Recipe submitted successfully!");
+  
+      // Reset form after successful submission
+      setPhoto(null);
+      setTitle("");
+      setRecipeLink("");
+      setIngredients([]);
+      setSteps([]);
+  
+    } catch (error) {
+      console.error("Error submitting recipe:", error);
+      alert("Failed to submit recipe. Please try again.");
+    }
   };
   
   return (
@@ -248,7 +345,23 @@ export default function CreateRecipe() {
 
                   {/* Display Selected Photo */}
                   {photo && (
-                    <Image source={{ uri: photo }} style={{ width: '100%', height: 350, borderRadius: 10 }} />
+                    <View>
+                      <Image 
+                        source={{ uri: photo }} 
+                        style={{ width: '100%', height: 350, borderRadius: 10 }} 
+                      />
+                      <TouchableOpacity
+                        onPress={() => setPhoto(null)}
+                        className="rounded-2xl bg-background-0 opacity-70 p-2"
+                        style={{
+                          position: 'absolute', 
+                          top: 10, 
+                          right: 10,
+                        }}
+                      >
+                        <Icon as={CloseIcon} className="text-white" />
+                      </TouchableOpacity>
+                    </View>
                   )}
                 </VStack>
 
@@ -262,6 +375,7 @@ export default function CreateRecipe() {
                   >
                     {ingredients.map((item, index) => (
                       <View 
+                        key={index}
                         className="rounded-2xl bg-background-50 flex-row justify-between items-center p-4 mb-3"
                       >
                         <TextInput
@@ -316,7 +430,7 @@ export default function CreateRecipe() {
                           placeholderTextColor="#8C8C8C"
                         />
                     </View>
-                    <Button className="rounded-xl mt-5" size="md" variant="solid" action="primary" onPress={addIngredient} isDisabled={!ingredientName.trim() || !ingredientCount.trim()}>
+                    <Button className="rounded-xl mt-5" size="md" variant="solid" action="primary" onPress={addIngredient} isDisabled={!ingredientName.trim()}>
                         <Feather name="plus" size={20} color="black" />
                     </Button>
                   </View>
@@ -408,7 +522,7 @@ export default function CreateRecipe() {
                 </VStack>
               </VStack>
             </FormControl>
-            <Button className="rounded-xl mt-10" size="xl" variant="solid" action="primary">
+            <Button className="rounded-xl mt-10" size="xl" variant="solid" action="primary" onPress={submitRecipe}>
               <ButtonText>Add Recipe!</ButtonText>
             </Button>
           </VStack>
