@@ -31,6 +31,11 @@ export default function CreateRecipe() {
   const [recipeLoading, setRecipeLoading] = useState(false);
   const [recipe, setRecipe] = useState(null);
 
+  const isValidRecipeLink = (link: string) => {
+    const urlPattern = /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,})(\/\S*)?$/i;
+    return urlPattern.test(link.trim());
+  };
+
   const importRecipe = async (recipeUrl: string) => {
     setRecipeLoading(true);
     try {
@@ -302,7 +307,7 @@ export default function CreateRecipe() {
                       style={{ fontSize: 17, flex: 1 }}
                       placeholderTextColor="#8C8C8C"
                     />
-                    <Button className="px-3 py-2 rounded-xl" size="lg" variant="solid" action="primary" onPress={() => importRecipe(recipeLink)}>
+                    <Button className="px-3 py-2 rounded-xl" size="lg" variant="solid" action="primary" onPress={() => importRecipe(recipeLink)} isDisabled={!isValidRecipeLink(recipeLink)}>
                       {!recipeLoading && <Feather name="arrow-right" size={20} color="black" />}
                       {recipeLoading && <Spinner/>}
                     </Button>
