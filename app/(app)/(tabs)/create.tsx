@@ -187,7 +187,10 @@ export default function CreateRecipe() {
   steps.some(({ text }) => text.trim() !== "") &&
   selectedTastes.length > 0;
 
+  const [recipeSubmit, setRecipeSubmit] = useState(false);
+
   const submitRecipe = async () => {
+    setRecipeSubmit(true);
     let photoUrl = "";
 
     // Upload image if it exists
@@ -197,6 +200,7 @@ export default function CreateRecipe() {
       } catch (error) {
         console.error("Error uploading image:", error);
         alert("Failed to upload image. Please try again.");
+        setRecipeSubmit(false);
         return;
       }
     }
@@ -247,6 +251,7 @@ export default function CreateRecipe() {
   
       // TODO: Have a more proper success screen
       alert("Recipe submitted successfully!");
+      setRecipeSubmit(false);
   
       // Reset form after successful submission
       setPhoto(null);
@@ -259,6 +264,7 @@ export default function CreateRecipe() {
     } catch (error) {
       console.error("Error submitting recipe:", error);
       alert("Failed to submit recipe. Please try again.");
+      setRecipeSubmit(false);
     }
   };
   
@@ -536,7 +542,8 @@ export default function CreateRecipe() {
               </VStack>
             </FormControl>
             <Button className="rounded-xl mt-10" size="xl" variant="solid" action="primary" onPress={submitRecipe} isDisabled={!canSubmitRecipe}>
-              <ButtonText>Add Recipe!</ButtonText>
+              {!recipeSubmit && <ButtonText>Add Recipe!</ButtonText>}
+              {recipeSubmit && <Spinner/>}
             </Button>
           </VStack>
       </ScrollView>
