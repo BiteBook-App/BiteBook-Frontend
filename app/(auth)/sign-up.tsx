@@ -14,6 +14,7 @@ import { Feather } from '@expo/vector-icons';
 import { router } from "expo-router";
 import { Spinner } from "@/components/ui/spinner"
 import { FormControl, FormControlError, FormControlErrorIcon, FormControlErrorText } from "@/components/ui/form-control";
+import { doc, setDoc, getDocs, collection, query, where, serverTimestamp } from "firebase/firestore";
 // @ts-ignore
 import PasswordStrengthMeterBar from 'react-native-password-strength-meter-bar';
 import { useAuth } from '@/configs/authProvider';

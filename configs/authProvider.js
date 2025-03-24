@@ -52,23 +52,40 @@ export const AuthProvider = ({ children }) => {
 
                 const googleCredential = auth.GoogleAuthProvider.credential(response.data?.idToken);
 
-                return auth().signInWithCredential(googleCredential)
+                const userCredential = await auth().signInWithCredential(googleCredential);
+
+                if (userCredential && userCredential.additionalUserInfo.isNewUser) {
+                    console.log("New User logged in.")
+                    const username = userCredential.user.email.split("@")[0];
+                    const profilePicture = userCredential.user.photoURL;
+
+                    await value.createUserDB(username, profilePicture, userCredential.user.uid);
+
+                    console.log("New User from Google Sign In Created.")
+                }
             }
             catch (error) {
-                console.error("Google Sign In error:", error);
+                console.error("Unable to sign in with Google. Error: ", error);
                 throw error;
             }
         },
         signInWithPhoneNumber: async (phoneNumber) => {
-            const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-            setConfirm(confirmation);
+            try {
+                const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+                setConfirm(confirmation);
+            }
+            catch (error) {
+                console.log(`Unable to sign in with phone number. Error: ${error}`);
+                throw error;
+            }
         },
         confirmPhoneNumberCode: async (code) => {
             try {
                 await confirm.confirm(code);
                 setConfirm(null);
             } catch (error) {
-                console.log('Invalid code.');
+                console.log(`Unable to confirm code. Error: ${error}`);
+                throw error;
             }
         },
         register: async (email, password) => {
@@ -89,8 +106,14 @@ export const AuthProvider = ({ children }) => {
                 console.error("Logout error:", error);
             }
         },
-        checkUserExistance: async () => {
-            const usernameQuery = query(collection(db, "users"), where("uid", "==", user.uid));
+        checkUserExistance: async (uid = "") => {
+            let userUID = uid;
+
+            if (userUID === "") {
+                userUID = user.uid;
+            }
+
+            const usernameQuery = query(collection(db, "users"), where("uid", "==", userUID));
             const querySnapshot = await getDocs(usernameQuery);
 
             return !querySnapshot.empty;
@@ -103,7 +126,7 @@ export const AuthProvider = ({ children }) => {
 
             return !querySnapshot.empty;
         },
-        createUserDB: async (username, uid = null) => {
+        createUserDB: async (username, uid = null, profilePicture = "") => {
             const userId = uid || user?.uid;
             if (!userId) {
                 console.error("Error: No valid UID found for user.");
@@ -112,7 +135,7 @@ export const AuthProvider = ({ children }) => {
             await setDoc(doc(db, "users", userId), {
                 uid: userId,
                 displayName: username,
-                profilePicture: "",
+                profilePicture: profilePicture,
                 createdAt: serverTimestamp(),
             });
         },
@@ -120,22 +143,22 @@ export const AuthProvider = ({ children }) => {
             const q = query(collection(db, "users"), where("uid", "==", user.uid));
             try {
               const querySnapshot = await getDocs(q);
-          
+
               if (querySnapshot.empty) {
                 console.log("No user found.");
                 return null; // Return null if no user is found
               }
-          
+
               const userData = querySnapshot.docs[0].data();
               return {
                 displayName: userData.displayName,
                 profilePicture: userData.profilePicture,
               };
-          
+
             } catch (error) {
               console.error("Error fetching user data:", error);
               return null; // Return null in case of an error
-            }     
+            }
         },
         deleteUser: async () => {
             try {
@@ -154,6 +177,7 @@ export const AuthProvider = ({ children }) => {
             }
         }
     };
+
     return (
         <AuthContext.Provider value={value}>
             {!loading && children}

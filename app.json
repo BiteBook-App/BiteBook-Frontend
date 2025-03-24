@@ -11,11 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.bitebook",
-      "googleServicesFile": "./services-files/GoogleService-Info.plist",
-      "infoPlist": {
-        "NSCameraUsageDescription": "This app requires access to your camera to take food photos.",
-        "NSPhotoLibraryUsageDescription": "This app requires access to your photo library to upload images."
-      }
+      "googleServicesFile": "./services-files/GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
