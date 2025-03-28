@@ -4,7 +4,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
-import { Feather, MaterialIcons } from "@expo/vector-icons";
+import { Feather, MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { FormControl } from "@/components/ui/form-control";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
@@ -52,6 +52,8 @@ export default function CreateRecipe() {
     }
     setRecipeLoading(false);
   }
+
+  const [hasCooked, setHasCooked] = useState('');
 
   const toggleTasteSelection = (taste: string) => {
     // If taste is already in array, remove; otherwise, add.
@@ -175,12 +177,13 @@ export default function CreateRecipe() {
     }
   };
 
-  const canSubmitRecipe =
+  const canSubmitRecipe = 
   title.trim() !== "" &&
-  (photo || "").trim() !== "" &&
   ingredients.some(({ name }) => name.trim() !== "") &&
   steps.some(({ text }) => text.trim() !== "") &&
-  selectedTastes.length > 0;
+  (hasCooked === 'Yes' 
+    ? ((photo || "").trim() !== "" && selectedTastes.length > 0)  // If cooked, photo and tastes required
+    : true);  // If not cooked, photo and tastes are optional
 
   const [recipeSubmit, setRecipeSubmit] = useState(false);
 
@@ -316,10 +319,10 @@ export default function CreateRecipe() {
                 </VStack>
                 <VStack space="md">
                   <Text className="text-3xl font-medium">
-                    Show your <Text className="text-3xl font-bold">meal</Text>
+                    Describe the <Text className="text-3xl font-bold">recipe</Text>
                   </Text>
                   <Text className="text-xl font-medium">
-                    What is the <Text className="text-xl font-bold">name</Text> of your meal?
+                    What is the <Text className="text-xl font-bold">name</Text> of the meal?
                   </Text>
                   <TextInput
                     placeholder="Meal Name"
@@ -331,52 +334,96 @@ export default function CreateRecipe() {
                     placeholderTextColor="#8C8C8C"
                   />
 
-                  <Text className="text-xl font-medium">What does your meal <Text className="text-xl font-bold">look like</Text>? </Text>
+                  <Text className="text-xl font-medium">
+                    Have you <Text className="text-xl font-bold">cooked</Text> this meal?
+                  </Text>
 
                   <HStack space="md">
-                    {/* Camera Button */}
                     <Button 
-                      className="rounded-full bg-background-0 opacity-70"
+                      className={`rounded-full opacity-70 ${hasCooked === 'Yes' ? 'bg-green-500' : 'bg-background-0'}`}
                       size="xl" 
                       variant="solid" 
                       action="secondary" 
-                      onPress={takePhoto}
+                      onPress={() => setHasCooked('Yes')}
                     >
-                      <Feather name="camera" size={24} color="white" />
+                      <Feather 
+                        name="check" 
+                        size={24} 
+                        color={hasCooked === 'Yes' ? 'black' : 'white'}
+                      />
+                      <Text className={`text-xl font-medium ${hasCooked === 'Yes' ? 'text-black' : 'text-white'}`}> Yes </Text>
                     </Button>
 
-                    {/* Select from Photos Button */}
                     <Button 
-                      className="rounded-full bg-background-0 opacity-70"
+                      className={`rounded-full opacity-70 ${hasCooked === 'No' ? 'bg-red-500' : 'bg-background-0'}`}
                       size="xl" 
                       variant="solid" 
                       action="secondary" 
-                      onPress={pickImage}
+                      onPress={() => setHasCooked('No')}
                     >
-                      <MaterialIcons name="photo-library" size={24} color="white" />
+                      <Ionicons 
+                        name="close" 
+                        size={24} 
+                        color={hasCooked === 'No' ? 'black' : 'white'}
+                      />
+                      <Text className={`text-xl font-medium ${hasCooked === 'No' ? 'text-black' : 'text-white'}`}> No </Text>
                     </Button>
                   </HStack>
 
-                  {/* Display Selected Photo */}
-                  {photo && (
-                    <View>
-                      <Image 
-                        source={{ uri: photo }} 
-                        style={{ width: '100%', height: 350, borderRadius: 10 }} 
-                      />
-                      <TouchableOpacity
-                        onPress={() => setPhoto(null)}
-                        className="rounded-2xl bg-background-0 opacity-70 p-2"
-                        style={{
-                          position: 'absolute', 
-                          top: 10, 
-                          right: 10,
-                        }}
+                  {hasCooked === 'Yes' && (
+                  <>
+                    <Text className="text-xl font-medium">
+                      What does your meal <Text className="text-xl font-bold">look like</Text>?
+                    </Text>
+
+                    <HStack space="md">
+                      {/* Camera Button */}
+                      <Button 
+                        className="rounded-full bg-background-0 opacity-70"
+                        size="xl" 
+                        variant="solid" 
+                        action="secondary" 
+                        onPress={takePhoto}
                       >
-                        <Icon as={CloseIcon} className="text-white" />
-                      </TouchableOpacity>
-                    </View>
-                  )}
+                        <Feather name="camera" size={24} color="white" />
+                      </Button>
+
+                      {/* Select from Photos Button */}
+                      <Button 
+                        className="rounded-full bg-background-0 opacity-70"
+                        size="xl" 
+                        variant="solid" 
+                        action="secondary" 
+                        onPress={pickImage}
+                      >
+                        <MaterialIcons name="photo-library" size={24} color="white" />
+                      </Button>
+                    </HStack>
+
+                    {/* Display Selected Photo */}
+                    {photo && (
+                      <View style={{ position: 'relative' }}>
+                        <Image 
+                          source={{ uri: photo }} 
+                          style={{ width: '100%', height: 350, borderRadius: 10 }} 
+                        />
+                        <TouchableOpacity
+                          onPress={() => setPhoto(null)}
+                          style={{
+                            position: 'absolute', 
+                            top: 10, 
+                            right: 10,
+                            backgroundColor: 'rgba(0,0,0,0.5)', 
+                            borderRadius: 20,
+                            padding: 10,
+                          }}
+                        >
+                          <Icon as={CloseIcon} color="white" />
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  </>
+                )}
                 </VStack>
 
                 <VStack space="md">
@@ -509,6 +556,8 @@ export default function CreateRecipe() {
                     </Button>
                   </View>
                 </VStack>
+              {hasCooked === 'Yes' && (
+              <>
                 <VStack space="md">
                   <Text className="text-3xl font-medium">
                     How does it <Text className="text-3xl font-bold">taste</Text>?
@@ -534,6 +583,8 @@ export default function CreateRecipe() {
                   </HStack>
                   </View>
                 </VStack>
+              </>
+              )}
               </VStack>
             </FormControl>
             <Button className="rounded-xl mt-10" size="xl" variant="solid" action="primary" onPress={submitRecipe} isDisabled={!canSubmitRecipe}>
