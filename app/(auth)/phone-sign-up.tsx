@@ -77,7 +77,7 @@ export default function PhoneSignUp() {
       await createUserDB(username)
 
       console.log("Account successfully created and authenticated");
-      router.push('/(app)/(tabs)');
+      router.push('/(app)/(tabs)/(home)');
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.log(error.message);

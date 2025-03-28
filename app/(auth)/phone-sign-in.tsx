@@ -66,7 +66,7 @@ const PhoneSignIn = () => {
             setLoading(false);
 
             if (userExists) {
-                router.replace("/(app)/(tabs)");
+                router.replace("/(app)/(tabs)/(home)");
             } else {
                 router.push("/phone-sign-up")
             }

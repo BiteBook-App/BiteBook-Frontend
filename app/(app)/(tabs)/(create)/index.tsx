@@ -268,7 +268,6 @@ export default function CreateRecipe() {
     style={{
       flex: 1,
       width: "100%",
-      paddingBottom: 20,
     }}>
       <LinearGradient
         colors={[
@@ -288,7 +287,7 @@ export default function CreateRecipe() {
         }}
       />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-          <VStack space="xs">
+          <VStack space="xs" className="mb-20">
             <VStack className="mt-8 lg:mt-3" space="xs">
               <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px]" size="5xl">
                 Add a Recipe
