@@ -202,6 +202,8 @@ export default function CreateRecipe() {
         return;
       }
     }
+
+    const hasCookedBool = hasCooked === 'Yes';
     
     // Construct the recipeData object
     const recipeData = {
@@ -215,7 +217,8 @@ export default function CreateRecipe() {
       steps: steps
         .map(({ text }) => ({ text: text.trim(), expanded: false }))
         .filter(({ text }) => text !== ""), // Remove empty steps
-      tastes: selectedTastes, // Add later
+      tastes: selectedTastes,
+      hasCooked: hasCookedBool,
     };
   
     // GraphQL Mutation with Variables
