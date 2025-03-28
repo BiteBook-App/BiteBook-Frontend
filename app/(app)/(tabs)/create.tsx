@@ -359,7 +359,7 @@ export default function CreateRecipe() {
                     </Button>
 
                     <Button 
-                      className={`rounded-full opacity-70 ${hasCooked === 'No' ? 'bg-red-500' : 'bg-background-0'}`}
+                      className={`px-8 rounded-full opacity-70 ${hasCooked === 'No' ? 'bg-red-500' : 'bg-background-0'}`}
                       size="xl" 
                       variant="solid" 
                       action="secondary" 
