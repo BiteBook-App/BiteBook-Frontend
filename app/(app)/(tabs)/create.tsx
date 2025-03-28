@@ -261,6 +261,7 @@ export default function CreateRecipe() {
       setIngredients([]);
       setSteps([]);
       setSelectedTastes([]);
+      setHasCooked("");
   
     } catch (error) {
       console.error("Error submitting recipe:", error);
