@@ -101,7 +101,7 @@ export default function SignUp() {
       await createUserDB(username, uid);
 
       console.log("Account successfully created and authenticated");
-      router.replace('/(app)/(tabs)');
+      router.replace('/(app)/(tabs)/(home)');
 
     } catch (error: any) {
         if (error.code === "auth/email-already-in-use") {

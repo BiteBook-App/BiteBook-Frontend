@@ -71,7 +71,7 @@ export default function Login() {
     login(email, password)
       .then(() => {
         // Signed in
-        router.replace("/(app)/(tabs)");
+        router.replace("/(app)/(tabs)/(home)");
       })
       .catch((error: unknown) => {
         if (error instanceof Error) {
