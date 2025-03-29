@@ -42,6 +42,10 @@ export default function EditRecipe() {
     const {loading, error, data} = useQuery(GET_RECIPES);
     const [editRecipe, {data: mutationData, loading: mutationLoading, error: mutationError}] = useMutation(EDIT_RECIPE);
 
+    if(error) {
+        alert("Unable to find recipe. Please try again later.")
+    }
+
     const loadData = () => {
         setRecipeLoading(true);
         try {

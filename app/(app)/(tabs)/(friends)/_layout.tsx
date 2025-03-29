@@ -1,14 +1,7 @@
-import { Redirect, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
-import { useAuth } from "@/configs/authProvider";
 
 export default function AppLayout() {
-  const { user, signOut } = useAuth();
-  
-  // Unauthenticated users are redirected to login page
-  if (!user)
-    return <Redirect href="/(auth)"/>
-
   return (
     <GluestackUIProvider mode="dark">
       <Stack screenOptions={{
@@ -23,8 +16,7 @@ export default function AppLayout() {
           headerTransparent: true
         }}
       >
-        {/* If the user is authenticated, home page renders */}
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }}/> 
+        <Stack.Screen name="index" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', headerTitle: 'BiteBook'}}/>
       </Stack>
     </GluestackUIProvider>
   );

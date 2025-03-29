@@ -16,45 +16,45 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="(home)"
         options={{
-          title: "BiteBook",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Foundation name="home" size={size} color={color}/>
           ),
         }}
       />
       <Tabs.Screen
-        name="friends"
+        name="(friends)"
         options={{
-          title: "BiteBook",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Feather name="users" size={size} color={color}/>
           ),
         }}
       />
       <Tabs.Screen
-        name="create"
+        name="(create)"
         options={{
-          title: "BiteBook",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <AntDesign name="pluscircleo" size={size} color={color}/>
           ),
         }}
       />
       <Tabs.Screen
-        name="taste"
+        name="(taste)"
         options={{
-          title: "BiteBook",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <FontAwesome5 name="cookie-bite" size={size} color={color}/>
           ),
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="(profile)"
         options={{
-          title: "BiteBook",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Feather name="user" size={size} color={color}/>
           ),
