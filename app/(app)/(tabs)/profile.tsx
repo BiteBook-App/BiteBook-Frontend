@@ -3,10 +3,17 @@ import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { Pressable } from "@/components/ui/pressable"
 import { useAuth } from "@/configs/authProvider";
+import {useRouter} from "expo-router";
 
 export default function Profile() {
   const { user, signOut, getUserProfile, deleteUser } = useAuth();
   const [profile, setProfile] = useState({ displayName: "", profilePicture: "" });
+
+  const router = useRouter();
+
+  const editRecipe = () => {
+    router.push("/(app)/edit")
+  }
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -33,6 +40,9 @@ export default function Profile() {
       </Pressable>
       <Pressable onPress={async () => await deleteUser()}>
         <Text>Delete Account</Text>
+      </Pressable>
+      <Pressable onPress={async () => editRecipe()}>
+        <Text>Edit Recipe</Text>
       </Pressable>
     </View>
   );
