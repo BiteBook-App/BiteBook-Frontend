@@ -19,7 +19,9 @@
     "@expo/html-elements": "^0.4.2",
     "@expo/vector-icons": "^14.0.2",
     "@firebase/auth": "^1.9.0",
+    "@gluestack-ui/actionsheet": "^0.2.52",
     "@gluestack-ui/alert": "^0.1.16",
+    "@gluestack-ui/avatar": "^0.1.18",
     "@gluestack-ui/button": "^1.0.8",
     "@gluestack-ui/form-control": "^0.1.19",
     "@gluestack-ui/icon": "^0.1.25",
@@ -47,6 +49,7 @@
     "expo-constants": "~17.0.5",
     "expo-font": "~13.0.3",
     "expo-haptics": "~14.0.1",
+    "expo-image-picker": "~16.0.6",
     "expo-linear-gradient": "~14.0.2",
     "expo-linking": "~7.0.5",
     "expo-router": "~4.0.17",
@@ -78,8 +81,7 @@
     "react-redux": "^9.2.0",
     "redux": "^5.0.1",
     "tailwindcss": "^3.4.17",
-    "web-streams-polyfill": "^4.1.0",
-    "expo-image-picker": "~16.0.6"
+    "web-streams-polyfill": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
