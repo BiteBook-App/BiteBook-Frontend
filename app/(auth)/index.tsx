@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { Text } from "@/components/ui/text";
 import { FormControl, FormControlError, FormControlErrorIcon, FormControlErrorText } from "@/components/ui/form-control";
 import { VStack } from "@/components/ui/vstack";
-import { MailIcon, LockIcon, CloseCircleIcon, PhoneIcon, createIcon } from "@/components/ui/icon";
+import { MailIcon, LockIcon, CloseCircleIcon, PhoneIcon, createIcon, InfoIcon } from "@/components/ui/icon";
 import { Image } from "@/components/ui/image";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
@@ -17,7 +17,6 @@ import CustomInputField from "@/components/ui/custom-input-field";
 import { Path } from "react-native-svg";
 import { useAuth } from '@/configs/authProvider';
 import { Alert, AlertText, AlertIcon } from "@/components/ui/alert"
-import { InfoIcon } from "@/components/ui/icon"
 
 SplashScreen.preventAutoHideAsync();
 
@@ -72,7 +71,7 @@ export default function Login() {
     login(email, password)
       .then(() => {
         // Signed in
-        router.replace("/(app)/(tabs)");
+        router.replace("/(app)/(tabs)/(home)");
       })
       .catch((error: unknown) => {
         if (error instanceof Error) {
