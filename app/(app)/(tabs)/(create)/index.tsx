@@ -349,12 +349,9 @@ export default function CreateRecipe() {
                   {/* Wrap in View for scroll measurement */}
                   <View>
                     <Text className="text-3xl font-medium">
-                      Show your <Text className="text-3xl font-bold">meal</Text>
+                      What's the <Text className="text-3xl font-bold">meal</Text> called?
                     </Text>
                   </View>
-                  <Text className="text-xl font-medium">
-                    What is the <Text className="text-xl font-bold">name</Text> of the meal?
-                  </Text>
                   <TextInput
                     placeholder="Meal Name"
                     multiline={true}
@@ -619,8 +616,8 @@ export default function CreateRecipe() {
               </VStack>
             </FormControl>
             <Button className="rounded-xl mt-10" size="xl" variant="solid" action="primary" onPress={submitRecipe} isDisabled={!canSubmitRecipe}>
-              {!recipeSubmit && <ButtonText>Add Recipe!</ButtonText>}
-              {recipeSubmit && <Spinner/>}
+              {!recipeSubmit && <ButtonText>{hasCooked === 'No' ? 'Save Recipe!' : 'Share Recipe!'}</ButtonText>}
+              {recipeSubmit && <Spinner />}
             </Button>
           </VStack>
       </ScrollView>
