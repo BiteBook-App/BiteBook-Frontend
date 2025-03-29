@@ -15,6 +15,7 @@ export default function AppLayout() {
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', headerTitle: 'BiteBook'}}/>
+        <Stack.Screen name="settings" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', headerTitle: ''}}/>
       </Stack>
     </GluestackUIProvider>
   );
