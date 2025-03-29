@@ -11,7 +11,10 @@ export default function Profile() {
   const [profile, setProfile] = useState({ displayName: "", profilePicture: "" });
 
   const router = useRouter();
-  
+
+  const editRecipe = () => {
+    router.push("/(app)/edit")
+  }
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -38,6 +41,9 @@ export default function Profile() {
       </Pressable>
       <Pressable onPress={async () => await deleteUser()}>
         <Text>Delete Account</Text>
+      </Pressable>
+      <Pressable onPress={async () => editRecipe()}>
+        <Text>Edit Recipe</Text>
       </Pressable>
     </View>
   );
