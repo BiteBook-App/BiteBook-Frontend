@@ -5,11 +5,18 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Feather, MaterialIcons } from "@expo/vector-icons";
-import { FormControl } from "@/components/ui/form-control";
+import {
+  FormControl,
+  FormControlError,
+  FormControlErrorText,
+  FormControlErrorIcon,
+  FormControlLabel,
+  FormControlLabelText,
+} from "@/components/ui/form-control"
 import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import { Icon, CloseIcon, ChevronUpIcon, ChevronDownIcon } from "@/components/ui/icon";
+import { Icon, CloseIcon, ChevronUpIcon, ChevronDownIcon, CloseCircleIcon } from "@/components/ui/icon";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useAuth } from '@/configs/authProvider';
 import { Spinner } from "@/components/ui/spinner";
@@ -30,6 +37,13 @@ export default function CreateRecipe() {
   };
   const [recipeLoading, setRecipeLoading] = useState(false);
   const [recipe, setRecipe] = useState(null);
+  const [importError, setImportError] = useState(false);
+
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  const scrollToText = () => {
+    scrollViewRef.current?.scrollTo({ y: 180, animated: true});
+  };
 
   const importRecipe = async (recipeUrl: string) => {
     setRecipeLoading(true);
@@ -46,9 +60,12 @@ export default function CreateRecipe() {
       setTitle(data.name);
       setIngredients(data.ingredients);
       setSteps(data.instructions);
+      scrollToText();
+      setImportError(false);
     } catch (error) {
       console.error("Error calling API:", error);
       setRecipeLoading(false)
+      setImportError(true);
     }
     setRecipeLoading(false);
   }
@@ -287,7 +304,7 @@ export default function CreateRecipe() {
           alignItems: 'center', // Centers content horizontally
         }}
       />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false} ref={scrollViewRef}>
           <VStack space="xs">
             <VStack className="mt-8 lg:mt-3" space="xs">
               <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px]" size="5xl">
@@ -297,27 +314,38 @@ export default function CreateRecipe() {
 
             <FormControl>
               <VStack space="4xl">
+                <FormControl isInvalid={importError}>
+                  <VStack space="md">
+                    <Text className="text-xl font-medium">Do you have a <Text className="text-xl font-bold">link</Text> to the recipe?</Text>
+                    <HStack space="sm">
+                      <TextInput
+                        placeholder="Recipe Link"
+                        value={recipeLink}
+                        onChangeText={setRecipeLink}
+                        className="text-white bg-background-0 rounded-xl opacity-70 p-3 pl-4"
+                        style={{ fontSize: 17, flex: 1 }}
+                        placeholderTextColor="#8C8C8C"
+                      />
+                      <Button className="px-3 py-2 rounded-xl" size="lg" variant="solid" action="primary" onPress={() => importRecipe(recipeLink)} isDisabled={recipeLink.length < 1}>
+                        {!recipeLoading && <Feather name="arrow-right" size={20} color="black" />}
+                        {recipeLoading && <Spinner/>}
+                      </Button>
+                    </HStack>
+                    <FormControlError>
+                      <FormControlErrorIcon as={CloseCircleIcon} />
+                      <FormControlErrorText>
+                        Unable to import recipe. Try again or enter manually.
+                      </FormControlErrorText>
+                    </FormControlError>
+                  </VStack>
+                </FormControl>
                 <VStack space="md">
-                  <Text className="text-xl font-medium">Do you have a <Text className="text-xl font-bold">link</Text> to the recipe?</Text>
-                  <HStack space="sm">
-                    <TextInput
-                      placeholder="Recipe Link"
-                      value={recipeLink}
-                      onChangeText={setRecipeLink}
-                      className="text-white bg-background-0 rounded-xl opacity-70 p-3 pl-4"
-                      style={{ fontSize: 17, flex: 1 }}
-                      placeholderTextColor="#8C8C8C"
-                    />
-                    <Button className="px-3 py-2 rounded-xl" size="lg" variant="solid" action="primary" onPress={() => importRecipe(recipeLink)} isDisabled={recipeLink.length < 1}>
-                      {!recipeLoading && <Feather name="arrow-right" size={20} color="black" />}
-                      {recipeLoading && <Spinner/>}
-                    </Button>
-                  </HStack>
-                </VStack>
-                <VStack space="md">
-                  <Text className="text-3xl font-medium">
-                    Show your <Text className="text-3xl font-bold">meal</Text>
-                  </Text>
+                  {/* Wrap in View for scroll measurement */}
+                  <View>
+                    <Text className="text-3xl font-medium">
+                      Show your <Text className="text-3xl font-bold">meal</Text>
+                    </Text>
+                  </View>
                   <Text className="text-xl font-medium">
                     What is the <Text className="text-xl font-bold">name</Text> of your meal?
                   </Text>
