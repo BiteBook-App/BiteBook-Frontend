@@ -20,6 +20,7 @@ import { Icon, CloseIcon, ChevronUpIcon, ChevronDownIcon, CloseCircleIcon } from
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useAuth } from '@/configs/authProvider';
 import { Spinner } from "@/components/ui/spinner";
+import { router } from "expo-router";
 
 export default function CreateRecipe() {
   const [photo, setPhoto] = useState<string | null>(null);
@@ -262,7 +263,7 @@ export default function CreateRecipe() {
       }
   
       // TODO: Have a more proper success screen
-      alert("Recipe submitted successfully!");
+      router.replace("/(app)/(tabs)/(profile)");
       setRecipeSubmit(false);
   
       // Reset form after successful submission
