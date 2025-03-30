@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { View, ScrollView } from "react-native";
+import { useState, useEffect, useCallback } from "react";
+import { View, ScrollView, RefreshControl } from "react-native";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/configs/authProvider";
 import { useRouter} from 'expo-router';
@@ -20,48 +20,46 @@ import {
   ActionsheetIcon,
 } from "@/components/ui/actionsheet"
 import { Pressable } from "react-native";
+import { useQuery } from "@apollo/client";
+import { GET_RECIPE_PREVIEW, GET_PROFILE } from "@/configs/queries";
 
 export default function Profile() {
-  const { user, signOut, getUserProfile, deleteUser } = useAuth();
+  const { user } = useAuth();
+  const [refreshing, setRefreshing] = useState(false);
 
-  // TODO: Pull values from backend
-  const [profile, setProfile] = useState({ 
-    displayName: "catluvr", 
-    profilePicture: "https://i.pinimg.com/736x/29/5c/c0/295cc07854f00d2d81953125b93f6b99.jpg", 
-    numPosts: 2, 
-    numFriends: 3
+  const { loading: postsLoading, error: postsError, data: posts, refetch } = useQuery(GET_RECIPE_PREVIEW, {
+    variables: { userId: user?.uid }, // Ensure the userId is passed correctly
+    skip: !user?.uid, // Prevents running query if user.uid is undefined
   });
 
-  const [posts, setPosts] = useState([
-    { 
-      photo_url: "https://i.redd.it/6eii7kz9aj051.jpg",
-      name: "Best Grilled Cheese",
-      tastes: ['Salty', 'Umami']
-    },
-    { 
-      photo_url: "https://preview.redd.it/sponge-cake-v0-qfvafbgje4id1.jpeg?auto=webp&s=538fc9b370a2f6b476405a6dc7e68b1386baf208",
-      name: "Strawberry Shortcake",
-      tastes: ['Sweet']
-    },
-  ]);
+  const { loading: profileLoading, error: profileError, data: profile } = useQuery(GET_PROFILE, {
+    variables: { uid: user?.uid }, // Ensure the userId is passed correctly
+    skip: !user?.uid, // Prevents running query if user.uid is undefined
+  });
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+  
+    try {
+      await refetch();  // Wait for the refetch to complete
+    } catch (error) {
+      console.error("Error during refetch:", error);
+    } finally {
+      setRefreshing(false);  // Set refreshing to false after refetch completes or fails
+    }
+  }, [refetch]);
+
+  const numPosts = posts?.getRecipes?.length;
+
+  useEffect(() => {
+    refetch();  // Trigger refetch when the page loads or when route changes
+  }, [posts]);
 
   const router = useRouter();
 
   const editRecipe = () => {
     router.push("/(app)/edit")
   }
-
-  // TODO: Uncomment and update 
-  // useEffect(() => {
-  //   const fetchProfile = async () => {
-  //     if (user?.uid) {
-  //       const userProfile = await getUserProfile(user.uid);
-  //       if (userProfile) setProfile(userProfile);
-  //     }
-  //   };
-
-  //   fetchProfile();
-  // }, []);
 
   return (
     <View
@@ -90,42 +88,34 @@ export default function Profile() {
         }}
       />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         <VStack space="xl" className="mt-5 mb-5">
+          {/* TODO: Update numFriends!! */}
           <ProfileInfo 
-            displayName={profile.displayName} 
-            profilePicture={profile.profilePicture} 
-            numPosts={profile.numPosts} 
-            numFriends={profile.numFriends}
+            displayName={profile?.getUsers?.[0].displayName} 
+            profilePicture={profile?.getUsers?.[0].profilePicture} 
+            numPosts={numPosts} 
+            numFriends={3} 
           />
 
-          {/* <View className="h-px bg-background-100" /> */}
-
-          <Pressable onPress={async () => editRecipe()}>
-        <Text>Edit Recipe</Text>
-      </Pressable>
+          {/* <Pressable onPress={async () => editRecipe()}>
+            <Text>Edit Recipe</Text>
+          </Pressable> */}
 
           <Text className="font-[Rashfield] leading-[50px]" style={{ marginBottom: -10 }} size="3xl">
             Served Recipes              
           </Text>
 
-          {posts.map((post, index) => (
+          {posts?.getRecipes?.map((post: { photoUrl: string; name: string; tastes: string[] }, index: number) => (
             <Post
               key={index}
-              photoUrl={post.photo_url}
+              photoUrl={post.photoUrl}
               mealName={post.name}
               tastes={post.tastes}
             />
           ))}
 
         </VStack>
-        
-        {/* <Text>{ `Username: ${ profile.displayName }` }</Text>
-        <Pressable onPress={async () => await signOut()}>
-          <Text>Sign Out</Text>
-        </Pressable>
-        <Pressable onPress={async () => await deleteUser()}>
-          <Text>Delete Account</Text>
-        </Pressable> */}
       </ScrollView>
     </View>
   );
