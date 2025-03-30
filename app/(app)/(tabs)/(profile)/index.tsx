@@ -19,6 +19,7 @@ import {
   ActionsheetItemText,
   ActionsheetIcon,
 } from "@/components/ui/actionsheet"
+import { Pressable } from "react-native";
 
 export default function Profile() {
   const { user, signOut, getUserProfile, deleteUser } = useAuth();
@@ -45,9 +46,12 @@ export default function Profile() {
   ]);
 
   const router = useRouter();
-  
-  // TODO: Uncomment and update 
 
+  const editRecipe = () => {
+    router.push("/(app)/edit")
+  }
+
+  // TODO: Uncomment and update 
   // useEffect(() => {
   //   const fetchProfile = async () => {
   //     if (user?.uid) {
@@ -95,6 +99,10 @@ export default function Profile() {
           />
 
           {/* <View className="h-px bg-background-100" /> */}
+
+          <Pressable onPress={async () => editRecipe()}>
+        <Text>Edit Recipe</Text>
+      </Pressable>
 
           <Text className="font-[Rashfield] leading-[50px]" style={{ marginBottom: -10 }} size="3xl">
             Served Recipes              
