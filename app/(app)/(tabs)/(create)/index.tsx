@@ -304,7 +304,7 @@ export default function CreateRecipe() {
         }}
       />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false} ref={scrollViewRef}>
-          <VStack space="xs" className="mb-20">
+          <VStack space="xs" className="mb-10">
             <VStack className="mt-8 lg:mt-3" space="xs">
               <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px]" size="5xl">
                 Add a Recipe
