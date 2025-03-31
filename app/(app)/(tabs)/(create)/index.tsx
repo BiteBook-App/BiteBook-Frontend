@@ -339,7 +339,7 @@ export default function CreateRecipe() {
       // Ensure each imported instruction has an ID
       setSteps(data.instructions.map((instruction: { text: string; }) => ({
         text: instruction.text || "",
-        expanded: false,
+        expanded: true,
         id: generateUniqueId()
       })));
       
