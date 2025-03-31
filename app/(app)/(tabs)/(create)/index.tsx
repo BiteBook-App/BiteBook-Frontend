@@ -718,7 +718,7 @@ export default function CreateRecipe() {
                   <Text className="text-3xl font-medium">
                     How do you <Text className="text-3xl font-bold">make it</Text>?
                   </Text>
-                  <View className="bg-background-0 rounded-2xl border-0 opacity-70 p-5" style={{ flexGrow: 1, maxHeight: 350 }}>
+                  <View className="bg-background-0 rounded-2xl border-0 opacity-70 p-5" style={{ flexGrow: 1, maxHeight: 480 }}>
                     
                     {steps.length > 0 && (
                       <ReorderableList
