@@ -137,27 +137,29 @@ export default function Edit() {
           </Button>
         </VStack>
         <FormControl isInvalid={invalidEdit}>
-          <VStack space="sm">
-            <Text>Username</Text>
-            <CustomInputField
-                placeholder="Test"
-                value={displayName}
-                onChangeText={(text) => {
-                  setDisplayName(text);
-                  setInvalidEdit(false);
-                }}
-                icon={() => <Feather name="user" size={20} color="#8C8C8C" />}
-              />
+          <VStack space="md">
+            <VStack space="sm">
+              <Text>Username</Text>
+              <CustomInputField
+                  placeholder="Test"
+                  value={displayName}
+                  onChangeText={(text) => {
+                    setDisplayName(text);
+                    setInvalidEdit(false);
+                  }}
+                  icon={() => <Feather name="user" size={20} color="#8C8C8C" />}
+                />
+            </VStack>
+            <Button style={styles.button} onPress={handleUpdateUser} isDisabled={!hasPictureChanged && displayName == profile?.getUsers?.[0]?.displayName}>
+              { pageLoading ? <Spinner/> : <ButtonText>Save changes</ButtonText>}
+            </Button>
+            <FormControlError>
+              <FormControlErrorIcon as={AlertCircleIcon} />
+              <FormControlErrorText>
+                Username already taken. Please choose again.
+              </FormControlErrorText>
+            </FormControlError>
           </VStack>
-          <Button className="mb-2" style={styles.button} onPress={handleUpdateUser} isDisabled={!hasPictureChanged && displayName == profile?.getUsers?.[0]?.displayName}>
-            { pageLoading ? <Spinner/> : <ButtonText>Save changes</ButtonText>}
-          </Button>
-          <FormControlError>
-            <FormControlErrorIcon as={AlertCircleIcon} />
-            <FormControlErrorText>
-              Username already taken. Please choose again.
-            </FormControlErrorText>
-          </FormControlError>
         </FormControl>
       </VStack>
     </View>
