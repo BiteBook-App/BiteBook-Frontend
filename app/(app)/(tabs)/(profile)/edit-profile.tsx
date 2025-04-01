@@ -18,6 +18,16 @@ import CustomInputField from "@/components/ui/custom-input-field";
 import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter } from "expo-router";
+import {
+  FormControl,
+  FormControlError,
+  FormControlErrorText,
+  FormControlErrorIcon,
+  FormControlLabel,
+  FormControlLabelText,
+} from "@/components/ui/form-control"
+import { AlertCircleIcon } from "@/components/ui/icon";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Edit() {
   const { storage, user } = useAuth();
@@ -31,6 +41,8 @@ export default function Edit() {
   const [displayName, setDisplayName] = useState(profile?.getUsers?.[0]?.displayName);
   const [profilePicture, setProfilePicture] = useState(profile?.getUsers?.[0]?.profilePicture || "");
   const [hasPictureChanged, setHasPictureChanged] = useState(false); // Tracks if user selects a new photo
+  const [invalidEdit, setInvalidEdit] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
 
   // TODO: Move this to a new file for modularity
   const pickImage = async () => {
@@ -75,6 +87,8 @@ export default function Edit() {
   const [editUser, { data, loading, error }] = useMutation(EDIT_USER);
 
   const handleUpdateUser = async () => {
+    setPageLoading(true);
+
     const profilePictureURL = await uploadImage(profilePicture);
 
     // Only updates if changes have been detected
@@ -91,8 +105,10 @@ export default function Edit() {
       router.back();
       router.back();
     } catch (err) {
-      console.error("Error updating user:", err);
+      setInvalidEdit(true)
     }
+
+    setPageLoading(false);
   };
 
   return (
@@ -120,18 +136,29 @@ export default function Edit() {
             <ButtonText>Change photo</ButtonText>
           </Button>
         </VStack>
-        <VStack space="sm">
-          <Text>Username</Text>
-          <CustomInputField
-              placeholder="Test"
-              value={displayName}
-              onChangeText={setDisplayName}
-              icon={() => <Feather name="user" size={20} color="#8C8C8C" />}
-            />
-        </VStack>
-        <Button style={styles.button} onPress={handleUpdateUser} isDisabled={!hasPictureChanged && displayName == profile?.getUsers?.[0]?.displayName}>
-          <ButtonText>Save changes</ButtonText>
-        </Button>
+        <FormControl isInvalid={invalidEdit}>
+          <VStack space="sm">
+            <Text>Username</Text>
+            <CustomInputField
+                placeholder="Test"
+                value={displayName}
+                onChangeText={(text) => {
+                  setDisplayName(text);
+                  setInvalidEdit(false);
+                }}
+                icon={() => <Feather name="user" size={20} color="#8C8C8C" />}
+              />
+          </VStack>
+          <Button className="mb-2" style={styles.button} onPress={handleUpdateUser} isDisabled={!hasPictureChanged && displayName == profile?.getUsers?.[0]?.displayName}>
+            { pageLoading ? <Spinner/> : <ButtonText>Save changes</ButtonText>}
+          </Button>
+          <FormControlError>
+            <FormControlErrorIcon as={AlertCircleIcon} />
+            <FormControlErrorText>
+              Username already taken. Please choose again.
+            </FormControlErrorText>
+          </FormControlError>
+        </FormControl>
       </VStack>
     </View>
   );
