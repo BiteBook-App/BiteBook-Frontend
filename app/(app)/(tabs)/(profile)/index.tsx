@@ -27,33 +27,35 @@ export default function Profile() {
   const { user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
 
-  const { loading: postsLoading, error: postsError, data: posts, refetch } = useQuery(GET_RECIPE_PREVIEW, {
+  const { loading: postsLoading, error: postsError, data: posts, refetch: refetchPosts } = useQuery(GET_RECIPE_PREVIEW, {
     variables: { userId: user?.uid }, // Ensure the userId is passed correctly
     skip: !user?.uid, // Prevents running query if user.uid is undefined
   });
 
-  const { loading: profileLoading, error: profileError, data: profile } = useQuery(GET_PROFILE, {
+  const { loading: profileLoading, error: profileError, data: profile, refetch: refetchProfile } = useQuery(GET_PROFILE, {
     variables: { uid: user?.uid }, // Ensure the userId is passed correctly
     skip: !user?.uid, // Prevents running query if user.uid is undefined
   });
+
+  const numPosts = posts?.getRecipes?.length;
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
   
     try {
-      await refetch();  // Wait for the refetch to complete
+      await refetchPosts();  // Wait for the refetch to complete
+      await refetchProfile();  // Wait for the refetch to complete
     } catch (error) {
       console.error("Error during refetch:", error);
     } finally {
       setRefreshing(false);  // Set refreshing to false after refetch completes or fails
     }
-  }, [refetch]);
+  }, [refetchPosts, refetchProfile]);
 
-  const numPosts = posts?.getRecipes?.length;
-
-  useEffect(() => {
-    refetch();  // Trigger refetch when the page loads or when route changes
-  }, [posts]);
+  // useEffect(() => {
+  //   refetchPosts();  // Trigger refetch when the page loads or when route changes
+  //   refetchProfile();
+  // }, [posts, profile]);
 
   const router = useRouter();
 
@@ -67,6 +69,7 @@ export default function Profile() {
       style={{
         flex: 1,
       }}
+      key={profile}
     >
       <LinearGradient
         colors={[
@@ -92,10 +95,10 @@ export default function Profile() {
         <VStack space="xl" className="mt-5 mb-5">
           {/* TODO: Update numFriends!! */}
           <ProfileInfo 
-            displayName={profile?.getUsers?.[0].displayName} 
-            profilePicture={profile?.getUsers?.[0].profilePicture} 
+            displayName={profile?.getUsers?.[0]?.displayName}
+            profilePicture={profile?.getUsers?.[0]?.profilePicture}
             numPosts={numPosts} 
-            numFriends={3} 
+            numFriends={0} 
           />
 
           {/* <Pressable onPress={async () => editRecipe()}>
