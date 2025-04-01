@@ -51,3 +51,13 @@ export const EDIT_RECIPE = gql`
       }
   }
 `;
+
+export const EDIT_USER = gql`
+  mutation EditUser($userId: String!, $displayName: String, $profilePicture: String) {
+      editUser(userId: $userId, displayName: $displayName, profilePicture: $profilePicture) {
+          uid
+          displayName
+          profilePicture
+      }
+  }
+`;
