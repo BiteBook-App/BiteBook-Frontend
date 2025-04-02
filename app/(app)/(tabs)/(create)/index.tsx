@@ -16,6 +16,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { CloseCircleIcon } from "@/components/ui/icon";
 import { useAuth } from '@/configs/authProvider';
 import { Spinner } from "@/components/ui/spinner";
+import { router } from "expo-router";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import StepsSection, { StepsUtils, StepItem } from "@/components/ui/steps-component/steps";
 import CameraComponent from "@/components/ui/camera-component/camera";
@@ -171,10 +172,11 @@ export default function CreateRecipe() {
         return;
       }
   
-      // Success handling
-      alert("Recipe submitted successfully!");
-      
-      // Reset form
+      // TODO: Have a more proper success screen
+      router.replace("/(app)/(tabs)/(profile)");
+      setRecipeSubmit(false);
+  
+      // Reset form after successful submission
       setPhoto(null);
       setTitle("");
       setRecipeLink("");
@@ -230,7 +232,7 @@ export default function CreateRecipe() {
           showsVerticalScrollIndicator={false} 
           ref={scrollViewRef}
         >
-          <VStack space="xs" className="mb-20">
+          <VStack space="xs" className="mb-10">
             <VStack className="mt-8 lg:mt-3" space="xs">
               <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px]" size="5xl">
                 Add a Recipe
