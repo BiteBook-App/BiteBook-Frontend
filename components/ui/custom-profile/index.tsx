@@ -22,7 +22,7 @@ export default function Profile({ displayName, profilePicture, numPosts, numFrie
   const router = useRouter();
 
   return (
-    <VStack space="md">
+    <VStack space="md" className="mt-3 px-5">
       <HStack space="lg" className="items-center">
         <Avatar size="xl">
           <AvatarFallbackText>{ displayName }</AvatarFallbackText>
