@@ -18,7 +18,7 @@ interface ProfileInfo {
   numFriends: number
 }
 
-export default function Profile({ displayName, profilePicture, numPosts, numFriends}: ProfileInfo) {
+export default function Profile({ displayName, profilePicture, numPosts, numFriends }: ProfileInfo) {
   const router = useRouter();
 
   return (
