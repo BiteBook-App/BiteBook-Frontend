@@ -25,7 +25,19 @@ export const GET_RECIPES = gql`
 
 export const GET_RECIPE_PREVIEW = gql`
   query GetRecipePreview($userId: String) {
-    getRecipes(userId: $userId) {
+    getRecipes(userId: $userId, hasCooked: true) {
+      createdAt
+      name
+      photoUrl
+      tastes
+      uid
+    }
+  }
+`;
+
+export const GET_DRAFT_PREVIEW = gql`
+  query GetDraftPreview($userId: String) {
+    getRecipes(userId: $userId, hasCooked: false) {
       createdAt
       name
       photoUrl
