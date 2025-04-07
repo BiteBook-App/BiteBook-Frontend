@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { View, ScrollView, RefreshControl } from "react-native";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { View, ScrollView, RefreshControl, useWindowDimensions, StyleSheet } from "react-native";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/configs/authProvider";
 import { useRouter} from 'expo-router';
@@ -21,13 +21,28 @@ import {
 } from "@/components/ui/actionsheet"
 import { Pressable } from "react-native";
 import { useQuery } from "@apollo/client";
-import { GET_RECIPE_PREVIEW, GET_PROFILE } from "@/configs/queries";
+import { GET_RECIPE_PREVIEW, GET_PROFILE, GET_DRAFT_PREVIEW } from "@/configs/queries";
+import DraftRecipe from "@/components/ui/custom-draft-recipe";
+import { Tabs, MaterialTabBar, MaterialTabItem } from 'react-native-collapsible-tab-view';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 
 export default function Profile() {
   const { user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState<'Posts' | 'Drafts'>('Posts');
+  const slideX = useSharedValue(0);
+  const previousTab = useRef("Posts"); // Track previous tab
 
   const { loading: postsLoading, error: postsError, data: posts, refetch: refetchPosts } = useQuery(GET_RECIPE_PREVIEW, {
+    variables: { userId: user?.uid }, // Ensure the userId is passed correctly
+    skip: !user?.uid, // Prevents running query if user.uid is undefined
+  });
+
+  const { loading: draftsLoading, error: draftsError, data: drafts, refetch: refetchDrafts } = useQuery(GET_DRAFT_PREVIEW, {
     variables: { userId: user?.uid }, // Ensure the userId is passed correctly
     skip: !user?.uid, // Prevents running query if user.uid is undefined
   });
@@ -41,10 +56,10 @@ export default function Profile() {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-  
     try {
       await refetchPosts();  // Wait for the refetch to complete
       await refetchProfile();  // Wait for the refetch to complete
+      await refetchDrafts();
     } catch (error) {
       console.error("Error during refetch:", error);
     } finally {
@@ -52,10 +67,33 @@ export default function Profile() {
     }
   }, [refetchPosts, refetchProfile]);
 
-  // useEffect(() => {
-  //   refetchPosts();  // Trigger refetch when the page loads or when route changes
-  //   refetchProfile();
-  // }, [posts, profile]);
+  useEffect(() => {
+    refetchPosts();  // Trigger refetch when the page loads or when route changes
+    refetchProfile();
+    refetchDrafts();
+  }, []);
+
+  useEffect(() => {
+    // Determine direction
+    const direction = activeTab === "Posts" && previousTab.current === "Drafts"
+      ? -1
+      : activeTab === "Drafts" && previousTab.current === "Posts"
+      ? 1
+      : 0;
+  
+    // Start off-screen based on direction
+    slideX.value = direction * 300;
+  
+    // Animate to center
+    slideX.value = withTiming(0, { duration: 400 });
+  
+    // Save current tab
+    previousTab.current = activeTab;
+  }, [activeTab]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: slideX.value }],
+  }));
 
   const router = useRouter();
 
@@ -65,7 +103,7 @@ export default function Profile() {
 
   return (
     <View
-      className="bg-background-dark px-5 lg:px-40"
+      className="bg-background-dark lg:px-40"
       style={{
         flex: 1,
       }}
@@ -90,9 +128,9 @@ export default function Profile() {
           alignItems: 'center', // Centers content horizontally
         }}
       />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        <VStack space="xl" className="mt-5 mb-5">
+        <VStack space="md" className="bg-background-dark">
           {/* TODO: Update numFriends!! */}
           <ProfileInfo 
             displayName={profile?.getUsers?.[0]?.displayName}
@@ -100,26 +138,83 @@ export default function Profile() {
             numPosts={numPosts} 
             numFriends={0} 
           />
+          <HStack>
+            <Pressable
+              onPress={() => setActiveTab('Posts')}
+              style={[
+                styles.tab,
+                activeTab === 'Posts' && styles.activeTab,
+              ]}
+            >
+              <Text style={activeTab === 'Posts' ? styles.activeText : styles.inactiveText}>
+                Posts
+              </Text>
+            </Pressable>
 
-          {/* <Pressable onPress={async () => editRecipe()}>
-            <Text>Edit Recipe</Text>
-          </Pressable> */}
-
-          <Text className="font-[Rashfield] leading-[50px]" style={{ marginBottom: -10 }} size="3xl">
-            Served Recipes              
-          </Text>
-
-          {posts?.getRecipes?.map((post: { photoUrl: string; name: string; tastes: string[] }, index: number) => (
-            <Post
-              key={index}
-              photoUrl={post.photoUrl}
-              mealName={post.name}
-              tastes={post.tastes}
-            />
-          ))}
-
+            <Pressable
+              onPress={() => setActiveTab('Drafts')}
+              style={[
+                styles.tab,
+                activeTab === 'Drafts' && styles.activeTab,
+              ]}
+            >
+              <Text style={activeTab === 'Drafts' ? styles.activeText : styles.inactiveText}>
+                Drafts
+              </Text>
+            </Pressable>
+          </HStack>
         </VStack>
+        
+        <Animated.View style={[animatedStyle]}>
+          {activeTab === "Posts" ? (
+            <VStack space="lg" className="mb-5 px-5 mt-4">
+              {posts?.getRecipes?.map((post: any, index: any) => (
+                <Post
+                  key={index}
+                  photoUrl={post.photoUrl}
+                  mealName={post.name}
+                  tastes={post.tastes}
+                />
+              ))}
+            </VStack>
+          ) : (
+            <VStack space="sm" className="mb-5 px-4 mt-4">
+              {drafts?.getRecipes?.map((post: any, index: any) => (
+                <DraftRecipe
+                  key={index}
+                  createdAt={post.createdAt}
+                  mealName={post.name}
+                  tastes={post.tastes}
+                />
+              ))}
+
+            </VStack>
+          )}
+        </Animated.View>
       </ScrollView>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  tab: {
+    flex: 1,
+    padding: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  activeTab: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'white',
+  },
+  activeText: {
+    color: 'white',
+    fontWeight: '500', // medium-bold
+    textAlign: 'center',
+  },
+  inactiveText: {
+    color: '#888', // or use 'gray' / '#aaa' for dimmed
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+});
