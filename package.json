@@ -21,6 +21,7 @@
     "@expo/vector-icons": "^14.0.2",
     "@firebase/auth": "^1.9.0",
     "@gluestack-ui/alert": "^0.1.16",
+    "@gluestack-ui/avatar": "^0.1.18",
     "@gluestack-ui/button": "^1.0.8",
     "@gluestack-ui/form-control": "^0.1.19",
     "@gluestack-ui/icon": "^0.1.25",
