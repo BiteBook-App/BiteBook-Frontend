@@ -14,7 +14,7 @@ export default function AppLayout() {
           headerShadowVisible: false,
         }}
       >
-        <Stack.Screen name="[id]" options={{ headerShown: false, headerBackButtonDisplayMode: 'minimal', headerTitle: ''}}/>
+        <Stack.Screen name="[editRecipeId]" options={{ headerShown: false, headerBackButtonDisplayMode: 'minimal', headerTitle: ''}}/>
       </Stack>
     </GluestackUIProvider>
   );
