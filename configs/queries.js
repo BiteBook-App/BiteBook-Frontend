@@ -23,6 +23,33 @@ export const GET_RECIPES = gql`
   }
 `;
 
+export const GET_RECIPE = gql`
+  query GetRecipe($recipeUid: String!) {
+    getRecipe(recipeUid: $recipeUid) {
+      userId
+      uid
+      url
+      name
+      photoUrl
+      likes
+      createdAt
+      steps {
+        expanded
+        text
+      }
+      ingredients {
+        count
+        name
+      }
+      tastes
+      user {
+        displayName
+        profilePicture
+      }
+    }
+  }
+`;
+
 export const GET_RECIPE_PREVIEW = gql`
   query GetRecipePreview($userId: String) {
     getRecipes(userId: $userId, hasCooked: true) {
