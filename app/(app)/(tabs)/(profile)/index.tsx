@@ -169,12 +169,16 @@ export default function Profile() {
           {activeTab === "Posts" ? (
             <VStack space="lg" className="mb-5 px-5 mt-4">
               {posts?.getRecipes?.map((post: any, index: any) => (
-                <Post
+                <Pressable 
+                  onPress={() => router.push(`/(app)/(tabs)/(profile)/(recipe)/${post.uid}`)} 
                   key={index}
-                  photoUrl={post.photoUrl}
-                  mealName={post.name}
-                  tastes={post.tastes}
-                />
+                >
+                  <Post
+                    photoUrl={post.photoUrl}
+                    mealName={post.name}
+                    tastes={post.tastes}
+                  />
+                </Pressable>
               ))}
             </VStack>
           ) : (
