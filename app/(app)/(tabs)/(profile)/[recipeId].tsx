@@ -1,20 +1,36 @@
-import { View, ScrollView, StyleSheet, Image } from "react-native";
+import { View, ScrollView, StyleSheet, Image, Pressable } from "react-native";
 import { Text } from "@/components/ui/text";
 import { LinearGradient } from "expo-linear-gradient";
 import RecipeComponent from "@/components/ui/custom-recipe";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLayoutEffect, useRef, useState } from "react";
+import { Icon, ThreeDotsIcon } from "@/components/ui/icon";
+import CustomActionsheet from "@/components/ui/custom-actionsheet";
 
 export default function Recipe() {
   const GRADIENT_COLORS: [string, string, ...string[]] = [
     "#141f30", "#151d2e", "#161b2c", "#171a2a", "#181928", "#181826", 
     "#1a1923", "#1a1921", "#1a181f", "#1a181d", "#19181b", "#181719"
   ];
-  
   const GRADIENT_LOCATIONS: [number, number, ...number[]] = [
     0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7
   ];
 
-  const { id } = useLocalSearchParams() as { id: string };
+  const { recipeId } = useLocalSearchParams() as { recipeId: string };
+
+  const navigation = useNavigation();
+  const [showActionsheet, setShowActionsheet] = useState(false);
+  const handleClose = () => setShowActionsheet(false);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable onPress={() => setShowActionsheet(true)}>
+          <Icon as={ThreeDotsIcon} size="xl" />
+        </Pressable>
+      ),
+    });
+  }, [navigation]);
 
   return (
     <View
@@ -38,9 +54,9 @@ export default function Recipe() {
         contentContainerStyle={{ flexGrow: 1 }} 
         showsVerticalScrollIndicator={false} 
       >
-        <RecipeComponent recipeId={id}/>
-
+        <RecipeComponent recipeId={recipeId}/>
       </ScrollView>
+      <CustomActionsheet showActionsheet={showActionsheet} handleClose={handleClose} recipeId={recipeId}/>
     </View>
   );
 }
