@@ -73,3 +73,27 @@ export const EDIT_USER = gql`
       }
   }
 `;
+
+export const CREATE_RECIPE = gql`
+ mutation CreateRecipe($recipeData: RecipeInput!) {
+      createRecipe(recipeData: $recipeData) {
+        uid
+      }
+    }
+`;
+
+export const GET_HOME_PAGE = gql`
+  query getHomePage($userId: String!, $numRecipes: Int!) {
+    getHomePageRecipes(userId: $userId, numRecipes: $numRecipes) {
+      name
+      photoUrl
+      likes
+      tastes
+      createdAt
+      user {
+        displayName
+        profilePicture
+      }
+    }
+  }
+`;

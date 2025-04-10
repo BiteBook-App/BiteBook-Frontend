@@ -25,6 +25,8 @@ import ReorderableList, {
   reorderItems,
   useReorderableDrag,
 } from 'react-native-reorderable-list';
+import { CREATE_RECIPE } from "@/configs/queries";
+import { useMutation } from "@apollo/client";
 
 type StepItem = {
   text: string;
@@ -354,6 +356,8 @@ export default function CreateRecipe() {
     }
   }, [generateUniqueId, scrollToText]);
 
+  const [createRecipeMutation, { loading: mutationLoading, error: mutationError }] = useMutation(CREATE_RECIPE);
+
   // Form submission
   const submitRecipe = useCallback(async () => {
     setRecipeSubmit(true);
@@ -389,40 +393,16 @@ export default function CreateRecipe() {
       hasCooked: hasCookedBool,
     };
   
-    // GraphQL Mutation with Variables
-    const mutationQuery = {
-      query: `
-        mutation CreateRecipe($recipeData: RecipeInput!) {
-          createRecipe(recipeData: $recipeData) {
-            uid
-          }
-        }
-      `,
-      variables: { recipeData },
-    };
-  
     try {
-      const response = await fetch("http://localhost:8000/graphql", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      await createRecipeMutation({
+        variables: {
+          recipeData,
         },
-        body: JSON.stringify(mutationQuery),
       });
   
-      const responseData = await response.json();
-  
-      if (responseData.errors) {
-        alert("Error submitting recipe: " + responseData.errors[0].message);
-        setRecipeSubmit(false);
-        return;
-      }
-  
-      // TODO: Have a more proper success screen
       router.replace("/(app)/(tabs)/(profile)");
-      setRecipeSubmit(false);
   
-      // Reset form after successful submission
+      // Reset form
       setPhoto(null);
       setTitle("");
       setRecipeLink("");
@@ -430,6 +410,7 @@ export default function CreateRecipe() {
       setSteps([]);
       setSelectedTastes([]);
       setHasCooked("");
+  
     } catch (error) {
       console.error("Error submitting recipe:", error);
       alert("Failed to submit recipe. Please try again.");
@@ -437,15 +418,16 @@ export default function CreateRecipe() {
       setRecipeSubmit(false);
     }
   }, [
-    photo, 
-    title, 
-    recipeLink, 
-    ingredients, 
-    steps, 
-    selectedTastes, 
-    hasCooked, 
-    user.uid, 
-    uploadImage
+    photo,
+    title,
+    recipeLink,
+    ingredients,
+    steps,
+    selectedTastes,
+    hasCooked,
+    user.uid,
+    uploadImage,
+    createRecipeMutation
   ]);
 
   // Memoized renderStepItem function to prevent unnecessary re-renders
@@ -542,7 +524,7 @@ export default function CreateRecipe() {
                 <VStack space="md">
                   <View>
                     <Text className="text-3xl font-medium">
-                      What's the <Text className="text-3xl font-bold">meal</Text> called?
+                      What's the <Text className="text-3xl font-bold">recipe</Text> called?
                     </Text>
                   </View>
                   <TextInput
@@ -557,7 +539,7 @@ export default function CreateRecipe() {
 
                   {/* Have You Cooked Section */}
                   <Text className="text-xl font-medium">
-                    Have you <Text className="text-xl font-bold">cooked</Text> this meal?
+                    Have you <Text className="text-xl font-bold">cooked</Text> this recipe?
                   </Text>
 
                   <HStack space="md">
