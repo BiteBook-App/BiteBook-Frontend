@@ -84,8 +84,8 @@ export const GET_PROFILE = gql`
 `;
 
 export const EDIT_RECIPE = gql`
-  mutation EditRecipe($recipeData: RecipeInput!) {
-      editRecipe(recipeData: $recipeData, recipeId: "OA3NkEzSqFdKM26Hvf1x") {
+  mutation EditRecipe($recipeData: RecipeInput!, $recipeId: String!) {
+      editRecipe(recipeData: $recipeData, recipeId: $recipeId) {
           uid
       }
   }
