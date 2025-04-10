@@ -1,5 +1,8 @@
 import { Stack } from "expo-router";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
+import { Pressable } from "react-native";
+import { Icon, ThreeDotsIcon } from "@/components/ui/icon"
+
 
 export default function AppLayout() {
   return (
@@ -17,6 +20,16 @@ export default function AppLayout() {
         <Stack.Screen name="index" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', headerTitle: 'BiteBook'}}/>
         <Stack.Screen name="settings" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', headerTitle: ''}}/>
         <Stack.Screen name="edit-profile" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', headerTitle: ''}}/>
+        <Stack.Screen name="(recipe)" options={{ 
+          headerShown: true, 
+          headerBackButtonDisplayMode: 'minimal', 
+          headerTitle: '',
+          headerRight: () => (
+            <Pressable>
+              <Icon as={ThreeDotsIcon} size="xl" />
+            </Pressable>
+          ),
+        }}/>
       </Stack>
     </GluestackUIProvider>
   );
