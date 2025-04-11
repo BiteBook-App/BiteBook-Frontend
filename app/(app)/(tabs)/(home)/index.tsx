@@ -123,7 +123,7 @@ export default function Home() {
         <VStack space="lg" className="mb-5 mt-4">
           {data?.getHomePageRecipes?.length === 0 ? ( <NoRecipes />) : (
             data?.getHomePageRecipes?.map((post: any, index: any) => (
-              <View key={index} className="mb-6">
+              <View key={index} className="mb-4">
                 {/* Heading with profile picture and display name */}
                 <View className="flex-row items-center mb-4">
                   <Avatar size="sm">
