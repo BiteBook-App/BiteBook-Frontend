@@ -14,7 +14,8 @@ import {
   AvatarFallbackText,
   AvatarImage,
 } from "@/components/ui/avatar"
-
+import { LinearGradient } from "expo-linear-gradient";
+import NoRecipes from "@/components/ui/custom-no-recipes-display";
 
 export default function Home() {
   const { user } = useAuth();
@@ -63,7 +64,6 @@ export default function Home() {
     }
   };
 
-  // TODO: have loading page or animation?
   if (loading) 
     return (
       <View
@@ -80,6 +80,18 @@ export default function Home() {
 
   // if (error) return <Text>Error: {error.message}</Text>;
 
+  // TODO: have text that redirects to create recipe if no recipes on home page
+
+  const GRADIENT_COLORS: [string, string, ...string[]] = [
+    "#301818", "#2e181a", "#2c181b", "#2a171d", "#28171d", 
+    "#25181e", "#22181e", "#20181e", "#1e181d", "#1b181c", 
+    "#1a171b", "#181719"
+  ];
+  
+  const GRADIENT_LOCATIONS: [number, number, ...number[]] = [
+    0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7
+  ];
+
   return (
     <View
       className="bg-background-dark px-5 lg:px-40"
@@ -89,6 +101,19 @@ export default function Home() {
         width: "100%",
       }}
     >
+      <LinearGradient
+        colors={GRADIENT_COLORS}
+        locations={GRADIENT_LOCATIONS}
+        start={{ x: 0, y: 0.5 }}
+        end={{ x: 1, y: -0.5 }}
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+        }}
+      />
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -96,34 +121,36 @@ export default function Home() {
         }
       >
         <VStack space="lg" className="mb-5 mt-4">
-          {data?.getHomePageRecipes?.map((post: any, index: any) => (
-            <View key={index} className="bg-background-dark lg:px-40 mb-6">
-              {/* Heading with profile picture and display name */}
-              <View className="flex-row items-center mb-4">
-                <Avatar size="sm">
-                  <AvatarFallbackText>{post.user.displayName}</AvatarFallbackText>
-                  <AvatarImage
-                    source={{
-                      uri: post.user.profilePicture,
-                    }}
-                  />
-                </Avatar>
-                <Text className="font-semibold text-white ml-2">{post.user.displayName}</Text>
+          {data?.getHomePageRecipes?.length === 0 ? ( <NoRecipes />) : (
+            data?.getHomePageRecipes?.map((post: any, index: any) => (
+              <View key={index} className="mb-6">
+                {/* Heading with profile picture and display name */}
+                <View className="flex-row items-center mb-4">
+                  <Avatar size="sm">
+                    <AvatarFallbackText>{post.user.displayName}</AvatarFallbackText>
+                    <AvatarImage
+                      source={{
+                        uri: post.user.profilePicture,
+                      }}
+                    />
+                  </Avatar>
+                  <Text className="font-semibold text-white ml-2">{post.user.displayName}</Text>
+                </View>
+
+                {/* Render post content */}
+                <Post
+                  photoUrl={post.photoUrl}
+                  mealName={post.name}
+                  tastes={post.tastes}
+                />
+
+                {/* Post time or date */}
+                <Text className="text-sm text-gray-300 mt-2">
+                  {formatDate(post.createdAt)}
+                </Text>
               </View>
-
-              {/* Render post content */}
-              <Post
-                photoUrl={post.photoUrl}
-                mealName={post.name}
-                tastes={post.tastes}
-              />
-
-              {/* Post time or date */}
-              <Text className="text-sm text-gray-500 mt-2">
-                {formatDate(post.createdAt)}
-              </Text>
-            </View>
-          ))}
+            ))
+          )}
         </VStack>
       </ScrollView>
     </View>
