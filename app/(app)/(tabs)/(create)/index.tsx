@@ -322,6 +322,16 @@ export default function CreateRecipe() {
     }
   }, [storage, user.uid]);
 
+  const clearForm = (): void => {
+    setPhoto(null);
+    setTitle("");
+    setRecipeLink("");
+    setIngredients([]);
+    setSteps([]);
+    setSelectedTastes([]);
+    setHasCooked("");
+  };
+
   // Recipe import function
   const importRecipe = useCallback(async (recipeUrl: string) => {
     if (!recipeUrl.trim()) return;
@@ -403,13 +413,7 @@ export default function CreateRecipe() {
       router.replace("/(app)/(tabs)/(profile)");
   
       // Reset form
-      setPhoto(null);
-      setTitle("");
-      setRecipeLink("");
-      setIngredients([]);
-      setSteps([]);
-      setSelectedTastes([]);
-      setHasCooked("");
+      clearForm();
   
     } catch (error) {
       console.error("Error submitting recipe:", error);
@@ -479,9 +483,12 @@ export default function CreateRecipe() {
         >
           <VStack space="xs" className="mb-10">
             <VStack className="mt-8 lg:mt-3" space="xs">
-              <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px]" size="5xl">
-                Add a Recipe
-              </Text>
+              <HStack>
+                <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px]" size="5xl">
+                  Add a Recipe
+                </Text>
+                <MaterialCommunityIcons onPress={() => clearForm()} className="pl-20 pt-2" name="restart" size={30} color="white" />
+              </HStack>
             </VStack>
 
             <FormControl>
