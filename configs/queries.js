@@ -52,6 +52,7 @@ export const GET_PROFILE = gql`
     getUsers(uid: $uid) {
       displayName
       profilePicture
+      relationships
     }
   }
 `;

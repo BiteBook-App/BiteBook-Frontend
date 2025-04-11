@@ -136,7 +136,7 @@ export default function Profile() {
             displayName={profile?.getUsers?.[0]?.displayName}
             profilePicture={profile?.getUsers?.[0]?.profilePicture}
             numPosts={numPosts} 
-            numFriends={0} 
+            numFriends={profile?.getUsers?.[0]?.relationships?.length}
           />
           <HStack>
             <Pressable
