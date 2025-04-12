@@ -1,5 +1,4 @@
 import { View, ScrollView, StyleSheet, Image, Pressable } from "react-native";
-import { Text } from "@/components/ui/text";
 import { LinearGradient } from "expo-linear-gradient";
 import RecipeComponent from "@/components/ui/custom-recipe";
 import { useLocalSearchParams, useNavigation } from "expo-router";
