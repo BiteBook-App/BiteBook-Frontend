@@ -126,7 +126,11 @@ export default function Home() {
             data?.getHomePageRecipes?.map((post: any, index: any) => (
               <View key={index} className="mb-4">
                 {/* Heading with profile picture and display name */}
-                <View className="flex-row items-center mb-4">
+                <Pressable className="flex-row items-center mb-4" 
+                  onPress={() => {
+                    post.user.uid == userId ? router.push(`/(app)/(tabs)/(profile)`) : router.push(`/(app)/(tabs)/(home)/(friend)/${post.user.uid}`)
+                  }}
+                >
                   <Avatar size="sm">
                     <AvatarFallbackText>{post.user.displayName}</AvatarFallbackText>
                     <AvatarImage
@@ -136,7 +140,7 @@ export default function Home() {
                     />
                   </Avatar>
                   <Text className="font-semibold text-white ml-2">{post.user.displayName}</Text>
-                </View>
+                </Pressable>
 
                 {/* Render post content */}
                 <Pressable onPress={() => router.push(`/(app)/(tabs)/(home)/${post.uid}`)}>
