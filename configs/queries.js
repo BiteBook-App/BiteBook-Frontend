@@ -122,6 +122,7 @@ export const GET_HOME_PAGE = gql`
       user {
         displayName
         profilePicture
+        uid
       }
     }
   }
