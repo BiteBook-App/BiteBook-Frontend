@@ -13,10 +13,13 @@ import { Icon, CloseIcon, ChevronUpIcon, ChevronDownIcon } from "@/components/ui
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useAuth } from '@/configs/authProvider';
 import { Spinner } from "@/components/ui/spinner";
-import {useMutation, useQuery} from "@apollo/client";
-import {EDIT_RECIPE, GET_RECIPES} from "@/configs/queries";
+import { useMutation, useQuery } from "@apollo/client";
+import { EDIT_RECIPE, GET_RECIPE } from "@/configs/queries";
+import { useLocalSearchParams } from "expo-router";
 
 export default function EditRecipe() {
+    const { editRecipeId } = useLocalSearchParams() as { editRecipeId: string };
+
     const [photo, setPhoto] = useState<string | null>(null);
     const [recipeLink, setRecipeLink] = useState("");
     const [title, setTitle] = useState("");
@@ -39,10 +42,12 @@ export default function EditRecipe() {
     const [steps, setSteps] = useState<{ text: string; expanded: boolean }[]>([]);
 
 
-    const {loading, error, data} = useQuery(GET_RECIPES);
+    const { loading, error, data, refetch } = useQuery(GET_RECIPE, {
+        variables: { recipeUid: editRecipeId }
+    });    
     const [editRecipe, {data: mutationData, loading: mutationLoading, error: mutationError}] = useMutation(EDIT_RECIPE);
 
-    if(error) {
+    if (error) {
         alert("Unable to find recipe. Please try again later.")
     }
 
@@ -298,7 +303,6 @@ export default function EditRecipe() {
               style={{
                   flex: 1,
                   width: "100%",
-                  paddingBottom: 20
               }}>
             <LinearGradient
                 colors={[
@@ -319,9 +323,9 @@ export default function EditRecipe() {
             />
             <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
                 <VStack space="xs">
-                    <VStack className="mt-8 lg:mt-3" space="xs">
-                        <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px] mt-28" size="5xl">
-                            Edit a Recipe
+                    <VStack className="mt-8" space="xs">
+                        <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px]" size="5xl">
+                            Edit Recipe
                         </Text>
                     </VStack>
 

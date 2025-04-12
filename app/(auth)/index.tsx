@@ -38,6 +38,7 @@ export default function Login() {
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
+      router.replace("/(app)/(tabs)/(home)")
     }
     catch (error) {
       setGoogleError(true);

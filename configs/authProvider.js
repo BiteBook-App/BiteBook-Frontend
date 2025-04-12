@@ -137,6 +137,7 @@ export const AuthProvider = ({ children }) => {
                 displayName: username,
                 profilePicture: profilePicture,
                 createdAt: serverTimestamp(),
+                relationships: []
             });
         },
         getUserProfile: async () => {
