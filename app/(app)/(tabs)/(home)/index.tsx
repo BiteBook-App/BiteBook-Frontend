@@ -1,4 +1,4 @@
-import { View, RefreshControl, ScrollView, Image } from "react-native";
+import { View, RefreshControl, ScrollView, Image, Pressable } from "react-native";
 import { useRouter } from 'expo-router';
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/configs/authProvider";
@@ -18,6 +18,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import NoRecipes from "@/components/ui/custom-no-recipes-display";
 
 export default function Home() {
+  const router = useRouter();
   const { user } = useAuth();
   const userId = user?.uid;
   const [refreshing, setRefreshing] = useState(false);
@@ -138,11 +139,13 @@ export default function Home() {
                 </View>
 
                 {/* Render post content */}
-                <Post
-                  photoUrl={post.photoUrl}
-                  mealName={post.name}
-                  tastes={post.tastes}
-                />
+                <Pressable onPress={() => router.push(`/(app)/(tabs)/(home)/${post.uid}`)}>
+                  <Post
+                    photoUrl={post.photoUrl}
+                    mealName={post.name}
+                    tastes={post.tastes}
+                  />
+                </Pressable>
 
                 {/* Post time or date */}
                 <Text className="text-sm text-gray-300 mt-2">
