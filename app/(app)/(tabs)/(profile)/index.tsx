@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { View, ScrollView, RefreshControl, useWindowDimensions, StyleSheet } from "react-native";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/configs/authProvider";
-import { useRouter} from 'expo-router';
+import { useRouter } from 'expo-router';
 import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
 import { Feather } from "@expo/vector-icons";
@@ -169,23 +169,32 @@ export default function Profile() {
           {activeTab === "Posts" ? (
             <VStack space="lg" className="mb-5 px-5 mt-4">
               {posts?.getRecipes?.map((post: any, index: any) => (
-                <Post
+                <Pressable 
+                  onPress={() => router.push(`/(app)/(tabs)/(profile)/${post.uid}`)} 
                   key={index}
-                  photoUrl={post.photoUrl}
-                  mealName={post.name}
-                  tastes={post.tastes}
-                />
+                >
+                  <Post
+                    photoUrl={post.photoUrl}
+                    mealName={post.name}
+                    tastes={post.tastes}
+                  />
+                </Pressable>
               ))}
             </VStack>
           ) : (
             <VStack space="sm" className="mb-5 px-4 mt-4">
               {drafts?.getRecipes?.map((post: any, index: any) => (
-                <DraftRecipe
+                <Pressable
+                  onPress={() => router.push(`/(app)/(tabs)/(profile)/${post.uid}`)} 
                   key={index}
-                  createdAt={post.createdAt}
-                  mealName={post.name}
-                  tastes={post.tastes}
-                />
+                >
+                  <DraftRecipe
+                    key={index}
+                    createdAt={post.createdAt}
+                    mealName={post.name}
+                    tastes={post.tastes}
+                  />
+                </Pressable>
               ))}
 
             </VStack>
