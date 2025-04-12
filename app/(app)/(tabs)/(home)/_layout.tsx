@@ -15,12 +15,13 @@ export default function AppLayout() {
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', headerTitle: 'BiteBook'}}/>
-        <Stack.Screen name="recipe" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', headerTitle: ''}}/>
         <Stack.Screen name="[recipeId]" options={{ 
           headerShown: true, 
           headerBackButtonDisplayMode: 'minimal', 
           headerTitle: '',
         }}/>
+        <Stack.Screen name="(friend)/[userId]" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', headerTitle: ''}}/>
+        <Stack.Screen name="(friend)/(recipe)/[recipeId]" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', headerTitle: ''}}/>
       </Stack>
     </GluestackUIProvider>
   );
