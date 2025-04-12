@@ -369,7 +369,7 @@ export default function CreateRecipe() {
               onPress={submitRecipe} 
               isDisabled={!canSubmitRecipe}
             >
-              {!recipeSubmit && <ButtonText>{hasCooked === 'No' ? 'Save Recipe!' : 'Share Recipe!'}</ButtonText>}
+              {!recipeSubmit && <ButtonText>{hasCooked === 'No' ? 'Save recipe' : 'Share recipe'}</ButtonText>}
               {recipeSubmit && <Spinner />}
             </Button>
           </VStack>
