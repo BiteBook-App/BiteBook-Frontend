@@ -25,6 +25,7 @@ import TastesSection from "@/components/ui/tastes-component/tastes";
 import { useImagePicker } from "../../../../../components/ui/camera-component/camera-functionality"
 import { EDIT_RECIPE, GET_RECIPE } from "@/configs/queries";
 import { useMutation, useQuery } from "@apollo/client";
+import { deleteObject, ref } from "firebase/storage";
 
 type Ingredient = {
   name: string;
@@ -130,7 +131,7 @@ export default function EditRecipe() {
       setRecipeLoading(false);
     }
   };
-  
+
   useEffect(() => {
       loadData()
   }, []);
@@ -180,16 +181,36 @@ export default function EditRecipe() {
   const submitRecipe = useCallback(async () => {
     setRecipeSubmit(true);
     let photoUrl = "";
-
-    // Upload image if it exists AND user has cooked this recipe
+    const isOriginalPhoto = photo && photo.startsWith('http');
+    
+    // Upload image only if it's new AND user has cooked this recipe
     if (photo && hasCooked === 'Yes') {
-      try {
-        photoUrl = await uploadImage(photo, storage, user.uid, "recipes");
-      } catch (error) {
-        console.error("Error uploading image:", error);
-        alert("Failed to upload image. Please try again.");
-        setRecipeSubmit(false);
-        return;
+      // If image did not change, do not upload new image
+      if (isOriginalPhoto)
+          photoUrl = photo;
+      else {
+        // If image changed, upload new image and delete the old one
+        try {
+          photoUrl = await uploadImage(photo, storage, user.uid, "recipes");
+
+          if (originalRecipeData) {
+            const oldImageUrl = originalRecipeData["photoUrl"];
+            if (oldImageUrl) {
+              try {
+                const oldImageRef = ref(storage, oldImageUrl);
+                await deleteObject(oldImageRef);
+                console.log("Old image deleted successfully.");
+              } catch (deleteError) {
+                console.error("Failed to delete old image:", deleteError);
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          alert("Failed to upload image. Please try again.");
+          setRecipeSubmit(false);
+          return;
+        }
       }
     }
 
