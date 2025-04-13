@@ -29,15 +29,13 @@ export default function CustomActionsheet({ showActionsheet, handleClose, recipe
             <ActionsheetDragIndicator />
           </ActionsheetDragIndicatorWrapper>
           {data?.getRecipe?.user.uid == user.uid && 
-            <ActionsheetItem onPress={handleClose}>
-              <Pressable 
-                onPress={() => {
-                  handleClose();
-                  router.push(`/(app)/(tabs)/(profile)/(editRecipe)/${recipeId}`);
-                }}
-              >
-                <ActionsheetItemText size="md">Edit</ActionsheetItemText>
-              </Pressable>
+            <ActionsheetItem                 
+              onPress={() => {
+                handleClose();
+                router.push(`/(app)/(tabs)/(profile)/(editRecipe)/${recipeId}`);
+              }}
+            >
+              <ActionsheetItemText size="md">Edit</ActionsheetItemText>
             </ActionsheetItem>
           }
           <ActionsheetItem onPress={handleClose}>

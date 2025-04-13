@@ -90,48 +90,55 @@ export default function Home() {
           bottom: 0,
         }}
       />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <VStack space="lg" className="mb-5 mt-4">
-          {data?.getHomePageRecipes?.length === 0 ? ( <NoRecipes />) : (
-            data?.getHomePageRecipes?.map((post: any, index: any) => (
-              <View key={index} className="mb-4">
-                {/* Heading with profile picture and display name */}
-                <Pressable className="flex-row items-center mb-4" 
-                  onPress={() => {
-                    post.user.uid == userId ? router.push(`/(app)/(tabs)/(profile)`) : router.push(`/(app)/(tabs)/(home)/(friend)/${post.user.uid}`)
-                  }}
-                >
-                  <Avatar size="sm">
-                    <AvatarFallbackText>{post.user.displayName}</AvatarFallbackText>
-                    <AvatarImage
-                      source={{
-                        uri: post.user.profilePicture,
-                      }}
-                    />
-                  </Avatar>
-                  <Text className="font-semibold text-white ml-2">{post.user.displayName}</Text>
-                </Pressable>
 
-                {/* Render post content */}
-                <Pressable onPress={() => router.push(`/(app)/(tabs)/(home)/${post.uid}`)}>
-                  <Post
-                    photoUrl={post.photoUrl}
-                    mealName={post.name}
-                    tastes={post.tastes}
-                    createdAt={post.createdAt}
-                  lastUpdatedAt={post.lastUpdatedAt}
-                />
-                </Pressable>
-            </View>
-            ))
-          )}
-        </VStack>
-      </ScrollView>
+      {/* Render No Recipes component if there is no data to display */}
+      {data?.getHomePageRecipes?.length === 0 && <NoRecipes displayAction={true}/>}
+
+      {/* Render posts if there is data to display */}
+      { data?.getHomePageRecipes?.length !== 0 &&
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <VStack space="lg" className="mb-5 mt-4">
+            {
+              data?.getHomePageRecipes?.map((post: any, index: any) => (
+                <View key={index} className="mb-4">
+                  {/* Heading with profile picture and display name */}
+                  <Pressable className="flex-row items-center mb-4" 
+                    onPress={() => {
+                      post.user.uid == userId ? router.push(`/(app)/(tabs)/(profile)`) : router.push(`/(app)/(tabs)/(home)/(friend)/${post.user.uid}`)
+                    }}
+                  >
+                    <Avatar size="sm">
+                      <AvatarFallbackText>{post.user.displayName}</AvatarFallbackText>
+                      <AvatarImage
+                        source={{
+                          uri: post.user.profilePicture,
+                        }}
+                      />
+                    </Avatar>
+                    <Text className="font-semibold text-white ml-2">{post.user.displayName}</Text>
+                  </Pressable>
+
+                  {/* Render post content */}
+                  <Pressable onPress={() => router.push(`/(app)/(tabs)/(home)/${post.uid}`)}>
+                    <Post
+                      photoUrl={post.photoUrl}
+                      mealName={post.name}
+                      tastes={post.tastes}
+                      createdAt={post.createdAt}
+                    lastUpdatedAt={post.lastUpdatedAt}
+                  />
+                  </Pressable>
+              </View>
+              ))
+            }
+          </VStack>
+        </ScrollView>
+      }
     </View>
   );
 }
