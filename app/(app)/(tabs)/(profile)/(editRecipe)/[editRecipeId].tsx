@@ -230,7 +230,7 @@ export default function EditRecipe() {
     // Construct the recipeData object
     const recipeData = {
       userId: user.uid,
-      url: recipeLink.trim(),
+      url: recipeLink.trim() !== 'No URL entered.' ? recipeLink.trim() : '',
       name: title.trim(),
       photoUrl: photoUrl || "",
       ingredients: ingredients

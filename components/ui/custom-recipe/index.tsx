@@ -112,7 +112,7 @@ export default function RecipeComponent({ recipeId }: RecipeId) {
         <View className="bg-background-0 rounded-2xl border-0 opacity-80 p-5">
           <HStack space="sm">
             <Icon as={LinkIcon} />
-            {data?.getRecipe.url === 'No URL entered.' ? (
+            {data?.getRecipe.url === '' ? (
               <Text className="text-primary-950 font-medium italic" size="md">
                 No link provided
               </Text>
