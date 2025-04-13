@@ -3,7 +3,7 @@ import { Text } from "@/components/ui/text";
 import {LinearGradient} from "expo-linear-gradient";
 import {VStack} from "@/components/ui/vstack";
 import { Alert, AlertText, AlertIcon } from "@/components/ui/alert"
-import { ExternalLinkIcon, SearchIcon } from "@/components/ui/icon"
+import {ExternalLinkIcon, SearchIcon, StarIcon} from "@/components/ui/icon"
 import {
     Avatar,
     AvatarBadge,
@@ -14,11 +14,14 @@ import { Heading } from "@/components/ui/heading"
 import { HStack } from "@/components/ui/hstack"
 import { Input, InputField, InputSlot, InputIcon } from "@/components/ui/input"
 import { Pressable } from "@/components/ui/pressable"
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import { createURL } from 'expo-linking';
 import {useLocalSearchParams} from "expo-router";
 import {useAuth} from "@/configs/authProvider";
 import Share from 'react-native-share';
+import CustomModal from "@/components/ui/custom-modal";
+import {useLazyQuery, useMutation, useQuery} from "@apollo/client";
+import {CREATE_RELATIONSHIP, GET_PROFILE} from "@/configs/queries";
 
 export default function Friends() {
     const testData = [
@@ -125,9 +128,22 @@ export default function Friends() {
     const {user} = useAuth();
     const {id} = useLocalSearchParams();
 
-    if (id) {
-        console.log("THIS IS ID")
-        console.log(id)
+    const [invitationModalOpen, setInvitationModalOpen] = useState(false);
+    const [getUserData, { loading: profileLoading, error: profileError, data: profile, refetch: refetchProfile }] = useLazyQuery(GET_PROFILE);
+    const [addFriend, {loading: friendLoading, error: friendError, data: friendData}] = useMutation(CREATE_RELATIONSHIP);
+
+    useEffect(() => {
+        if (id) {
+            setInvitationModalOpen(true);
+        }
+    }, [id]);
+
+    const acceptFriendRequest = () => {
+        addFriend({variables: {
+                relationshipData: {firstUserId: user.uid, secondUserId: id}
+            }}).then((res) => {
+            setInvitationModalOpen(false);
+        })
     }
 
     const handleInvitation = () => {
@@ -190,7 +206,15 @@ export default function Friends() {
                     alignItems: 'center', // Centers content horizontally
                 }}
             />
-
+            <CustomModal
+                isOpen={invitationModalOpen}
+                onClose={() => setInvitationModalOpen(false)}
+                modalTitle="Friend Request"
+                modalBody="A new user asked to be your friend! Do you wish to accept?"
+                modalActionText="Accept"
+                modalAction={acceptFriendRequest}
+                modalIcon={StarIcon}
+            />
             <VStack>
                 <Pressable onPress={handleInvitation}>
                     <Alert className="p-5 flex justify-between mt-28">

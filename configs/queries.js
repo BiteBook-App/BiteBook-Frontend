@@ -146,3 +146,9 @@ export const GET_USER_FROM_RECIPE = gql`
     }
   }
 `;
+
+export const CREATE_RELATIONSHIP = gql`
+ mutation MyMutation($relationshipData: RelationshipInput!) {
+  createRelationship(relationshipData: $relationshipData)
+ }
+`;
