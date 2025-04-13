@@ -124,9 +124,24 @@ export const GET_HOME_PAGE = gql`
       tastes
       createdAt
       lastUpdatedAt
+      uid
       user {
         displayName
         profilePicture
+        uid
+      }
+    }
+  }
+`;
+
+export const GET_USER_FROM_RECIPE = gql`
+  query GetRecipe($recipeUid: String!) {
+    getRecipe(recipeUid: $recipeUid) {
+      uid
+      user {
+        displayName
+        profilePicture
+        uid
       }
     }
   }

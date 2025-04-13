@@ -1,4 +1,4 @@
-import { View, RefreshControl, ScrollView, Image } from "react-native";
+import { View, RefreshControl, ScrollView, Image, Pressable } from "react-native";
 import { useRouter } from 'expo-router';
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/configs/authProvider";
@@ -19,6 +19,7 @@ import NoRecipes from "@/components/ui/custom-no-recipes-display";
 import { HStack } from "@/components/ui/hstack";
 
 export default function Home() {
+  const router = useRouter();
   const { user } = useAuth();
   const userId = user?.uid;
   const [refreshing, setRefreshing] = useState(false);
@@ -100,7 +101,11 @@ export default function Home() {
             data?.getHomePageRecipes?.map((post: any, index: any) => (
               <View key={index} className="mb-4">
                 {/* Heading with profile picture and display name */}
-                <View className="flex-row items-center mb-4">
+                <Pressable className="flex-row items-center mb-4" 
+                  onPress={() => {
+                    post.user.uid == userId ? router.push(`/(app)/(tabs)/(profile)`) : router.push(`/(app)/(tabs)/(home)/(friend)/${post.user.uid}`)
+                  }}
+                >
                   <Avatar size="sm">
                     <AvatarFallbackText>{post.user.displayName}</AvatarFallbackText>
                     <AvatarImage
@@ -110,16 +115,18 @@ export default function Home() {
                     />
                   </Avatar>
                   <Text className="font-semibold text-white ml-2">{post.user.displayName}</Text>
-                </View>
+                </Pressable>
 
                 {/* Render post content */}
-                <Post
-                  photoUrl={post.photoUrl}
-                  mealName={post.name}
-                  tastes={post.tastes}
-                  createdAt={post.createdAt}
+                <Pressable onPress={() => router.push(`/(app)/(tabs)/(home)/${post.uid}`)}>
+                  <Post
+                    photoUrl={post.photoUrl}
+                    mealName={post.name}
+                    tastes={post.tastes}
+                    createdAt={post.createdAt}
                   lastUpdatedAt={post.lastUpdatedAt}
                 />
+                </Pressable>
             </View>
             ))
           )}
