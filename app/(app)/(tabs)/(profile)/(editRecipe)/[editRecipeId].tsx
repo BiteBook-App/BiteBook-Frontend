@@ -4,7 +4,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import {
   FormControl,
   FormControlError,
@@ -37,6 +37,7 @@ export default function EditRecipe() {
   const [recipeLink, setRecipeLink] = useState("");
   const [hasCooked, setHasCooked] = useState('NULL');
   const [initialHasCooked, setInitialHasCooked] = useState(null);
+  const [originalRecipeData, setOriginalRecipeData] = useState(null);
   
   // Recipe import
   const [recipeLoading, setRecipeLoading] = useState(false);
@@ -90,64 +91,89 @@ export default function EditRecipe() {
   }
 
   const loadData = () => {
-      setRecipeLoading(true);
-      try {
-          const jsonData = data ? JSON.parse(JSON.stringify(data["getRecipe"], (key, value) =>
-              key === '__typename' ? undefined : value
-          )) : null;
-
-          console.log(jsonData);
-
-          setRecipe(jsonData);
-          setTitle(jsonData["name"]);
-          setIngredients(jsonData["ingredients"]);
-          StepsUtils.importStepsFromRecipe(jsonData["steps"], setSteps);
-          
-          // Store the initial hasCooked state
-          const initialCookedStatus = jsonData["hasCooked"];
-          setInitialHasCooked(initialCookedStatus);
-          
-          if (initialCookedStatus === true)
-            setHasCooked("Yes")
-          else
-            setHasCooked("No")
-
-          if (jsonData["tastes"]) {
-              setSelectedTastes(jsonData["tastes"]);
-          }
-
-          if(jsonData["url"]) {
-              setRecipeLink(jsonData["url"])
-          }
-          else {
-              setRecipeLink("No URL entered.")
-          }
-
-          if(jsonData["photoUrl"]) {
-              setPhoto(jsonData["photoUrl"])
-          }
-
-      } catch (error) {
-          console.error("Error calling API:", error);
-          setRecipeLoading(false)
+    setRecipeLoading(true);
+    
+    try {
+      if (!data || !data.getRecipe) {
+        throw new Error("No recipe data available");
       }
+      
+      // Parse and clean recipe data
+      const jsonData = JSON.parse(JSON.stringify(data.getRecipe, (key, value) => 
+        key === '__typename' ? undefined : value
+      ));
+      
+      // Store original data for reset functionality
+      setOriginalRecipeData(jsonData);
+      setRecipe(jsonData);
+      
+      // Set basic recipe information
+      setTitle(jsonData.name || "");
+      setRecipeLink(jsonData.url || "No URL entered.");
+      setPhoto(jsonData.photoUrl || null);
+      
+      // Set recipe components
+      setIngredients(jsonData.ingredients || []);
+      StepsUtils.importStepsFromRecipe(jsonData.steps || [], setSteps);
+      setSelectedTastes(jsonData.tastes || []);
+      
+      // Handle cooking status
+      const initialCookedStatus = jsonData.hasCooked;
+      setInitialHasCooked(initialCookedStatus);
+      setHasCooked(initialCookedStatus === true ? "Yes" : "No");
+    } 
+    catch (error) {
+      console.error("Error loading recipe data:", error);
+      // Could add user-facing error handling here
+    } 
+    finally {
       setRecipeLoading(false);
-  }
-
+    }
+  };
+  
   useEffect(() => {
       loadData()
   }, []);
   
-  // TODO: reset should go back to the inital recipe
-  const clearForm = (): void => {
-    setPhoto(null);
-    setTitle("");
-    setRecipeLink("");
-    setIngredients([]);
-    setSteps([]);
-    setSelectedTastes([]);
-    setHasCooked("");
-    // Don't reset initialHasCooked as it should remain fixed
+  const resetForm = (): void => {
+    if (originalRecipeData) {
+      // Reset to original values
+      setTitle(originalRecipeData["name"]);
+      setIngredients(originalRecipeData["ingredients"]);
+      StepsUtils.importStepsFromRecipe(originalRecipeData["steps"], setSteps);
+      
+      if (originalRecipeData["hasCooked"] === true)
+        setHasCooked("Yes")
+      else
+        setHasCooked("No")
+        
+      if (originalRecipeData["tastes"]) {
+        setSelectedTastes(originalRecipeData["tastes"]);
+      } else {
+        setSelectedTastes([]);
+      }
+      
+      if (originalRecipeData["url"]) {
+        setRecipeLink(originalRecipeData["url"])
+      } else {
+        setRecipeLink("No URL entered.")
+      }
+      
+      if (originalRecipeData["photoUrl"]) {
+        setPhoto(originalRecipeData["photoUrl"])
+      } else {
+        setPhoto(null);
+      }
+    } else {
+      // Fallback if originalRecipeData is not available
+      setPhoto(null);
+      setTitle("");
+      setRecipeLink("");
+      setIngredients([]);
+      setSteps([]);
+      setSelectedTastes([]);
+      setHasCooked("");
+    }
   };
 
   // Form submission
@@ -198,9 +224,6 @@ export default function EditRecipe() {
   
       router.dismissAll();
       router.replace("/(profile)");
-  
-      // Reset form
-      clearForm();
   
     } catch (error) {
       console.error("Error submitting recipe:", error);
@@ -256,11 +279,11 @@ export default function EditRecipe() {
                 <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px]" size="5xl">
                   Edit Recipe
                 </Text>
-                <Feather onPress={() => clearForm()} className="pl-20 pt-2" name="trash-2" size={24} color="white" />
+                <MaterialIcons onPress={() => resetForm()} className="pl-28 pt-2" name="restart-alt" size={30} color="white" />
               </HStack>
             </VStack>
 
-            <FormControl>
+            <FormControl>r
               <VStack space="4xl">
                 {/* Recipe Import Section */}
                 <FormControl isInvalid={importError}>
