@@ -16,7 +16,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import { GET_PROFILE, EDIT_USER } from "@/configs/queries";
 import CustomInputField from "@/components/ui/custom-input-field";
 import * as ImagePicker from "expo-image-picker";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { useRouter } from "expo-router";
 import {
   FormControl,
@@ -90,6 +90,17 @@ export default function Edit() {
     setPageLoading(true);
 
     const profilePictureURL = await uploadImage(profilePicture);
+
+    // Remove the original profile picture
+    if (profile?.getUsers?.[0]?.profilePicture) {
+      try {
+        const oldImageRef = ref(storage, profile?.getUsers?.[0]?.profilePicture);
+        await deleteObject(oldImageRef);
+        console.log("Old profile picture deleted successfully.");
+      } catch (deleteError) {
+        console.error("Failed to delete old profile picture:", deleteError);
+      }
+    }
 
     // Only updates if changes have been detected
     const hasDisplayNameChanged = displayName !== profile?.getUsers?.[0]?.displayName;
