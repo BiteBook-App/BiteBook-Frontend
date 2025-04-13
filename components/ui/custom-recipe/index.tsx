@@ -26,9 +26,6 @@ export default function RecipeComponent({ recipeId }: RecipeId) {
   if (error) {
     console.log(error)
   }
-  if (!data?.getRecipe.photoUrl) {
-    console.log("undefined")
-  }
 
   return (
     <View className="mb-4">

@@ -118,9 +118,24 @@ export const GET_HOME_PAGE = gql`
       likes
       tastes
       createdAt
+      uid
       user {
         displayName
         profilePicture
+        uid
+      }
+    }
+  }
+`;
+
+export const GET_USER_FROM_RECIPE = gql`
+  query GetRecipe($recipeUid: String!) {
+    getRecipe(recipeUid: $recipeUid) {
+      uid
+      user {
+        displayName
+        profilePicture
+        uid
       }
     }
   }

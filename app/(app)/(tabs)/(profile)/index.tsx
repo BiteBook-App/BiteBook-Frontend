@@ -97,10 +97,6 @@ export default function Profile() {
 
   const router = useRouter();
 
-  const editRecipe = () => {
-    router.push("/(app)/edit")
-  }
-
   return (
     <View
       className="bg-background-dark lg:px-40"
@@ -137,6 +133,7 @@ export default function Profile() {
             profilePicture={profile?.getUsers?.[0]?.profilePicture}
             numPosts={numPosts} 
             numFriends={profile?.getUsers?.[0]?.relationships?.length}
+            displayOptions={true}
           />
           <HStack>
             <Pressable
