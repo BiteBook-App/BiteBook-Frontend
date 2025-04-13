@@ -12,7 +12,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Spinner } from "@/components/ui/spinner"
 import { initializeApp } from "firebase/app";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
-import CustomModal from "@/components/ui/custom-modal";
+import CustomModal from "@/components/ui/custom-modal-forgot-password";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");

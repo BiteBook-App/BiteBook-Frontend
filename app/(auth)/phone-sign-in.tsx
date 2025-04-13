@@ -36,7 +36,7 @@ const PhoneSignIn = () => {
     });
 
     const handlePhoneEntry = async () => {
-        if(phoneInput.current.isValidNumber(phoneNumber)) {
+        if(phoneInput.current?.isValidNumber(phoneNumber)) {
             try{
                 setLoading(true);
                 await signInWithPhoneNumber(phoneNumber);

@@ -13,11 +13,32 @@ import { Icon, CloseIcon, ChevronUpIcon, ChevronDownIcon } from "@/components/ui
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useAuth } from '@/configs/authProvider';
 import { Spinner } from "@/components/ui/spinner";
-import {useMutation, useQuery} from "@apollo/client";
-import {EDIT_RECIPE, GET_RECIPES} from "@/configs/queries";
+import { useMutation, useQuery } from "@apollo/client";
+import { EDIT_RECIPE, GET_RECIPE } from "@/configs/queries";
+import { useLocalSearchParams } from "expo-router";
+
+
+import CameraComponent from "@/components/ui/camera-component/camera";
+import { useImagePicker } from "../../../../../components/ui/camera-component/camera-functionality"
+import IngredientsSection from "@/components/ui/ingredients-component/ingredients";
+
+type Ingredient = {
+    name: string;
+    count: string;
+  };
 
 export default function EditRecipe() {
+    const { editRecipeId } = useLocalSearchParams() as { editRecipeId: string };
+
+    const { storage, user } = useAuth();
+
+     // Camera
     const [photo, setPhoto] = useState<string | null>(null);
+    const { uploadImage } = useImagePicker();
+
+    // Ingredient management
+    const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+
     const [recipeLink, setRecipeLink] = useState("");
     const [title, setTitle] = useState("");
     const tasteOptions = ["Salty", "Sweet", "Sour", "Bitter", "Umami", "Spicy"];
@@ -32,17 +53,16 @@ export default function EditRecipe() {
     };
     const [recipeLoading, setRecipeLoading] = useState(false);
     const [recipe, setRecipe] = useState(null);
-    const [ingredients, setIngredients] = useState<{ name: string; count: string }[]>([]);
-    const [ingredientName, setIngredientName] = useState("");
-    const [ingredientCount, setIngredientCount] = useState("");
     const [step, setStep] = useState("");
     const [steps, setSteps] = useState<{ text: string; expanded: boolean }[]>([]);
 
 
-    const {loading, error, data} = useQuery(GET_RECIPES);
+    const { loading, error, data, refetch } = useQuery(GET_RECIPE, {
+        variables: { recipeUid: editRecipeId }
+    });    
     const [editRecipe, {data: mutationData, loading: mutationLoading, error: mutationError}] = useMutation(EDIT_RECIPE);
 
-    if(error) {
+    if (error) {
         alert("Unable to find recipe. Please try again later.")
     }
 
@@ -86,95 +106,12 @@ export default function EditRecipe() {
         loadData()
     }, []);
 
-    const importRecipe = async (recipeUrl: string) => {
-        setRecipeLoading(true);
-        try {
-            const res = await fetch("http://127.0.0.1:8000/import-recipe/", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    url: recipeUrl
-                }),
-            });
-            const data = await res.json();
-            setRecipe(data);
-            setTitle(data.name);
-            setIngredients(data.ingredients);
-            setSteps(data.instructions);
-        } catch (error) {
-            console.error("Error calling API:", error);
-            setRecipeLoading(false)
-        }
-        setRecipeLoading(false);
-    }
-
     const toggleTasteSelection = (taste: string) => {
         // If taste is already in array, remove; otherwise, add.
         setSelectedTastes((prev) =>
             prev.includes(taste) ? prev.filter((item) => item !== taste) : [...prev, taste]
         );
     };
-
-    // Function to request permissions and open the camera
-    const takePhoto = async () => {
-        const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-
-        if (!permissionResult.granted) {
-            alert("Camera access is required to take a photo!");
-            return;
-        }
-
-        const result = await ImagePicker.launchCameraAsync({
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
-
-        if (!result.canceled) {
-            setPhoto(result.assets[0].uri);
-        }
-    };
-
-    // Function to request permissions and open the photo library
-    const pickImage = async () => {
-        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-        if (!permissionResult.granted) {
-            alert("Permission to access photos is required!");
-            return;
-        }
-
-        const result = await ImagePicker.launchImageLibraryAsync({
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
-
-        if (!result.canceled) {
-            setPhoto(result.assets[0].uri);
-        }
-    };
-
-    const addIngredient = () => {
-        if (ingredientName.trim()) {
-            setIngredients([...ingredients, { name: ingredientName, count: ingredientCount }]);
-            setIngredientName("");
-            setIngredientCount("");
-        }
-    };
-
-    const removeIngredient = (index: number) => {
-        setIngredients(ingredients.filter((_, i) => i !== index));
-    };
-
-    const updateIngredient = (index: number, field: "count" | "name", value: string) => {
-        setIngredients((prev) =>
-            prev.map((item, i) =>
-                i === index ? { ...item, [field]: value } : item
-            )
-        );
-    };
-
 
     const addStep = () => {
         if (step.trim() === "") return;
@@ -201,27 +138,6 @@ export default function EditRecipe() {
                 i === index ? { ...step, text } : step
             )
         );
-    };
-
-    const { storage, user } = useAuth();
-
-    const uploadImage = async (uri: string) => {
-        if (!uri) return "";
-
-        const response = await fetch(uri);
-        const blob = await response.blob();
-        const filename = `recipes/${user.uid}/${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
-        const storageRef = ref(storage, filename);
-
-        try {
-            // Upload to Firebase Storage
-            await uploadBytes(storageRef, blob);
-            // Get the URL
-            return await getDownloadURL(storageRef);
-        } catch (error) {
-            console.error("Upload failed:", error);
-            return "";
-        }
     };
 
     const canSubmitRecipe =
@@ -298,7 +214,6 @@ export default function EditRecipe() {
               style={{
                   flex: 1,
                   width: "100%",
-                  paddingBottom: 20
               }}>
             <LinearGradient
                 colors={[
@@ -319,38 +234,31 @@ export default function EditRecipe() {
             />
             <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
                 <VStack space="xs">
-                    <VStack className="mt-8 lg:mt-3" space="xs">
-                        <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px] mt-28" size="5xl">
-                            Edit a Recipe
+                    <VStack className="mt-8" space="xs">
+                        <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px]" size="5xl">
+                            Edit Recipe
                         </Text>
                     </VStack>
 
                     <FormControl>
                         <VStack space="4xl">
                             <VStack space="md">
-                                <Text className="text-xl font-medium"><Text className="text-xl font-bold">Link</Text> to the Recipe</Text>
+                            <Text className="text-xl font-medium"><Text className="text-xl font-bold">Link</Text> to the recipe</Text>
                                 <HStack space="sm">
                                     <TextInput
                                         editable={false}
                                         placeholder="Recipe Link"
                                         value={recipeLink}
                                         onChangeText={setRecipeLink}
-                                        className="text-white bg-background-0 rounded-xl opacity-70 p-3 pl-4"
+                                        className="text-white bg-background-0 rounded-xl opacity-50 p-3 pl-4"
                                         style={{ fontSize: 17, flex: 1 }}
                                         placeholderTextColor="#8C8C8C"
                                     />
-                                    <Button className="px-3 py-2 rounded-xl" size="lg" variant="solid" action="primary" onPress={() => importRecipe(recipeLink)} isDisabled={true}>
-                                        {!recipeLoading && <Feather name="arrow-right" size={20} color="black" />}
-                                        {recipeLoading && <Spinner/>}
-                                    </Button>
                                 </HStack>
                             </VStack>
                             <VStack space="md">
                                 <Text className="text-3xl font-medium">
-                                    Show your <Text className="text-3xl font-bold">meal</Text>
-                                </Text>
-                                <Text className="text-xl font-medium">
-                                    What is the <Text className="text-xl font-bold">name</Text> of your meal?
+                                    What's the <Text className="text-3xl font-bold">recipe</Text> called?
                                 </Text>
                                 <TextInput
                                     placeholder="Meal Name"
@@ -362,124 +270,20 @@ export default function EditRecipe() {
                                     placeholderTextColor="#8C8C8C"
                                 />
 
-                                <Text className="text-xl font-medium">What does your meal <Text className="text-xl font-bold">look like</Text>? </Text>
-
-                                <HStack space="md">
-                                    {/* Camera Button */}
-                                    <Button
-                                        className="rounded-full bg-background-0 opacity-70"
-                                        size="xl"
-                                        variant="solid"
-                                        action="secondary"
-                                        onPress={takePhoto}
-                                    >
-                                        <Feather name="camera" size={24} color="white" />
-                                    </Button>
-
-                                    {/* Select from Photos Button */}
-                                    <Button
-                                        className="rounded-full bg-background-0 opacity-70"
-                                        size="xl"
-                                        variant="solid"
-                                        action="secondary"
-                                        onPress={pickImage}
-                                    >
-                                        <MaterialIcons name="photo-library" size={24} color="white" />
-                                    </Button>
-                                </HStack>
-
-                                {/* Display Selected Photo */}
-                                {photo && (
-                                    <View>
-                                        <Image
-                                            source={{ uri: photo }}
-                                            style={{ width: '100%', height: 350, borderRadius: 10 }}
-                                        />
-                                        <TouchableOpacity
-                                            onPress={() => setPhoto(null)}
-                                            className="rounded-2xl bg-background-0 opacity-70 p-2"
-                                            style={{
-                                                position: 'absolute',
-                                                top: 10,
-                                                right: 10,
-                                            }}
-                                        >
-                                            <Icon as={CloseIcon} className="text-white" />
-                                        </TouchableOpacity>
-                                    </View>
-                                )}
-                            </VStack>
-
-                            <VStack space="md">
-                                <Text className="text-3xl font-medium">
-                                    <Text className="text-3xl font-bold">What's</Text> in it?
+                                <Text className="text-xl font-medium">
+                                    What does your meal <Text className="text-xl font-bold">look like</Text>?
                                 </Text>
 
-                                <View
-                                    className="bg-background-0 rounded-2xl border-0 opacity-70 p-5"
-                                >
-                                    {ingredients.map((item, index) => (
-                                        <View
-                                            key={index}
-                                            className="rounded-2xl bg-background-50 flex-row justify-between items-center p-4 mb-3"
-                                        >
-                                            <TextInput
-                                                placeholder="Amount"
-                                                value={item.count}
-                                                onChangeText={(text) => updateIngredient(index, "count", text)}
-                                                multiline={true}
-                                                className="text-white font-bold"
-                                                style={{ width: 125, textAlign: "left", fontSize: 16 }}
-                                                placeholderTextColor="#8C8C8C"
-                                            />
-                                            <TextInput
-                                                placeholder="Ingredient"
-                                                value={item.name}
-                                                multiline={true}
-                                                onChangeText={(text) => updateIngredient(index, "name", text)}
-                                                className="text-white flex-1 ml-3 p-1"
-                                                style={{ fontSize: 16 }}
-                                                placeholderTextColor="#8C8C8C"
-                                            />
-                                            <TouchableOpacity onPress={() => removeIngredient(index)}>
-                                                <Icon as={CloseIcon}/>
-                                            </TouchableOpacity>
-                                        </View>
-                                    ))}
-                                    {/* Input Fields for Ingredient and Count */}
-                                    <View
-                                        className="rounded-2xl bg-background-0 flex-row"
-                                    >
-                                        <TextInput
-                                            placeholder="Amount"
-                                            value={ingredientCount}
-                                            multiline={true}
-                                            onChangeText={setIngredientCount}
-                                            className="p-5 flex-1"
-                                            style={{
-                                                color: "white",
-                                                fontSize: 16
-                                            }}
-                                            placeholderTextColor="#8C8C8C"
-                                        />
-                                        <TextInput
-                                            placeholder="Ingredient"
-                                            value={ingredientName}
-                                            multiline={true}
-                                            onChangeText={setIngredientName}
-                                            className="p-5 flex-1"
-                                            style={{
-                                                color: "white",
-                                                fontSize: 16
-                                            }}
-                                            placeholderTextColor="#8C8C8C"
-                                        />
-                                    </View>
-                                    <Button className="rounded-xl mt-5" size="md" variant="solid" action="primary" onPress={addIngredient} isDisabled={!ingredientName.trim()}>
-                                        <Feather name="plus" size={20} color="black" />
-                                    </Button>
-                                </View>
+                                <CameraComponent 
+                                    photo={photo}
+                                    setPhoto={setPhoto}
+                                />
                             </VStack>
+
+                            <IngredientsSection 
+                            ingredients={ingredients}
+                            setIngredients={setIngredients}
+                            />
 
                             <VStack space="md">
                                 <Text className="text-3xl font-medium">

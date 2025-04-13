@@ -15,6 +15,14 @@ export default function AppLayout() {
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', headerTitle: 'BiteBook'}}/>
+        <Stack.Screen name="settings" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', headerTitle: ''}}/>
+        <Stack.Screen name="edit-profile" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', headerTitle: ''}}/>
+        <Stack.Screen name="[recipeId]" options={{ 
+          headerShown: true, 
+          headerBackButtonDisplayMode: 'minimal', 
+          headerTitle: '',
+        }}/>
+        <Stack.Screen name="(editRecipe)/[editRecipeId]" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', headerTitle: ''}}/>
       </Stack>
     </GluestackUIProvider>
   );

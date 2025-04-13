@@ -4,38 +4,41 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import {
   FormControl,
   FormControlError,
   FormControlErrorText,
   FormControlErrorIcon,
 } from "@/components/ui/form-control"
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { CloseCircleIcon } from "@/components/ui/icon";
 import { useAuth } from '@/configs/authProvider';
 import { Spinner } from "@/components/ui/spinner";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import StepsSection, { StepsUtils, StepItem } from "@/components/ui/steps-component/steps";
 import CameraComponent from "@/components/ui/camera-component/camera";
 import IngredientsSection from "@/components/ui/ingredients-component/ingredients";
 import TastesSection from "@/components/ui/tastes-component/tastes";
-import { useImagePicker } from "../../../../components/ui/camera-component/camera-functionality"
-import { CREATE_RECIPE } from "@/configs/queries";
-import { useMutation } from "@apollo/client";
+import { useImagePicker } from "../../../../../components/ui/camera-component/camera-functionality"
+import { EDIT_RECIPE, GET_RECIPE } from "@/configs/queries";
+import { useMutation, useQuery } from "@apollo/client";
+import { deleteObject, ref } from "firebase/storage";
 
 type Ingredient = {
   name: string;
   count: string;
 };
 
-export default function CreateRecipe() {
+export default function EditRecipe() {
   // Recipe metadata
   const [title, setTitle] = useState("");
   const [recipeLink, setRecipeLink] = useState("");
   const [hasCooked, setHasCooked] = useState('NULL');
+  const [initialHasCooked, setInitialHasCooked] = useState(null);
+  const [originalRecipeData, setOriginalRecipeData] = useState(null);
   
   // Recipe import
   const [recipeLoading, setRecipeLoading] = useState(false);
@@ -64,6 +67,9 @@ export default function CreateRecipe() {
   // Auth context
   const { storage, user } = useAuth();
 
+  // Edit recipe ID
+  const { editRecipeId } = useLocalSearchParams() as { editRecipeId: string };
+
   // Calculate if form can be submitted
   const canSubmitRecipe = useMemo(() => {
     const hasTitle = title.trim() !== "";
@@ -76,67 +82,135 @@ export default function CreateRecipe() {
     return hasTitle && hasIngredients && hasSteps && hasRequiredCookedFields;
   }, [title, ingredients, steps, hasCooked, photo, selectedTastes]);
 
-  // Helper functions for scrolling
-  const scrollToText = useCallback(() => {
-    scrollViewRef.current?.scrollTo({ y: 180, animated: true });
-  }, []);
+  const { loading, error, data, refetch } = useQuery(GET_RECIPE, {
+          variables: { recipeUid: editRecipeId }
+  });    
+  const [editRecipe, {data: mutationData, loading: mutationLoading, error: mutationError}] = useMutation(EDIT_RECIPE);
   
-  const clearForm = (): void => {
-    setPhoto(null);
-    setTitle("");
-    setRecipeLink("");
-    setIngredients([]);
-    setSteps([]);
-    setSelectedTastes([]);
-    setHasCooked("");
-  };
+  if (error) {
+      alert("Unable to find recipe. Please try again later.")
+  }
 
-  // Recipe import function
-  const importRecipe = useCallback(async (recipeUrl: string) => {
-    if (!recipeUrl.trim()) return;
-    
+  const loadData = () => {
     setRecipeLoading(true);
+    
     try {
-      const res = await fetch("http://127.0.0.1:8000/import-recipe/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: recipeUrl }),      
-      });
+      if (!data || !data.getRecipe) {
+        throw new Error("No recipe data available");
+      }
       
-      const data = await res.json();
-      setRecipe(data);
-      setTitle(data.name);
-      setIngredients(data.ingredients);
+      // Parse and clean recipe data
+      const jsonData = JSON.parse(JSON.stringify(data.getRecipe, (key, value) => 
+        key === '__typename' ? undefined : value
+      ));
       
-      // Import steps
-      StepsUtils.importStepsFromRecipe(data.instructions, setSteps);
+      // Store original data for reset functionality
+      setOriginalRecipeData(jsonData);
+      setRecipe(jsonData);
       
-      scrollToText();
-      setImportError(false);
-    } catch (error) {
-      console.error("Error calling API:", error);
-      setImportError(true);
-    } finally {
+      // Set basic recipe information
+      setTitle(jsonData.name || "");
+      setRecipeLink(jsonData.url || "No URL entered.");
+      setPhoto(jsonData.photoUrl || null);
+      
+      // Set recipe components
+      setIngredients(jsonData.ingredients || []);
+      StepsUtils.importStepsFromRecipe(jsonData.steps || [], setSteps);
+      setSelectedTastes(jsonData.tastes || []);
+      
+      // Handle cooking status
+      const initialCookedStatus = jsonData.hasCooked;
+      setInitialHasCooked(initialCookedStatus);
+      setHasCooked(initialCookedStatus === true ? "Yes" : "No");
+    } 
+    catch (error) {
+      console.error("Error loading recipe data:", error);
+      // Could add user-facing error handling here
+    } 
+    finally {
       setRecipeLoading(false);
     }
-  }, [scrollToText]);
+  };
 
-  const [createRecipeMutation, { loading: mutationLoading, error: mutationError }] = useMutation(CREATE_RECIPE);
+  useEffect(() => {
+      loadData()
+  }, []);
+  
+  const resetForm = (): void => {
+    if (originalRecipeData) {
+      // Reset to original values
+      setTitle(originalRecipeData["name"]);
+      setIngredients(originalRecipeData["ingredients"]);
+      StepsUtils.importStepsFromRecipe(originalRecipeData["steps"], setSteps);
+      
+      if (originalRecipeData["hasCooked"] === true)
+        setHasCooked("Yes")
+      else
+        setHasCooked("No")
+        
+      if (originalRecipeData["tastes"]) {
+        setSelectedTastes(originalRecipeData["tastes"]);
+      } else {
+        setSelectedTastes([]);
+      }
+      
+      if (originalRecipeData["url"]) {
+        setRecipeLink(originalRecipeData["url"])
+      } else {
+        setRecipeLink("No URL entered.")
+      }
+      
+      if (originalRecipeData["photoUrl"]) {
+        setPhoto(originalRecipeData["photoUrl"])
+      } else {
+        setPhoto(null);
+      }
+    } else {
+      // Fallback if originalRecipeData is not available
+      setPhoto(null);
+      setTitle("");
+      setRecipeLink("");
+      setIngredients([]);
+      setSteps([]);
+      setSelectedTastes([]);
+      setHasCooked("");
+    }
+  };
 
   // Form submission
   const submitRecipe = useCallback(async () => {
     setRecipeSubmit(true);
     let photoUrl = "";
-
-    // Upload image if it exists
+    const isOriginalPhoto = photo && photo.startsWith('http');
+    
+    // Upload image only if it's new AND user has cooked this recipe
     if (photo && hasCooked === 'Yes') {
-      try {
-        photoUrl = await uploadImage(photo, storage, user.uid, "recipes");
-      } catch (error) {
-        console.error("Error uploading image:", error);
-        alert("Failed to upload image. Please try again.");
-        setRecipeSubmit(false);
-        return;
+      // If image did not change, do not upload new image
+      if (isOriginalPhoto)
+          photoUrl = photo;
+      else {
+        // If image changed, upload new image and delete the old one
+        try {
+          photoUrl = await uploadImage(photo, storage, user.uid, "recipes");
+
+          if (originalRecipeData) {
+            const oldImageUrl = originalRecipeData["photoUrl"];
+            if (oldImageUrl) {
+              try {
+                const oldImageRef = ref(storage, oldImageUrl);
+                await deleteObject(oldImageRef);
+                console.log("Old image deleted successfully.");
+              } catch (deleteError) {
+                console.error("Failed to delete old image:", deleteError);
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          alert("Failed to upload image. Please try again.");
+          setRecipeSubmit(false);
+          return;
+        }
       }
     }
 
@@ -163,18 +237,14 @@ export default function CreateRecipe() {
       tastes: selectedTastes,
       hasCooked: hasCookedBool
     };
-  
+
     try {
-      await createRecipeMutation({
-        variables: {
-          recipeData,
-        },
+      await editRecipe({
+        variables: { recipeData: recipeData, recipeId: editRecipeId }
       });
   
-      router.replace("/(app)/(tabs)/(profile)");
-  
-      // Reset form
-      clearForm();
+      router.dismissAll();
+      router.replace("/(profile)");
   
     } catch (error) {
       console.error("Error submitting recipe:", error);
@@ -228,38 +298,28 @@ export default function CreateRecipe() {
             <VStack className="mt-8 lg:mt-3" space="xs">
               <HStack>
                 <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px]" size="5xl">
-                  Add a Recipe
+                  Edit Recipe
                 </Text>
-                <Feather onPress={() => clearForm()} className="pl-20 pt-2" name="trash-2" size={24} color="white" />
+                <MaterialIcons onPress={() => resetForm()} className="pl-28 pt-2" name="restart-alt" size={30} color="white" />
               </HStack>
             </VStack>
 
-            <FormControl>
+            <FormControl>r
               <VStack space="4xl">
                 {/* Recipe Import Section */}
                 <FormControl isInvalid={importError}>
                   <VStack space="md">
-                    <Text className="text-xl font-medium">Do you have a <Text className="text-xl font-bold">link</Text> to the recipe?</Text>
+                    <Text className="text-xl font-medium"><Text className="text-xl font-bold">Link</Text> to the recipe</Text>
                     <HStack space="sm">
                       <TextInput
+                        editable={false}
                         placeholder="Recipe Link"
                         value={recipeLink}
                         onChangeText={setRecipeLink}
-                        className="text-white bg-background-0 rounded-xl opacity-70 p-3 pl-4"
+                        className="text-white bg-background-0 rounded-xl opacity-40 p-3 pl-4"
                         style={{ fontSize: 17, flex: 1 }}
                         placeholderTextColor="#8C8C8C"
                       />
-                      <Button 
-                        className="px-3 py-2 rounded-xl" 
-                        size="lg" 
-                        variant="solid" 
-                        action="primary" 
-                        onPress={() => importRecipe(recipeLink)} 
-                        isDisabled={recipeLink.length < 1}
-                      >
-                        {!recipeLoading && <Feather name="arrow-right" size={20} color="black" />}
-                        {recipeLoading && <Spinner/>}
-                      </Button>
                     </HStack>
                     <FormControlError>
                       <FormControlErrorIcon as={CloseCircleIcon} />
@@ -287,45 +347,49 @@ export default function CreateRecipe() {
                     placeholderTextColor="#8C8C8C"
                   />
 
-                  {/* Have You Cooked Section */}
-                  <Text className="text-xl font-medium">
-                    Have you <Text className="text-xl font-bold">cooked</Text> this recipe?
-                  </Text>
+                  {/* Have You Cooked Section - Only show if initially not cooked */}
+                  {initialHasCooked === false && (
+                    <>
+                      <Text className="text-xl font-medium">
+                        Have you <Text className="text-xl font-bold">cooked</Text> this recipe?
+                      </Text>
 
-                  <HStack space="md">
-                    <Button 
-                      className={`rounded-full opacity-70 ${hasCooked === 'Yes' ? 'bg-green-500' : 'bg-background-0'}`}
-                      size="xl" 
-                      variant="solid" 
-                      action="secondary" 
-                      onPress={() => setHasCooked('Yes')}
-                    >
-                      <Feather 
-                        name="check" 
-                        size={24} 
-                        color={hasCooked === 'Yes' ? 'black' : 'white'}
-                      />
-                      <Text className={`text-xl font-medium ${hasCooked === 'Yes' ? 'text-black' : 'text-white'}`}> Yes </Text>
-                    </Button>
+                      <HStack space="md">
+                        <Button 
+                          className={`rounded-full opacity-70 ${hasCooked === 'Yes' ? 'bg-green-500' : 'bg-background-0'}`}
+                          size="xl" 
+                          variant="solid" 
+                          action="secondary" 
+                          onPress={() => setHasCooked('Yes')}
+                        >
+                          <Feather 
+                            name="check" 
+                            size={24} 
+                            color={hasCooked === 'Yes' ? 'black' : 'white'}
+                          />
+                          <Text className={`text-xl font-medium ${hasCooked === 'Yes' ? 'text-black' : 'text-white'}`}> Yes </Text>
+                        </Button>
 
-                    <Button 
-                      className={`px-8 rounded-full opacity-70 ${hasCooked === 'No' ? 'bg-red-500' : 'bg-background-0'}`}
-                      size="xl" 
-                      variant="solid" 
-                      action="secondary" 
-                      onPress={() => setHasCooked('No')}
-                    >
-                      <Ionicons 
-                        name="close" 
-                        size={24} 
-                        color={hasCooked === 'No' ? 'black' : 'white'}
-                      />
-                      <Text className={`text-xl font-medium ${hasCooked === 'No' ? 'text-black' : 'text-white'}`}> No </Text>
-                    </Button>
-                  </HStack>
+                        <Button 
+                          className={`px-8 rounded-full opacity-70 ${hasCooked === 'No' ? 'bg-red-500' : 'bg-background-0'}`}
+                          size="xl" 
+                          variant="solid" 
+                          action="secondary" 
+                          onPress={() => setHasCooked('No')}
+                        >
+                          <Ionicons 
+                            name="close" 
+                            size={24} 
+                            color={hasCooked === 'No' ? 'black' : 'white'}
+                          />
+                          <Text className={`text-xl font-medium ${hasCooked === 'No' ? 'text-black' : 'text-white'}`}> No </Text>
+                        </Button>
+                      </HStack>
+                    </>
+                  )}
 
-                  {/* Photo Upload Section*/}
-                  {hasCooked === 'Yes' && (
+                  {/* Photo Upload Section */}
+                  {(initialHasCooked === true || (initialHasCooked === false && hasCooked === 'Yes')) && (
                     <>
                       <Text className="text-xl font-medium">
                         What does your meal <Text className="text-xl font-bold">look like</Text>?
@@ -356,8 +420,8 @@ export default function CreateRecipe() {
                   />
                 </VStack>
 
-                {/* Taste Selection Section*/}
-                {hasCooked === 'Yes' && (
+                {/* Taste Selection Section - Show for initially cooked recipes or newly marked as cooked */}
+                {(initialHasCooked === true || (initialHasCooked === false && hasCooked === 'Yes')) && (
                   <TastesSection
                     selectedTastes={selectedTastes}
                     setSelectedTastes={setSelectedTastes}
@@ -375,7 +439,7 @@ export default function CreateRecipe() {
               onPress={submitRecipe} 
               isDisabled={!canSubmitRecipe}
             >
-              {!recipeSubmit && <ButtonText>{hasCooked === 'No' ? 'Save recipe' : 'Share recipe'}</ButtonText>}
+              {!recipeSubmit && <ButtonText>{initialHasCooked === false && hasCooked === 'Yes' ? 'Share recipe' : 'Update recipe'}</ButtonText>}
               {recipeSubmit && <Spinner />}
             </Button>
           </VStack>
