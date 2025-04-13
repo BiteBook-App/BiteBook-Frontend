@@ -1,4 +1,4 @@
-import { View, Image, StyleSheet } from "react-native";
+import { View, Image, StyleSheet, DimensionValue } from "react-native";
 import { Text } from "@/components/ui/text";
 import { LinearGradient } from "expo-linear-gradient"; // Import LinearGradient
 import { Button, ButtonText } from "@/components/ui/button";
@@ -12,15 +12,27 @@ interface RecipePost {
   tastes: string[]
   createdAt: string,
   lastUpdatedAt: string
+  imageSize?: "small" | "large";
 }
 
-export default function RecipePost({photoUrl, mealName, tastes, createdAt, lastUpdatedAt}: RecipePost) {
+export default function RecipePost({photoUrl, mealName, tastes, createdAt, lastUpdatedAt, imageSize = "large"}: RecipePost) {
+  const size = {
+    small: { height: 200, width: 200},
+    large: { height: 350, width: "100%" as DimensionValue}
+  }
+
+  const selectedSize = size[imageSize];
+
   return (
     <VStack space="md">
       <View style={styles.container}>
         <Image
           source={{ uri: `${photoUrl}` }}
-          style={styles.image}
+          style={{
+            width: selectedSize.width,
+            height: selectedSize.height,
+            borderRadius: 10,
+          }}
           alt="recipe post"
         />
         <LinearGradient
@@ -39,11 +51,13 @@ export default function RecipePost({photoUrl, mealName, tastes, createdAt, lastU
 
       <HStack className="flex justify-between w-full pb-2">
         {/* Post time or date */}
-        <Text className="text-sm text-gray-300">
-          {formatDate(createdAt)}
-        </Text>
+        {imageSize === "large" &&
+          <Text className="text-sm text-gray-300">
+            {formatDate(createdAt)}
+          </Text>
+        }
 
-        {lastUpdatedAt && (
+        {lastUpdatedAt && imageSize === "large" && (
           <Text className="text-sm text-gray-300">
             Last Updated At: {formatDate(lastUpdatedAt)}
           </Text>
@@ -57,11 +71,6 @@ export default function RecipePost({photoUrl, mealName, tastes, createdAt, lastU
 const styles = StyleSheet.create({
   container: {
     position: "relative", // Ensures the text can be positioned within the container
-  },
-  image: {
-    width: "100%",
-    height: 350,
-    borderRadius: 10,
   },
   overlayText: {
     position: "absolute",
