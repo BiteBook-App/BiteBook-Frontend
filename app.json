@@ -55,6 +55,18 @@
             "useFrameworks": "static"
           }
         }
+      ],
+      [
+        "react-native-share",
+        {
+          "ios": [
+            "instagram"
+          ],
+          "android": [
+            "com.instagram.android"
+          ],
+          "enableBase64ShareAndroid": true
+        }
       ]
     ],
     "experiments": {
