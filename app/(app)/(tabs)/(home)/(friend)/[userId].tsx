@@ -12,7 +12,7 @@ import { Pressable } from "react-native";
 import { useQuery } from "@apollo/client";
 import { GET_RECIPE_PREVIEW, GET_PROFILE } from "@/configs/queries";
 import { useLocalSearchParams } from "expo-router";
-
+import NoRecipes from "@/components/ui/custom-no-recipes-display";
 
 export default function Profile() {
   const { userId } = useLocalSearchParams() as { userId: string };
@@ -88,6 +88,7 @@ export default function Profile() {
         </VStack>
         
         <VStack space="lg" className="mb-5 px-5 mt-4">
+          {posts?.getRecipes?.length === 0 && <NoRecipes displayAction={false}/>}
           {posts?.getRecipes?.map((post: any, index: any) => (
             <Pressable 
               onPress={() => router.push(`/(app)/(tabs)/(home)/(friend)/(recipe)/${post.uid}`)} 
@@ -97,6 +98,8 @@ export default function Profile() {
                 photoUrl={post.photoUrl}
                 mealName={post.name}
                 tastes={post.tastes}
+                createdAt={post.createdAt}
+                lastUpdatedAt={post.lastUpdatedAt}
               />
             </Pressable>
           ))}
