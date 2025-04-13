@@ -1,4 +1,4 @@
-import { View, ScrollView, TextInput } from "react-native";
+import { View, ScrollView, TextInput, Pressable } from "react-native";
 import "@/global.css";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -25,6 +25,8 @@ import TastesSection from "@/components/ui/tastes-component/tastes";
 import { useImagePicker } from "../../../../components/ui/camera-component/camera-functionality"
 import { CREATE_RECIPE } from "@/configs/queries";
 import { useMutation } from "@apollo/client";
+import CustomModal from "@/components/ui/custom-modal";
+import { TrashIcon } from "@/components/ui/icon";
 
 type Ingredient = {
   name: string;
@@ -36,6 +38,7 @@ export default function CreateRecipe() {
   const [title, setTitle] = useState("");
   const [recipeLink, setRecipeLink] = useState("");
   const [hasCooked, setHasCooked] = useState('NULL');
+  const [showModal, setShowModal] = useState(false)
   
   // Recipe import
   const [recipeLoading, setRecipeLoading] = useState(false);
@@ -89,6 +92,7 @@ export default function CreateRecipe() {
     setSteps([]);
     setSelectedTastes([]);
     setHasCooked("");
+    setShowModal(false);
   };
 
   // Recipe import function
@@ -230,7 +234,18 @@ export default function CreateRecipe() {
                 <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px]" size="5xl">
                   Add a Recipe
                 </Text>
-                <Feather onPress={() => clearForm()} className="pl-20 pt-2" name="trash-2" size={24} color="white" />
+                <Pressable onPress={() => setShowModal(true)}>
+                  <Feather className="pl-20 pt-2" name="trash-2" size={24} color="white" />
+                </Pressable>
+                <CustomModal
+                  isOpen={showModal}
+                  onClose={() => setShowModal(false)}
+                  modalTitle="Clear changes"
+                  modalBody="Are you sure you want to clear all changes? This action cannot be undone"
+                  modalActionText="Clear"
+                  modalAction={clearForm}
+                  modalIcon={TrashIcon}
+                />
               </HStack>
             </VStack>
 

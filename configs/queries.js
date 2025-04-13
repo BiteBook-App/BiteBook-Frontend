@@ -46,6 +46,7 @@ export const GET_RECIPE = gql`
       }
       tastes
       user {
+        uid
         displayName
         profilePicture
       }
