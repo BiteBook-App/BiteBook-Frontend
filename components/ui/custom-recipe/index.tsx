@@ -13,6 +13,7 @@ import Step from "@/components/ui/custom-collapsible-item";
 import { useQuery } from "@apollo/client";
 import { GET_RECIPE } from "@/configs/queries";
 import { Icon, LinkIcon } from "@/components/ui/icon";
+import { formatDate } from "@/components/ui/custom-data-utils";
 
 interface RecipeId {
   recipeId: String
@@ -65,6 +66,18 @@ export default function RecipeComponent({ recipeId }: RecipeId) {
               alt="recipe post"
             />
           </View>
+            <HStack className="flex justify-between w-full pb-2">
+              {/* Post time or date */}
+              <Text className="text-sm text-gray-300">
+                {formatDate(data?.getRecipe.createdAt)}
+              </Text>
+
+              {data?.getRecipe.lastUpdatedAt && (
+                <Text className="text-sm text-gray-300">
+                  Last Updated At: {formatDate(data?.getRecipe.lastUpdatedAt)}
+                </Text>
+              )}
+            </HStack>
         </VStack>
 
         {/* Link */}

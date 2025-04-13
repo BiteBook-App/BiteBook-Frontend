@@ -10,6 +10,7 @@ export const GET_RECIPES = gql`
       photoUrl
       likes
       createdAt
+      lastUpdatedAt
       steps {
         expanded
         text
@@ -34,6 +35,7 @@ export const GET_RECIPE = gql`
       hasCooked
       likes
       createdAt
+      lastUpdatedAt
       steps {
         expanded
         text
@@ -55,6 +57,7 @@ export const GET_RECIPE_PREVIEW = gql`
   query GetRecipePreview($userId: String) {
     getRecipes(userId: $userId, hasCooked: true) {
       createdAt
+      lastUpdatedAt
       name
       photoUrl
       tastes
@@ -67,6 +70,7 @@ export const GET_DRAFT_PREVIEW = gql`
   query GetDraftPreview($userId: String) {
     getRecipes(userId: $userId, hasCooked: false) {
       createdAt
+      lastUpdatedAt
       name
       photoUrl
       tastes

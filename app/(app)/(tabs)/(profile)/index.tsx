@@ -177,6 +177,8 @@ export default function Profile() {
                     photoUrl={post.photoUrl}
                     mealName={post.name}
                     tastes={post.tastes}
+                    createdAt={post.createdAt}
+                    lastUpdatedAt={post.lastUpdatedAt}
                   />
                 </Pressable>
               ))}
