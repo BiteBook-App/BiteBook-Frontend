@@ -196,6 +196,7 @@ export default function EditRecipe() {
         variables: { recipeData: recipeData, recipeId: editRecipeId }
       });
   
+      router.dismissAll();
       router.replace("/(profile)");
   
       // Reset form
