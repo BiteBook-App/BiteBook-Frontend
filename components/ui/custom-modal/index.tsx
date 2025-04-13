@@ -14,16 +14,19 @@ import { Icon, TrashIcon } from "@/components/ui/icon";
 import { Box } from "@/components/ui/box";
 import { useAuth } from "@/configs/authProvider";
 
-
 interface CustomModalProps {
   isOpen: boolean;
   onClose: () => void;
+  modalTitle: String;
+  modalBody: String;
+  modalActionText: String;
+  modalAction: () => void;
+  modalIcon: React.ElementType;
 }
 
-export default function CustomModal({ isOpen, onClose }: CustomModalProps) {  
+export default function CustomModal({ isOpen, onClose, modalTitle, modalBody, modalActionText, modalAction, modalIcon }: CustomModalProps) {  
     const router = useRouter();
-    const { signOut, deleteUser } = useAuth();
-    
+
     return (
       <Modal
         isOpen={isOpen}
@@ -33,16 +36,16 @@ export default function CustomModal({ isOpen, onClose }: CustomModalProps) {
         <ModalBackdrop />
         <ModalContent className="rounded-xl border-0 items-center">
           <ModalHeader>
-            <Box className="w-[56px] h-[56px] rounded-full bg-background-error items-center justify-center">
-              <Icon as={TrashIcon} className="stroke-error-600" size="xl" />
+            <Box className="w-[56px] h-[56px] rounded-full bg-background-100 items-center justify-center">
+              <Icon as={modalIcon} size="xl" />
             </Box>
           </ModalHeader>
           <ModalBody>
             <Heading size="lg" className="text-typography-950 text-center">
-                Delete account
+              {modalTitle}
             </Heading>
             <Text size="md" className="text-typography-500 text-center">
-              Are you sure you want to delete your account? This action cannot be undone.
+              {modalBody}
             </Text>
           </ModalBody>
           <ModalFooter className="w-full">
@@ -56,11 +59,11 @@ export default function CustomModal({ isOpen, onClose }: CustomModalProps) {
               <ButtonText>Cancel</ButtonText>
             </Button>
             <Button
-              onPress={async () => await deleteUser()}
+              onPress={modalAction}
               size="sm"
               className="flex-grow"
             >
-              <ButtonText>Delete</ButtonText>
+              <ButtonText>{modalActionText}</ButtonText>
             </Button>
           </ModalFooter>
         </ModalContent>
