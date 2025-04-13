@@ -14,8 +14,11 @@ import { Heading } from "@/components/ui/heading"
 import { HStack } from "@/components/ui/hstack"
 import { Input, InputField, InputSlot, InputIcon } from "@/components/ui/input"
 import { Pressable } from "@/components/ui/pressable"
-import { Box } from "@/components/ui/box"
 import {useState} from "react";
+import { createURL } from 'expo-linking';
+import {useLocalSearchParams} from "expo-router";
+import {useAuth} from "@/configs/authProvider";
+import Share from 'react-native-share';
 
 export default function Friends() {
     const testData = [
@@ -119,6 +122,23 @@ export default function Friends() {
 
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredFriends, setFilteredFriends] = useState(testData);
+    const {user} = useAuth();
+    const {id} = useLocalSearchParams();
+
+    if (id) {
+        console.log("THIS IS ID")
+        console.log(id)
+    }
+
+    const handleInvitation = () => {
+        const invitationURL = createURL("friends", {
+            queryParams: {id: user.uid}
+        })
+
+        Share.open({message: "Invite friends to BiteBook!", title: "BiteBook Invitation", url: invitationURL})
+            .then((res) => console.log(res))
+            .catch((err) => console.log(err));
+    }
 
     // The search function that filters by name or username - Fixed for React Native
     const handleSearch = (text) => {
@@ -172,7 +192,7 @@ export default function Friends() {
             />
 
             <VStack>
-                <Pressable>
+                <Pressable onPress={handleInvitation}>
                     <Alert className="p-5 flex justify-between mt-28">
                         <AlertText size='lg'>
                             Invite friends to join you in BiteBook!
