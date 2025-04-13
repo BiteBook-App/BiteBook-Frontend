@@ -31,6 +31,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Spinner } from "@/components/ui/spinner";
 import colors from "tailwindcss/colors";
+import NoRecipes from "@/components/ui/custom-no-recipes-display";
 
 export default function Profile() {
   const { user } = useAuth();
@@ -186,6 +187,11 @@ export default function Profile() {
         <Animated.View style={[animatedStyle]}>
           {activeTab === "Posts" ? (
             <VStack space="lg" className="mb-5 px-5 mt-4">
+              {posts?.getRecipes?.length === 0 && 
+                <View className="mt-20">
+                  <NoRecipes displayAction={false}/>
+                </View>
+              }
               {posts?.getRecipes?.map((post: any, index: any) => (
                 <Pressable 
                   onPress={() => router.push(`/(app)/(tabs)/(profile)/${post.uid}`)} 
@@ -203,6 +209,11 @@ export default function Profile() {
             </VStack>
           ) : (
             <VStack space="sm" className="mb-5 px-4 mt-4">
+              {drafts?.getRecipes?.length === 0 && 
+                <View className="mt-20">
+                  <NoRecipes displayAction={false}/>
+                </View>
+              }
               {drafts?.getRecipes?.map((post: any, index: any) => (
                 <Pressable
                   onPress={() => router.push(`/(app)/(tabs)/(profile)/${post.uid}`)} 
