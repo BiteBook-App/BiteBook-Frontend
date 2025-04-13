@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/avatar"
 import { LinearGradient } from "expo-linear-gradient";
 import NoRecipes from "@/components/ui/custom-no-recipes-display";
+import { HStack } from "@/components/ui/hstack";
 
 export default function Home() {
   const router = useRouter();
@@ -43,28 +44,6 @@ export default function Home() {
     refetch();
   }, []);
 
-  const formatDate = (dateString: string) => {
-    const postDate = new Date(dateString);
-    const today = new Date();
-  
-    // Check if the post is from today
-    const isToday = postDate.toDateString() === today.toDateString();
-  
-    // Check if the post is from this year (but not today)
-    const isThisYear = postDate.getFullYear() === today.getFullYear();
-  
-    if (isToday) {
-      // Return time in HH:MM format if today
-      return postDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } else if (isThisYear) {
-      // Return Month Day if it's this year (but not today)
-      return postDate.toLocaleDateString("en-US", { month: 'long', day: 'numeric' });
-    } else {
-      // Return MM-DD-YY format if it's not from this year
-      return postDate.toLocaleDateString("en-US", { month: '2-digit', day: '2-digit', year: '2-digit' });
-    }
-  };
-
   if (loading) 
     return (
       <View
@@ -78,10 +57,6 @@ export default function Home() {
       <Spinner size="large" color={colors.gray[500]} />
     </View>
     );
-
-  // if (error) return <Text>Error: {error.message}</Text>;
-
-  // TODO: have text that redirects to create recipe if no recipes on home page
 
   const GRADIENT_COLORS: [string, string, ...string[]] = [
     "#301818", "#2e181a", "#2c181b", "#2a171d", "#28171d", 
@@ -148,14 +123,11 @@ export default function Home() {
                     photoUrl={post.photoUrl}
                     mealName={post.name}
                     tastes={post.tastes}
-                  />
+                    createdAt={post.createdAt}
+                  lastUpdatedAt={post.lastUpdatedAt}
+                />
                 </Pressable>
-
-                {/* Post time or date */}
-                <Text className="text-sm text-gray-300 mt-2">
-                  {formatDate(post.createdAt)}
-                </Text>
-              </View>
+            </View>
             ))
           )}
         </VStack>

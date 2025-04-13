@@ -13,6 +13,9 @@ import Step from "@/components/ui/custom-collapsible-item";
 import { useQuery } from "@apollo/client";
 import { GET_RECIPE } from "@/configs/queries";
 import { Icon, LinkIcon } from "@/components/ui/icon";
+import { formatDate } from "@/components/ui/custom-data-utils";
+import { Spinner } from "../spinner";
+import colors from "tailwindcss/colors";
 
 interface RecipeId {
   recipeId: String
@@ -20,12 +23,30 @@ interface RecipeId {
 
 export default function RecipeComponent({ recipeId }: RecipeId) {
   const { loading, error, data, refetch } = useQuery(GET_RECIPE, {
-    variables: { recipeUid: recipeId }
+    variables: { recipeUid: recipeId },
+    fetchPolicy: 'network-only'
   });
 
   if (error) {
     console.log(error)
   }
+  if (!data?.getRecipe.photoUrl) {
+    console.log("undefined")
+  }
+  
+  if (loading) 
+    return (
+      <View
+      className="bg-background-dark px-5 lg:px-40"
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        width: "100%",
+      }}
+    >
+      <Spinner size="large" color={colors.gray[500]} />
+    </View>
+    );
 
   return (
     <View className="mb-4">
@@ -62,6 +83,18 @@ export default function RecipeComponent({ recipeId }: RecipeId) {
               alt="recipe post"
             />
           </View>
+            <HStack className="flex justify-between w-full pb-2">
+              {/* Post time or date */}
+              <Text className="text-sm text-gray-300">
+                {formatDate(data?.getRecipe.createdAt)}
+              </Text>
+
+              {data?.getRecipe.lastUpdatedAt && (
+                <Text className="text-sm text-gray-300">
+                  Last Updated At: {formatDate(data?.getRecipe.lastUpdatedAt)}
+                </Text>
+              )}
+            </HStack>
         </VStack>
 
         {/* Link */}

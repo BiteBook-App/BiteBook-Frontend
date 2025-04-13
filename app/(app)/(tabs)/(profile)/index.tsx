@@ -29,6 +29,8 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
+import { Spinner } from "@/components/ui/spinner";
+import colors from "tailwindcss/colors";
 
 export default function Profile() {
   const { user } = useAuth();
@@ -96,6 +98,25 @@ export default function Profile() {
   }));
 
   const router = useRouter();
+
+  const editRecipe = () => {
+    router.push("/(app)/edit")
+  }
+
+  if (postsLoading || draftsLoading || profileLoading) {
+    return (
+      <View
+        className="bg-background-dark lg:px-40"
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          width: "100%",
+        }}
+      >
+        <Spinner size="large" color={colors.gray[500]} />
+      </View>
+    );
+  }
 
   return (
     <View
@@ -174,6 +195,8 @@ export default function Profile() {
                     photoUrl={post.photoUrl}
                     mealName={post.name}
                     tastes={post.tastes}
+                    createdAt={post.createdAt}
+                    lastUpdatedAt={post.lastUpdatedAt}
                   />
                 </Pressable>
               ))}
