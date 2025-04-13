@@ -31,6 +31,7 @@ export const GET_RECIPE = gql`
       url
       name
       photoUrl
+      hasCooked
       likes
       createdAt
       steps {
@@ -118,6 +119,7 @@ export const GET_HOME_PAGE = gql`
       likes
       tastes
       createdAt
+      lastUpdatedAt
       user {
         displayName
         profilePicture

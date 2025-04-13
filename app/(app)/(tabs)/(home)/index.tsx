@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/avatar"
 import { LinearGradient } from "expo-linear-gradient";
 import NoRecipes from "@/components/ui/custom-no-recipes-display";
+import { HStack } from "@/components/ui/hstack";
 
 export default function Home() {
   const { user } = useAuth();
@@ -77,10 +78,6 @@ export default function Home() {
       <Spinner size="large" color={colors.gray[500]} />
     </View>
     );
-
-  // if (error) return <Text>Error: {error.message}</Text>;
-
-  // TODO: have text that redirects to create recipe if no recipes on home page
 
   const GRADIENT_COLORS: [string, string, ...string[]] = [
     "#301818", "#2e181a", "#2c181b", "#2a171d", "#28171d", 
@@ -144,11 +141,19 @@ export default function Home() {
                   tastes={post.tastes}
                 />
 
+              <HStack className="flex justify-between w-full">
                 {/* Post time or date */}
                 <Text className="text-sm text-gray-300 mt-2">
                   {formatDate(post.createdAt)}
                 </Text>
-              </View>
+
+                {post.lastUpdatedAt && (
+                  <Text className="text-sm text-gray-300 mt-2">
+                    Last Updated At: {formatDate(post.lastUpdatedAt)}
+                  </Text>
+                )}
+              </HStack>
+            </View>
             ))
           )}
         </VStack>
