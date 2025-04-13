@@ -154,6 +154,7 @@ export default function Profile() {
             profilePicture={profile?.getUsers?.[0]?.profilePicture}
             numPosts={numPosts} 
             numFriends={profile?.getUsers?.[0]?.relationships?.length}
+            displayOptions={true}
           />
           <HStack>
             <Pressable

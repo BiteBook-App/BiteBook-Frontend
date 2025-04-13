@@ -15,14 +15,15 @@ interface ProfileInfo {
   displayName: string, 
   profilePicture: string, 
   numPosts: number, 
-  numFriends: number
+  numFriends: number,
+  displayOptions: Boolean
 }
 
-export default function Profile({ displayName, profilePicture, numPosts, numFriends }: ProfileInfo) {
+export default function Profile({ displayName, profilePicture, numPosts, numFriends, displayOptions }: ProfileInfo) {
   const router = useRouter();
 
   return (
-    <VStack space="md" className="mt-3 px-5">
+    <VStack space="md" className="mt-3 mb-3 px-5">
       <HStack space="lg" className="items-center">
         <Avatar size="xl">
           <AvatarFallbackText>{ displayName }</AvatarFallbackText>
@@ -44,7 +45,7 @@ export default function Profile({ displayName, profilePicture, numPosts, numFrie
           </HStack>
         </VStack>
       </HStack>
-      <HStack space="sm" style={{ flex: 1 }}>
+      {displayOptions && <HStack space="sm" style={{ flex: 1 }}>
         <Button size="md" variant="outline" style={styles.button} onPress={() => router.push('/(app)/(tabs)/(profile)/settings')}>
           <Feather name="settings" size={16} color="#e5e5e5"/>
           <ButtonText>Settings</ButtonText>
@@ -53,7 +54,7 @@ export default function Profile({ displayName, profilePicture, numPosts, numFrie
           <Feather name="share" size={16} color="#e5e5e5"/>
           <ButtonText>Share Profile</ButtonText>
         </Button>
-      </HStack>
+      </HStack>}
     </VStack>
   );
 }

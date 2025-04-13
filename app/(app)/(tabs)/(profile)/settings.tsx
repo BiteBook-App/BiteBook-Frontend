@@ -6,9 +6,10 @@ import { HStack } from "@/components/ui/hstack";
 import { useAuth } from "@/configs/authProvider";
 import { Pressable } from "@/components/ui/pressable";
 import Feather from '@expo/vector-icons/Feather';
-import { Button, ButtonText } from "@/components/ui/button";
 import { useRouter} from 'expo-router';
-import CustomModal from "@/components/ui/custom-modal-delete-account";
+import CustomModal from "@/components/ui/custom-modal";
+import { TrashIcon } from "@/components/ui/icon";
+
 
 export default function Settings() {
   const { signOut, deleteUser } = useAuth();
@@ -45,6 +46,11 @@ export default function Settings() {
       <CustomModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
+        modalTitle="Delete account"
+        modalBody="Are you sure you want to delete your account? This action cannot be undone"
+        modalActionText="Delete"
+        modalAction={deleteUser}
+        modalIcon={TrashIcon}
       />
     </View>
   );
