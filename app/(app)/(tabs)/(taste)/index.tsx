@@ -2,12 +2,14 @@ import { View, ScrollView } from "react-native";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/configs/authProvider";
 import { useQuery } from "@apollo/client";
-import { GET_PROFILE } from "@/configs/queries";
+import { GET_PROFILE, GET_TASTE_PROFILE } from "@/configs/queries";
 import { Box } from "@/components/ui/box";
-import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
 import { LinearGradient } from "expo-linear-gradient";
 import Recommendations from "@/components/ui/custom-recommendations";
+import BarChart from "@/components/ui/custom-bar-chart";
+import PlaceholderPost from "@/components/ui/custom-placeholder-post";
+import Tips from "@/components/ui/custom-taste-tips";
 
 export default function Taste() {
   const { user } = useAuth();
@@ -16,25 +18,10 @@ export default function Taste() {
     variables: { uid: user?.uid }, // Ensure the userId is passed correctly
     skip: !user?.uid, // Prevents running query if user.uid is undefined
   });
-  
-  const tasteStats = [
-    {taste: 'Salty', percentage: 0.75},
-    {taste: 'Sweet', percentage: 0.10},
-    {taste: 'Umami', percentage: 0.05},
-    {taste: 'Spicy', percentage: 0.05},
-    {taste: 'Bitter', percentage: 0},
-    {taste: 'Sour', percentage: 0},
-  ];
 
-  const TASTE_COLORS: Record<string, string> = {
-    Salty: "bg-blue-500 border-blue-500",
-    Sweet: "bg-pink-500 border-pink-500",
-    Sour: "bg-yellow-500 border-yellow-500",
-    Bitter: "bg-green-700 border-pgreen-700",
-    Umami: "bg-purple-500 border-purple-500",
-    Spicy: "bg-red-500 border-red-500",
-  };
-
+  const { loading: tasteLoading, error: tasteError, data: tasteProfile, refetch: refetchTaste } = useQuery(GET_TASTE_PROFILE, {
+    variables: { userId: user?.uid }, // Ensure the userId is passed correctly
+  });
 
   const GRADIENT_COLORS: [string, string, ...string[]] = [
     "#37232f", "#34222e", "#30212c", "#2d202a", 
@@ -68,27 +55,25 @@ export default function Taste() {
       />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Hi user */}
-        <Text className="font-[Rashfield] mt-5 pt-8" size="5xl">
-          Hi, {profile?.getUsers?.[0]?.displayName}!
+        <Text className="font-[Rashfield] mt-8 pt-8" style={{ marginBottom: -15 }}size="5xl">
+          Hi, {profile?.getUsers?.[0]?.displayName}
         </Text> 
+        <Text className="font-medium">🍳 Let's take a look at your <Text bold={true}>monthly</Text> kitchen recap!</Text>
+
         
-        <VStack space="lg" className="mb-5">
-          {/* Food for thought */}
+        <VStack space="lg" className="mt-5 mb-5">
           <Box 
             className="rounded-xl p-5"
             style={{
-              backgroundColor: 'rgba(67, 61, 73, 0.27)', // Adjust alpha as needed
+              backgroundColor: 'rgba(67, 61, 73, 0.27)',
             }}
           >
-            <Text className="font-[Rashfield] pt-2 mb-1" size="2xl">
-              Food for thought
+            <Text className="font-[Rashfield] pt-2" size="2xl">
+              Overall...
             </Text>
-            <Text className="text-white mb-2">
-              You cooked 3 new recipes this month and explored 4 taste profiles, with Salty being your favorite. Keep it up!
-            </Text>
-            <Text className="text-white italic">
-              🔥 Tip: You haven’t tried any spicy recipes yet—how about a quick Thai curry or shakshuka next?
-            </Text>
+            {tasteProfile?.getTastePageInfo?.tastePercentages?.length === 0 ? 
+              <Tips showPlaceholder={true}/> : <Tips numRecipes={tasteProfile?.getTastePageInfo?.numRecipes} numTastes={tasteProfile?.getTastePageInfo?.numTasteProfiles} favoriteTaste={tasteProfile?.getTastePageInfo?.tastePercentages?.[0].taste}/>
+            }
           </Box>
 
           {/* Taste profile bar chart */}
@@ -98,39 +83,10 @@ export default function Taste() {
               backgroundColor: 'rgba(67, 61, 73, 0.27)', // Adjust alpha as needed
             }}
           >            
-            <VStack space="md">
-              <Text className="font-[Rashfield] pt-2" size="2xl">Tastes you enjoyed the most this month</Text>
-              <HStack
-                space="sm"
-                className="justify-between"
-                style={{
-                  width: '100%',
-                  alignItems: 'flex-end', // ensures bars align at bottom
-                }}
-              >
-                {tasteStats.map((stat, i) => (
-                  <View
-                    key={i}
-                    style={{
-                      flex: 1,
-                      alignItems: 'center',
-                      justifyContent: 'flex-end',
-                    }}
-                  >
-                    <Box
-                      className={`rounded-xl ${TASTE_COLORS[stat.taste] || "bg-background-dark"} opacity-60`}                      
-                      style={{
-                        width: '100%',
-                        height: 300 * stat.percentage,
-                      }}
-                    />
-                    <Text className="text-white text-center mt-2 font-medium" size="sm">
-                      {stat.taste}
-                    </Text>
-                  </View>
-                ))}
-              </HStack>
-            </VStack>
+            <Text className="font-[Rashfield] pt-2" size="2xl">Tastes you enjoyed the most</Text>
+            {tasteProfile?.getTastePageInfo?.tastePercentages?.length === 0 ? 
+              <BarChart/> : <BarChart tasteProfile={tasteProfile?.getTastePageInfo?.tastePercentages}/>
+            }
           </Box>
           
           {/* Recommendations */}
@@ -140,13 +96,11 @@ export default function Taste() {
               backgroundColor: 'rgba(67, 61, 73, 0.27)', // Adjust alpha as needed
             }}
           >   
-            <VStack space="md">
-              <View>
-                <Text className="font-[Rashfield] pt-2" size="2xl">Recommendations</Text>
-                <Text>Your friends are cooking up these recipes and we think you'll love them.</Text>
-              </View>
-              <Recommendations/>     
-            </VStack> 
+            <View>
+              <Text className="font-[Rashfield] pt-2" size="2xl">Explore your friends' recipes</Text>
+            </View>
+            <Text className="mb-3">Your friends are cooking up these recipes and we think you'll love them.</Text>
+            {tasteProfile?.getTastePageInfo?.recommendations?.length === 0 ? <PlaceholderPost/> : <Recommendations recommendations={tasteProfile?.getTastePageInfo?.recommendations}/>}
           </Box>
 
         </VStack>
