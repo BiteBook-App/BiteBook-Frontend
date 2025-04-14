@@ -29,6 +29,9 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
+import { Spinner } from "@/components/ui/spinner";
+import colors from "tailwindcss/colors";
+import NoRecipes from "@/components/ui/custom-no-recipes-display";
 
 export default function Profile() {
   const { user } = useAuth();
@@ -96,6 +99,21 @@ export default function Profile() {
   }));
 
   const router = useRouter();
+
+  if (postsLoading || draftsLoading || profileLoading) {
+    return (
+      <View
+        className="bg-background-dark lg:px-40"
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          width: "100%",
+        }}
+      >
+        <Spinner size="large" color={colors.gray[500]} />
+      </View>
+    );
+  }
 
   return (
     <View
@@ -165,6 +183,11 @@ export default function Profile() {
         <Animated.View style={[animatedStyle]}>
           {activeTab === "Posts" ? (
             <VStack space="lg" className="mb-5 px-5 mt-4">
+              {posts?.getRecipes?.length === 0 && 
+                <View className="mt-20">
+                  <NoRecipes displayAction={false}/>
+                </View>
+              }
               {posts?.getRecipes?.map((post: any, index: any) => (
                 <Pressable 
                   onPress={() => router.push(`/(app)/(tabs)/(profile)/${post.uid}`)} 
@@ -174,12 +197,19 @@ export default function Profile() {
                     photoUrl={post.photoUrl}
                     mealName={post.name}
                     tastes={post.tastes}
+                    createdAt={post.createdAt}
+                    lastUpdatedAt={post.lastUpdatedAt}
                   />
                 </Pressable>
               ))}
             </VStack>
           ) : (
             <VStack space="sm" className="mb-5 px-4 mt-4">
+              {drafts?.getRecipes?.length === 0 && 
+                <View className="mt-20">
+                  <NoRecipes displayAction={false}/>
+                </View>
+              }
               {drafts?.getRecipes?.map((post: any, index: any) => (
                 <Pressable
                   onPress={() => router.push(`/(app)/(tabs)/(profile)/${post.uid}`)} 

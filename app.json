@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "bitebook",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -54,6 +54,18 @@
           "ios": {
             "useFrameworks": "static"
           }
+        }
+      ],
+      [
+        "react-native-share",
+        {
+          "ios": [
+            "instagram"
+          ],
+          "android": [
+            "com.instagram.android"
+          ],
+          "enableBase64ShareAndroid": true
         }
       ]
     ],

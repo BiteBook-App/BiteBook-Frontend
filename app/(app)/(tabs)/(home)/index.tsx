@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/avatar"
 import { LinearGradient } from "expo-linear-gradient";
 import NoRecipes from "@/components/ui/custom-no-recipes-display";
+import { HStack } from "@/components/ui/hstack";
 
 export default function Home() {
   const router = useRouter();
@@ -43,28 +44,6 @@ export default function Home() {
     refetch();
   }, []);
 
-  const formatDate = (dateString: string) => {
-    const postDate = new Date(dateString);
-    const today = new Date();
-  
-    // Check if the post is from today
-    const isToday = postDate.toDateString() === today.toDateString();
-  
-    // Check if the post is from this year (but not today)
-    const isThisYear = postDate.getFullYear() === today.getFullYear();
-  
-    if (isToday) {
-      // Return time in HH:MM format if today
-      return postDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } else if (isThisYear) {
-      // Return Month Day if it's this year (but not today)
-      return postDate.toLocaleDateString("en-US", { month: 'long', day: 'numeric' });
-    } else {
-      // Return MM-DD-YY format if it's not from this year
-      return postDate.toLocaleDateString("en-US", { month: '2-digit', day: '2-digit', year: '2-digit' });
-    }
-  };
-
   if (loading) 
     return (
       <View
@@ -78,10 +57,6 @@ export default function Home() {
       <Spinner size="large" color={colors.gray[500]} />
     </View>
     );
-
-  // if (error) return <Text>Error: {error.message}</Text>;
-
-  // TODO: have text that redirects to create recipe if no recipes on home page
 
   const GRADIENT_COLORS: [string, string, ...string[]] = [
     "#301818", "#2e181a", "#2c181b", "#2a171d", "#28171d", 
@@ -115,51 +90,55 @@ export default function Home() {
           bottom: 0,
         }}
       />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <VStack space="lg" className="mb-5 mt-4">
-          {data?.getHomePageRecipes?.length === 0 ? ( <NoRecipes />) : (
-            data?.getHomePageRecipes?.map((post: any, index: any) => (
-              <View key={index} className="mb-4">
-                {/* Heading with profile picture and display name */}
-                <Pressable className="flex-row items-center mb-4" 
-                  onPress={() => {
-                    post.user.uid == userId ? router.push(`/(app)/(tabs)/(profile)`) : router.push(`/(app)/(tabs)/(home)/(friend)/${post.user.uid}`)
-                  }}
-                >
-                  <Avatar size="sm">
-                    <AvatarFallbackText>{post.user.displayName}</AvatarFallbackText>
-                    <AvatarImage
-                      source={{
-                        uri: post.user.profilePicture,
-                      }}
-                    />
-                  </Avatar>
-                  <Text className="font-semibold text-white ml-2">{post.user.displayName}</Text>
-                </Pressable>
 
-                {/* Render post content */}
-                <Pressable onPress={() => router.push(`/(app)/(tabs)/(home)/${post.uid}`)}>
-                  <Post
-                    photoUrl={post.photoUrl}
-                    mealName={post.name}
-                    tastes={post.tastes}
+      {/* Render No Recipes component if there is no data to display */}
+      {data?.getHomePageRecipes?.length === 0 && <NoRecipes displayAction={true}/>}
+
+      {/* Render posts if there is data to display */}
+      { data?.getHomePageRecipes?.length !== 0 &&
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <VStack space="lg" className="mb-5 mt-4">
+            {
+              data?.getHomePageRecipes?.map((post: any, index: any) => (
+                <View key={index} className="mb-4">
+                  {/* Heading with profile picture and display name */}
+                  <Pressable className="flex-row items-center mb-4" 
+                    onPress={() => {
+                      post.user.uid == userId ? router.push(`/(app)/(tabs)/(profile)`) : router.push(`/(app)/(tabs)/(home)/(friend)/${post.user.uid}`)
+                    }}
+                  >
+                    <Avatar size="sm">
+                      <AvatarFallbackText>{post.user.displayName}</AvatarFallbackText>
+                      <AvatarImage
+                        source={{
+                          uri: post.user.profilePicture,
+                        }}
+                      />
+                    </Avatar>
+                    <Text className="font-semibold text-white ml-2">{post.user.displayName}</Text>
+                  </Pressable>
+
+                  {/* Render post content */}
+                  <Pressable onPress={() => router.push(`/(app)/(tabs)/(home)/${post.uid}`)}>
+                    <Post
+                      photoUrl={post.photoUrl}
+                      mealName={post.name}
+                      tastes={post.tastes}
+                      createdAt={post.createdAt}
+                    lastUpdatedAt={post.lastUpdatedAt}
                   />
-                </Pressable>
-
-                {/* Post time or date */}
-                <Text className="text-sm text-gray-300 mt-2">
-                  {formatDate(post.createdAt)}
-                </Text>
+                  </Pressable>
               </View>
-            ))
-          )}
-        </VStack>
-      </ScrollView>
+              ))
+            }
+          </VStack>
+        </ScrollView>
+      }
     </View>
   );
 }

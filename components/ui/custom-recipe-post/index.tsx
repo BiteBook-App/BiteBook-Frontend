@@ -4,16 +4,19 @@ import { LinearGradient } from "expo-linear-gradient"; // Import LinearGradient
 import { Button, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
+import { formatDate } from "@/components/ui/custom-data-utils";
 
 interface RecipePost {
   photoUrl: string,
   mealName: string,
   tastes: string[]
+  createdAt: string,
+  lastUpdatedAt: string
 }
 
-export default function RecipePost({photoUrl, mealName, tastes}: RecipePost) {
+export default function RecipePost({photoUrl, mealName, tastes, createdAt, lastUpdatedAt}: RecipePost) {
   return (
-    <VStack space="3xl">
+    <VStack space="md">
       <View style={styles.container}>
         <Image
           source={{ uri: `${photoUrl}` }}
@@ -33,6 +36,19 @@ export default function RecipePost({photoUrl, mealName, tastes}: RecipePost) {
         </HStack>
         <Text style={styles.overlayText} bold={true} size="3xl" className="m-6">{ mealName }</Text>
       </View>
+
+      <HStack className="flex justify-between w-full pb-2">
+        {/* Post time or date */}
+        <Text className="text-sm text-gray-300">
+          {formatDate(createdAt)}
+        </Text>
+
+        {lastUpdatedAt && (
+          <Text className="text-sm text-gray-300">
+            Last Updated: {formatDate(lastUpdatedAt)}
+          </Text>
+        )}
+      </HStack>
     </VStack>
 
   );

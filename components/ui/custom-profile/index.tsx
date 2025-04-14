@@ -41,7 +41,11 @@ export default function Profile({ displayName, profilePicture, numPosts, numFrie
           </HStack>
           <HStack className="items-center">
             <Feather name="globe" size={16} color="#e5e5e5" className="mr-1"/>
-            <Text>{ numFriends } people in your circle</Text>
+            {displayOptions ? (
+              <Text>{numFriends} people in your circle</Text>
+            ) : (
+              <Text>{numFriends} people in their circle</Text>
+            )}
           </HStack>
         </VStack>
       </HStack>

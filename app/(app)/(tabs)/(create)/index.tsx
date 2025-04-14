@@ -1,17 +1,17 @@
-import { View, ScrollView, TextInput } from "react-native";
+import { View, ScrollView, TextInput, Pressable } from "react-native";
 import "@/global.css";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
-import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import {
   FormControl,
   FormControlError,
   FormControlErrorText,
   FormControlErrorIcon,
 } from "@/components/ui/form-control"
-import { useState, useRef, useCallback, useMemo, SetStateAction } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { CloseCircleIcon } from "@/components/ui/icon";
 import { useAuth } from '@/configs/authProvider';
@@ -25,6 +25,8 @@ import TastesSection from "@/components/ui/tastes-component/tastes";
 import { useImagePicker } from "../../../../components/ui/camera-component/camera-functionality"
 import { CREATE_RECIPE } from "@/configs/queries";
 import { useMutation } from "@apollo/client";
+import CustomModal from "@/components/ui/custom-modal";
+import { TrashIcon } from "@/components/ui/icon";
 
 type Ingredient = {
   name: string;
@@ -36,6 +38,7 @@ export default function CreateRecipe() {
   const [title, setTitle] = useState("");
   const [recipeLink, setRecipeLink] = useState("");
   const [hasCooked, setHasCooked] = useState('NULL');
+  const [showModal, setShowModal] = useState(false);
   
   // Recipe import
   const [recipeLoading, setRecipeLoading] = useState(false);
@@ -89,6 +92,7 @@ export default function CreateRecipe() {
     setSteps([]);
     setSelectedTastes([]);
     setHasCooked("");
+    setShowModal(false);
   };
 
   // Recipe import function
@@ -129,7 +133,7 @@ export default function CreateRecipe() {
     let photoUrl = "";
 
     // Upload image if it exists
-    if (photo) {
+    if (photo && hasCooked === 'Yes') {
       try {
         photoUrl = await uploadImage(photo, storage, user.uid, "recipes");
       } catch (error) {
@@ -141,6 +145,12 @@ export default function CreateRecipe() {
     }
 
     const hasCookedBool = hasCooked === 'Yes';
+
+    // EDGE CASE: User says they cooked it, added photo and tastes, and then selected they didn't cook it before submitting
+    if (hasCooked === 'No') {
+      setPhoto(null);
+      setSelectedTastes([]);
+    }
     
     // Construct the recipeData object
     const recipeData = {
@@ -155,7 +165,7 @@ export default function CreateRecipe() {
         .map(({ text }) => ({ text: text.trim(), expanded: false }))
         .filter(({ text }) => text !== ""),
       tastes: selectedTastes,
-      hasCooked: hasCookedBool,
+      hasCooked: hasCookedBool
     };
   
     try {
@@ -224,7 +234,18 @@ export default function CreateRecipe() {
                 <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px]" size="5xl">
                   Add a Recipe
                 </Text>
-                <MaterialCommunityIcons onPress={() => clearForm()} className="pl-20 pt-2" name="restart" size={30} color="white" />
+                <Pressable onPress={() => setShowModal(true)}>
+                  <Feather className="pl-20 pt-2" name="trash-2" size={24} color="white" />
+                </Pressable>
+                <CustomModal
+                  isOpen={showModal}
+                  onClose={() => setShowModal(false)}
+                  modalTitle="Clear changes"
+                  modalBody="Are you sure you want to clear all changes? This action cannot be undone"
+                  modalActionText="Clear"
+                  modalAction={clearForm}
+                  modalIcon={TrashIcon}
+                />
               </HStack>
             </VStack>
 
