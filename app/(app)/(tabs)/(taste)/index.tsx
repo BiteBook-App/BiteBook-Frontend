@@ -1,4 +1,4 @@
-import { View, ScrollView } from "react-native";
+import { View, ScrollView, RefreshControl } from "react-native";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/configs/authProvider";
 import { useQuery } from "@apollo/client";
@@ -10,9 +10,11 @@ import Recommendations from "@/components/ui/custom-recommendations";
 import BarChart from "@/components/ui/custom-bar-chart";
 import PlaceholderPost from "@/components/ui/custom-placeholder-post";
 import Tips from "@/components/ui/custom-taste-tips";
+import { useCallback, useState } from "react";
 
 export default function Taste() {
   const { user } = useAuth();
+  const [refreshing, setRefreshing] = useState(false);
 
   const { loading: profileLoading, error: profileError, data: profile, refetch: refetchProfile } = useQuery(GET_PROFILE, {
     variables: { uid: user?.uid }, // Ensure the userId is passed correctly
@@ -22,6 +24,18 @@ export default function Taste() {
   const { loading: tasteLoading, error: tasteError, data: tasteProfile, refetch: refetchTaste } = useQuery(GET_TASTE_PROFILE, {
     variables: { userId: user?.uid }, // Ensure the userId is passed correctly
   });
+
+  const onRefresh = useCallback(async () => {
+      setRefreshing(true);
+      try {
+        await refetchProfile();
+        await refetchTaste();
+      } catch (error) {
+        console.error("Error during taste refetch:", error);
+      } finally {
+        setRefreshing(false);
+      }
+    }, [refetchTaste]);
 
   const GRADIENT_COLORS: [string, string, ...string[]] = [
     "#37232f", "#34222e", "#30212c", "#2d202a", 
@@ -53,7 +67,7 @@ export default function Taste() {
           bottom: 0,
         }}
       />
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {/* Hi user */}
         <Text className="font-[Rashfield] mt-8 pt-8" style={{ marginBottom: -15 }}size="5xl">
           Hi, {profile?.getUsers?.[0]?.displayName}
