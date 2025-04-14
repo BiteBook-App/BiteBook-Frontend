@@ -102,7 +102,7 @@ export default function RecipeComponent({ recipeId }: RecipeId) {
 
               {data?.getRecipe.lastUpdatedAt && (
                 <Text className="text-sm text-gray-300">
-                  Last Updated At: {formatDate(data?.getRecipe.lastUpdatedAt)}
+                  Last Updated: {formatDate(data?.getRecipe.lastUpdatedAt)}
                 </Text>
               )}
             </HStack>

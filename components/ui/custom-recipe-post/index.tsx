@@ -45,7 +45,7 @@ export default function RecipePost({photoUrl, mealName, tastes, createdAt, lastU
 
         {lastUpdatedAt && (
           <Text className="text-sm text-gray-300">
-            Last Updated At: {formatDate(lastUpdatedAt)}
+            Last Updated: {formatDate(lastUpdatedAt)}
           </Text>
         )}
       </HStack>
