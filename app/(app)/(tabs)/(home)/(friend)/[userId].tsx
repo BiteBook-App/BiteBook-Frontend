@@ -77,7 +77,6 @@ export default function Profile() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         <VStack space="md" className="bg-background-dark">
-          {/* TODO: Update numFriends!! */}
           <ProfileInfo 
             displayName={profile?.getUsers?.[0]?.displayName}
             profilePicture={profile?.getUsers?.[0]?.profilePicture}

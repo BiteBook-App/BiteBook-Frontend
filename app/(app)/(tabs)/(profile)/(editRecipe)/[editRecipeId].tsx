@@ -1,4 +1,4 @@
-import { View, ScrollView, TextInput } from "react-native";
+import { View, ScrollView, TextInput, Pressable } from "react-native";
 import "@/global.css";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -26,6 +26,8 @@ import { useImagePicker } from "../../../../../components/ui/camera-component/ca
 import { EDIT_RECIPE, GET_RECIPE } from "@/configs/queries";
 import { useMutation, useQuery } from "@apollo/client";
 import { deleteObject, ref } from "firebase/storage";
+import CustomModal from "@/components/ui/custom-modal";
+import { TrashIcon } from "@/components/ui/icon";
 
 type Ingredient = {
   name: string;
@@ -39,6 +41,7 @@ export default function EditRecipe() {
   const [hasCooked, setHasCooked] = useState('NULL');
   const [initialHasCooked, setInitialHasCooked] = useState(null);
   const [originalRecipeData, setOriginalRecipeData] = useState(null);
+  const [showModal, setShowModal] = useState(false)
   
   // Recipe import
   const [recipeLoading, setRecipeLoading] = useState(false);
@@ -137,6 +140,7 @@ export default function EditRecipe() {
   }, []);
   
   const resetForm = (): void => {
+    setShowModal(false);
     if (originalRecipeData) {
       // Reset to original values
       setTitle(originalRecipeData["name"]);
@@ -174,6 +178,7 @@ export default function EditRecipe() {
       setSteps([]);
       setSelectedTastes([]);
       setHasCooked("");
+      setShowModal(false);
     }
   };
 
@@ -225,7 +230,7 @@ export default function EditRecipe() {
     // Construct the recipeData object
     const recipeData = {
       userId: user.uid,
-      url: recipeLink.trim(),
+      url: recipeLink.trim() !== 'No URL entered.' ? recipeLink.trim() : '',
       name: title.trim(),
       photoUrl: photoUrl || "",
       ingredients: ingredients
@@ -299,8 +304,19 @@ export default function EditRecipe() {
               <HStack>
                 <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px]" size="5xl">
                   Edit Recipe
-                </Text>
-                <MaterialIcons onPress={() => resetForm()} className="pl-28 pt-2" name="restart-alt" size={30} color="white" />
+                </Text>                
+                <Pressable onPress={() => setShowModal(true)}>
+                <MaterialIcons className="pl-28 pt-2" name="restart-alt" size={30} color="white" />
+                </Pressable>
+                <CustomModal
+                  isOpen={showModal}
+                  onClose={() => setShowModal(false)}
+                  modalTitle="Restore Original"
+                  modalBody="Are you sure you want to revert to the original recipe? This action cannot be undone."
+                  modalActionText="Clear"
+                  modalAction={resetForm}
+                  modalIcon={TrashIcon}
+                />
               </HStack>
             </VStack>
 

@@ -1,4 +1,4 @@
-import { View, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, Image, Pressable } from "react-native";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
@@ -16,12 +16,17 @@ import { Icon, LinkIcon } from "@/components/ui/icon";
 import { formatDate } from "@/components/ui/custom-data-utils";
 import { Spinner } from "../spinner";
 import colors from "tailwindcss/colors";
+import { router } from "expo-router";
+import { useAuth } from "@/configs/authProvider";
 
 interface RecipeId {
   recipeId: String
 }
 
 export default function RecipeComponent({ recipeId }: RecipeId) {
+  const { user } = useAuth();
+  const userId = user?.uid;
+  
   const { loading, error, data, refetch } = useQuery(GET_RECIPE, {
     variables: { recipeUid: recipeId },
     fetchPolicy: 'network-only'
@@ -58,15 +63,21 @@ export default function RecipeComponent({ recipeId }: RecipeId) {
         <VStack space="sm" className="mb-3">
           <HStack space="sm" className="justify-between">
             <HStack space="sm" className="items-center">
-              <Avatar size="sm">
-                <AvatarFallbackText>{data?.getRecipe.user.displayName}</AvatarFallbackText>
-                <AvatarImage
-                  source={{
-                    uri: `${data?.getRecipe.user.profilePicture}`
-                  }}
-                />
-              </Avatar>            
-              <Text size="md" className="font-bold">{data?.getRecipe.user.displayName}</Text>
+              <Pressable className="flex-row items-center mb-4" 
+                onPress={() => {
+                  data?.getRecipe.user.uid == userId ? router.push(`/(app)/(tabs)/(profile)`) : router.push(`/(app)/(tabs)/(home)/(friend)/${data?.getRecipe.user.uid}`)
+                }}
+              >
+                <Avatar size="sm">
+                  <AvatarFallbackText>{data?.getRecipe.user.displayName}</AvatarFallbackText>
+                  <AvatarImage
+                    source={{
+                      uri: data?.getRecipe.user.profilePicture,
+                    }}
+                  />
+                </Avatar>
+                <Text className="font-semibold text-white ml-2">{data?.getRecipe.user.displayName}</Text>
+              </Pressable>
             </HStack>
             <HStack space="xs" className="mt-2 justify-end">
               {data?.getRecipe.tastes.map((taste: any, index: number) => (
@@ -91,7 +102,7 @@ export default function RecipeComponent({ recipeId }: RecipeId) {
 
               {data?.getRecipe.lastUpdatedAt && (
                 <Text className="text-sm text-gray-300">
-                  Last Updated At: {formatDate(data?.getRecipe.lastUpdatedAt)}
+                  Last Updated: {formatDate(data?.getRecipe.lastUpdatedAt)}
                 </Text>
               )}
             </HStack>
@@ -100,12 +111,18 @@ export default function RecipeComponent({ recipeId }: RecipeId) {
         {/* Link */}
         <View className="bg-background-0 rounded-2xl border-0 opacity-80 p-5">
           <HStack space="sm">
-            <Icon as={LinkIcon}/>
-            <Link href={data?.getRecipe.url}>
-              <LinkText className="text-primary-950 font-medium" size="md">
-                {data?.getRecipe.name}            
-              </LinkText>
+            <Icon as={LinkIcon} />
+            {data?.getRecipe.url === '' ? (
+              <Text className="text-primary-950 font-medium italic" size="md">
+                No link provided
+              </Text>
+            ) : (
+              <Link href={data.getRecipe.url}>
+                <LinkText className="text-primary-950 font-medium" size="md">
+                  {data.getRecipe.name}
+                </LinkText>
             </Link>
+            )}
           </HStack>
         </View>
 
