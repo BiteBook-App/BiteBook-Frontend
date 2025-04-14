@@ -11,6 +11,8 @@ import BarChart from "@/components/ui/custom-bar-chart";
 import PlaceholderPost from "@/components/ui/custom-placeholder-post";
 import Tips from "@/components/ui/custom-taste-tips";
 import { useCallback, useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
+import colors from "tailwindcss/colors";
 
 export default function Taste() {
   const { user } = useAuth();
@@ -46,6 +48,21 @@ export default function Taste() {
   const GRADIENT_LOCATIONS: [number, number, ...number[]] = [
     0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7
   ];
+
+  if (tasteLoading || profileLoading) {
+    return (
+      <View
+        className="bg-background-dark lg:px-40"
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          width: "100%",
+        }}
+      >
+        <Spinner size="large" color={colors.gray[500]} />
+      </View>
+    );
+  }
 
   return (
     <View
