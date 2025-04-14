@@ -48,7 +48,6 @@ export default function CustomActionsheet({ showActionsheet, handleClose, recipe
           {data?.getRecipe?.user.uid == user.uid && 
             <ActionsheetItem                 
               onPress={() => {
-                handleClose();
                 setShowModal(true);
               }}
             >
@@ -79,6 +78,7 @@ export default function CustomActionsheet({ showActionsheet, handleClose, recipe
             console.error("Error deleting recipe:", error);
           } finally {
             setShowModal(false);
+            handleClose();
           }
         }}
         modalIcon={TrashIcon}
