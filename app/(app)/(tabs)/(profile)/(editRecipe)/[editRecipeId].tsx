@@ -313,7 +313,7 @@ export default function EditRecipe() {
                   onClose={() => setShowModal(false)}
                   modalTitle="Restore Original"
                   modalBody="Are you sure you want to revert to the original recipe? This action cannot be undone."
-                  modalActionText="Clear"
+                  modalActionText="Restore"
                   modalAction={resetForm}
                   modalIcon={TrashIcon}
                 />
