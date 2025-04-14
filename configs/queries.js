@@ -146,3 +146,27 @@ export const GET_USER_FROM_RECIPE = gql`
     }
   }
 `;
+
+export const GET_TASTE_PROFILE = gql`
+  query GetTasteProfile($userId: String!) {
+    getTastePageInfo(userId: $userId) {
+      recommendations {
+        uid
+        photoUrl
+        name
+        tastes
+        user {
+          displayName
+          profilePicture
+          uid
+        }
+      }
+      tastePercentages {
+        percentage
+        taste
+      }
+      numRecipes
+      numTasteProfiles
+    }
+  }
+`;
