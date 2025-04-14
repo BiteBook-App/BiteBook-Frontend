@@ -153,3 +153,9 @@ export const CREATE_RELATIONSHIP = gql`
   createRelationship(relationshipData: $relationshipData)
  }
 `;
+
+export const DELETE_RECIPE = gql`
+ mutation MyMutation($recipeId: String!) {
+  deleteRecipe(recipeId: $recipeId)
+ }
+`;
