@@ -157,7 +157,7 @@ export default function Friends() {
     }
 
     // The search function that filters by name or username - Fixed for React Native
-    const handleSearch = (text) => {
+    const handleSearch = (text: any) => {
         // Update the search term state
         setSearchTerm(text);
 
