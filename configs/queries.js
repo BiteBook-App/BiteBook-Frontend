@@ -177,3 +177,9 @@ export const GET_TASTE_PROFILE = gql`
     }
   }
 `;
+
+export const DELETE_RECIPE = gql`
+ mutation MyMutation($recipeId: String!) {
+  deleteRecipe(recipeId: $recipeId)
+ }
+`;

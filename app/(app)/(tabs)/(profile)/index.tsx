@@ -100,10 +100,6 @@ export default function Profile() {
 
   const router = useRouter();
 
-  const editRecipe = () => {
-    router.push("/(app)/edit")
-  }
-
   if (postsLoading || draftsLoading || profileLoading) {
     return (
       <View

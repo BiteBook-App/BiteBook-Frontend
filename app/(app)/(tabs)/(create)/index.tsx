@@ -38,7 +38,7 @@ export default function CreateRecipe() {
   const [title, setTitle] = useState("");
   const [recipeLink, setRecipeLink] = useState("");
   const [hasCooked, setHasCooked] = useState('NULL');
-  const [showModal, setShowModal] = useState(false)
+  const [showModal, setShowModal] = useState(false);
   
   // Recipe import
   const [recipeLoading, setRecipeLoading] = useState(false);
