@@ -12,19 +12,19 @@ interface RecipePost {
   tastes: string[]
   createdAt: string,
   lastUpdatedAt: string
-  imageSize?: "small" | "large";
+  size?: "small" | "large";
 }
 
-export default function RecipePost({photoUrl, mealName, tastes, createdAt, lastUpdatedAt, imageSize = "large"}: RecipePost) {
-  const size = {
+export default function RecipePost({photoUrl, mealName, tastes, createdAt, lastUpdatedAt, size = "large"}: RecipePost) {
+  const sizes = {
     small: { height: 200, width: 200},
     large: { height: 350, width: "100%" as DimensionValue}
   }
 
-  const selectedSize = size[imageSize];
+  const selectedSize = sizes[size];
 
   return (
-    <VStack space="md">
+    <View>
       <View style={styles.container}>
         <Image
           source={{ uri: `${photoUrl}` }}
@@ -41,30 +41,29 @@ export default function RecipePost({photoUrl, mealName, tastes, createdAt, lastU
         />
         <HStack space="sm" style={styles.buttonContainer} className="m-2">
           {tastes.map((taste, index) => (
-            <Button key={index} style={styles.taste} className="rounded-full" variant="solid" size="sm">
+            <Button key={index} style={styles.taste} className="rounded-full" variant="solid" size={size === "large" ? "sm" : "xs"}>
               <ButtonText>{taste}</ButtonText>
             </Button>
           ))}
         </HStack>
-        <Text style={styles.overlayText} bold={true} size="3xl" className="m-6">{ mealName }</Text>
+        <Text style={styles.overlayText} bold={true} size={size === "large" ? "3xl" : "2xl"} className="m-6">{ mealName }</Text>
       </View>
 
       <HStack className="flex justify-between w-full pb-2">
         {/* Post time or date */}
-        {imageSize === "large" &&
-          <Text className="text-sm text-gray-300">
+        {size === "large" &&
+          <Text className="text-sm text-gray-300 mt-2">
             {formatDate(createdAt)}
           </Text>
         }
 
-        {lastUpdatedAt && imageSize === "large" && (
-          <Text className="text-sm text-gray-300">
+        {lastUpdatedAt && size === "large" && (
+          <Text className="text-sm text-gray-300 mt-2">
             Last Updated At: {formatDate(lastUpdatedAt)}
           </Text>
         )}
       </HStack>
-    </VStack>
-
+    </View>
   );
 }
 
