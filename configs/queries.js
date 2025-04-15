@@ -183,3 +183,14 @@ export const DELETE_RECIPE = gql`
   deleteRecipe(recipeId: $recipeId)
  }
 `;
+
+export const GET_FRIENDS = gql`
+  query GetFriends($userId: String!) {
+    getFriends(userId: $userId) {
+      displayName
+      profilePicture
+      uid
+      createdAt
+    }
+  }
+`;
