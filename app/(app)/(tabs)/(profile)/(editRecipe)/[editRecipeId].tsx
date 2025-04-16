@@ -504,7 +504,7 @@ export default function EditRecipe() {
               variant="solid" 
               action="primary" 
               onPress={() => setShowModal(true)}
-              isDisabled={!canSubmitRecipe || !hasChanges}
+              isDisabled={!hasChanges}
             >
               <ButtonText>Restore Recipe</ButtonText>
             </Button>
