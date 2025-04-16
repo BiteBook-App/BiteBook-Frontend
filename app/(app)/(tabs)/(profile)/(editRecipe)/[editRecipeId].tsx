@@ -1,10 +1,10 @@
-import { View, ScrollView, TextInput, Pressable } from "react-native";
+import { View, ScrollView, TextInput } from "react-native";
 import "@/global.css";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonText } from "@/components/ui/button";
-import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import {
   FormControl,
   FormControlError,
@@ -34,18 +34,28 @@ type Ingredient = {
   count: string;
 };
 
+type RecipeData = {
+  name: string;
+  url?: string;
+  photoUrl?: string;
+  ingredients: Ingredient[];
+  steps: { text: string }[];
+  tastes: string[];
+  hasCooked: boolean;
+};
+
 export default function EditRecipe() {
   // Recipe metadata
   const [title, setTitle] = useState("");
   const [recipeLink, setRecipeLink] = useState("");
   const [hasCooked, setHasCooked] = useState('NULL');
   const [initialHasCooked, setInitialHasCooked] = useState(null);
-  const [originalRecipeData, setOriginalRecipeData] = useState(null);
+  const [originalRecipeData, setOriginalRecipeData] = useState<RecipeData | null>(null);
   const [showModal, setShowModal] = useState(false)
   
   // Recipe import
   const [recipeLoading, setRecipeLoading] = useState(false);
-  const [recipe, setRecipe] = useState(null);
+  const [recipe, setRecipe] = useState<RecipeData | null>(null);
   const [importError, setImportError] = useState(false);
 
   // Camera
@@ -182,6 +192,47 @@ export default function EditRecipe() {
     }
   };
 
+  const hasChanges = useMemo(() => {
+    if (!originalRecipeData) return false;
+  
+    // Compare title
+    if (title.trim() !== (originalRecipeData.name || "").trim()) return true;
+  
+    // Compare recipe link
+    if (recipeLink.trim() !== (originalRecipeData.url || "No URL entered.").trim()) return true;
+  
+    // Compare ingredients
+    const ingredientsChanged = JSON.stringify(
+      ingredients.filter(({ name }) => name.trim())
+    ) !== JSON.stringify(
+      (originalRecipeData.ingredients || []).filter(({ name }) => name.trim())
+    );
+    if (ingredientsChanged) return true;
+  
+    // Compare steps
+    const stepsChanged = JSON.stringify(
+      steps.map(({ text }) => text.trim())
+    ) !== JSON.stringify(
+      (originalRecipeData.steps || []).map(({ text }) => text.trim())
+    );
+    if (stepsChanged) return true;
+  
+    // Compare hasCooked
+    const hasCookedBool = hasCooked === 'Yes';
+    if (hasCookedBool !== (originalRecipeData.hasCooked === true)) return true;
+  
+    // Compare photo (only if cooked)
+    if (hasCookedBool) {
+      if ((photo || "") !== (originalRecipeData.photoUrl || "")) return true;
+  
+      // Compare tastes
+      const tastesChanged = JSON.stringify([...selectedTastes].sort()) !== JSON.stringify([...(originalRecipeData.tastes || [])].sort());
+      if (tastesChanged) return true;
+    }
+  
+    return false;
+  }, [title, recipeLink, ingredients, steps, hasCooked, photo, selectedTastes, originalRecipeData]);
+
   // Form submission
   const submitRecipe = useCallback(async () => {
     setRecipeSubmit(true);
@@ -304,19 +355,7 @@ export default function EditRecipe() {
               <HStack>
                 <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px]" size="5xl">
                   Edit Recipe
-                </Text>                
-                <Pressable onPress={() => setShowModal(true)}>
-                <MaterialIcons className="pl-28 pt-2" name="restart-alt" size={30} color="white" />
-                </Pressable>
-                <CustomModal
-                  isOpen={showModal}
-                  onClose={() => setShowModal(false)}
-                  modalTitle="Restore Original"
-                  modalBody="Are you sure you want to revert to the original recipe? This action cannot be undone."
-                  modalActionText="Restore"
-                  modalAction={resetForm}
-                  modalIcon={TrashIcon}
-                />
+                </Text>
               </HStack>
             </VStack>
 
@@ -453,11 +492,33 @@ export default function EditRecipe() {
               variant="solid" 
               action="primary" 
               onPress={submitRecipe} 
-              isDisabled={!canSubmitRecipe}
+              isDisabled={!canSubmitRecipe || !hasChanges}
             >
               {!recipeSubmit && <ButtonText>{initialHasCooked === false && hasCooked === 'Yes' ? 'Share recipe' : 'Update recipe'}</ButtonText>}
               {recipeSubmit && <Spinner />}
             </Button>
+
+            <Button 
+              className="rounded-xl mt-5" 
+              size="xl" 
+              variant="solid" 
+              action="primary" 
+              onPress={() => setShowModal(true)}
+              isDisabled={!canSubmitRecipe || !hasChanges}
+            >
+              <ButtonText>Restore Recipe</ButtonText>
+            </Button>
+
+            <CustomModal
+              isOpen={showModal}
+              onClose={() => setShowModal(false)}
+              modalTitle="Restore recipe"
+              modalBody="Are you sure you want to restore to the original recipe? This action cannot be undone"
+              modalActionText="Restore"
+              modalAction={resetForm}
+              modalIcon={TrashIcon}
+            />
+
           </VStack>
         </ScrollView>
       </View>

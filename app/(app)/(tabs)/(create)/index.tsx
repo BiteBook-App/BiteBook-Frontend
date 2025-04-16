@@ -1,4 +1,4 @@
-import { View, ScrollView, TextInput, Pressable } from "react-native";
+import { View, ScrollView, TextInput } from "react-native";
 import "@/global.css";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -234,18 +234,6 @@ export default function CreateRecipe() {
                 <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px]" size="5xl">
                   Add a Recipe
                 </Text>
-                <Pressable onPress={() => setShowModal(true)}>
-                  <Feather className="pl-20 pt-2" name="trash-2" size={24} color="white" />
-                </Pressable>
-                <CustomModal
-                  isOpen={showModal}
-                  onClose={() => setShowModal(false)}
-                  modalTitle="Clear changes"
-                  modalBody="Are you sure you want to clear all changes? This action cannot be undone"
-                  modalActionText="Clear"
-                  modalAction={clearForm}
-                  modalIcon={TrashIcon}
-                />
               </HStack>
             </VStack>
 
@@ -399,6 +387,26 @@ export default function CreateRecipe() {
               {!recipeSubmit && <ButtonText>{hasCooked === 'No' ? 'Save recipe' : 'Share recipe'}</ButtonText>}
               {recipeSubmit && <Spinner />}
             </Button>
+
+            <Button 
+              className="rounded-xl mt-5" 
+              size="xl" 
+              variant="solid" 
+              action="primary" 
+              onPress={() => setShowModal(true)}
+            >
+              <ButtonText>Clear Recipe</ButtonText>
+            </Button>
+
+            <CustomModal
+              isOpen={showModal}
+              onClose={() => setShowModal(false)}
+              modalTitle="Clear changes"
+              modalBody="Are you sure you want to clear all changes? This action cannot be undone"
+              modalActionText="Clear"
+              modalAction={clearForm}
+              modalIcon={TrashIcon}
+            />
           </VStack>
         </ScrollView>
       </View>

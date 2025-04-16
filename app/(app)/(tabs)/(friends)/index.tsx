@@ -1,4 +1,4 @@
-import {ScrollView, View} from "react-native";
+import {ScrollView, View, RefreshControl} from "react-native";
 import { Text } from "@/components/ui/text";
 import {LinearGradient} from "expo-linear-gradient";
 import {VStack} from "@/components/ui/vstack";
@@ -14,7 +14,7 @@ import { Heading } from "@/components/ui/heading"
 import { HStack } from "@/components/ui/hstack"
 import { Input, InputField, InputSlot, InputIcon } from "@/components/ui/input"
 import { Pressable } from "@/components/ui/pressable"
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import { createURL } from 'expo-linking';
 import {useLocalSearchParams} from "expo-router";
 import {useAuth} from "@/configs/authProvider";
@@ -46,6 +46,19 @@ export default function Friends() {
     const [addFriend, {loading: friendLoading, error: friendError, data: friendData}] = useMutation(CREATE_RELATIONSHIP);
 
     const [filteredFriends, setFilteredFriends] = useState([]);
+
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        try {
+          await friendsRefetch();
+        } catch (error) {
+          console.error("Error during refetch:", error);
+        } finally {
+          setRefreshing(false);
+        }
+      }, [friendsRefetch]);
 
     useEffect(() => {
         if (friendsData?.getFriends) {
@@ -167,7 +180,14 @@ export default function Friends() {
         >
             <LinearGradient
                 colors={[
-                    "#141f30", "#151d2e", "#161b2c", "#171a2a", "#181928", "#181826", "#1a1923", "#1a1921", "#1a181f", "#1a181d", "#19181b", "#181719"
+                    "#02332b", 
+                    "#022f2f", 
+                    "#082b31", 
+                    "#10262f", 
+                    "#16222b", 
+                    "#191d26", 
+                    "#1a1a1f", 
+                    "#181719"
                 ]}
                 locations={[0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7]}
                 start={{ x: 0, y: 0.5 }}
@@ -193,9 +213,9 @@ export default function Friends() {
             />
             <VStack>
                 <Pressable onPress={handleInvitation}>
-                    <Alert className="p-5 flex justify-between mt-28">
+                    <Alert className="p-5 flex justify-between mt-28 rounded-xl">
                         <AlertText size='lg'>
-                            Invite friends to join you in BiteBook!
+                            Invite friends to join you on BiteBook!
                         </AlertText>
                         <AlertIcon as={ExternalLinkIcon}></AlertIcon>
                     </Alert>
@@ -205,7 +225,7 @@ export default function Friends() {
                 </Text>
                 <Input
                     size="lg"
-                    className="p-3"
+                    className="p-3 rounded-xl"
                 >
                     <InputSlot>
                         <InputIcon as={SearchIcon}></InputIcon>
@@ -217,7 +237,7 @@ export default function Friends() {
                     />
                 </Input>
 
-                <ScrollView className="h-[50vh] max-h-[50vh] w-full mt-3">
+                <ScrollView className="h-[50vh] max-h-[50vh] w-full mt-3" refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
                     {
                         friendsLoading ?
                         <Spinner size="large" color={colors.amber[600]} /> :
@@ -227,7 +247,7 @@ export default function Friends() {
                                     <AvatarFallbackText>{user.displayName.substring(0, 2).toUpperCase()}</AvatarFallbackText>
                                     <AvatarImage
                                         source={{
-                                            uri: user.profilePhoto,
+                                            uri: user.profilePicture,
                                         }}
                                     />
                                 </Avatar>
