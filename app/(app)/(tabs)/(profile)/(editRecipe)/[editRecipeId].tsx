@@ -321,8 +321,14 @@ export default function EditRecipe() {
   ]);
 
   const GRADIENT_COLORS: [string, string, ...string[]] = [
-    "#141f30", "#151d2e", "#161b2c", "#171a2a", "#181928", "#181826", 
-    "#1a1923", "#1a1921", "#1a181f", "#1a181d", "#19181b", "#181719"
+    "#2e0924",
+    "#2a0d24",
+    "#261024",
+    "#221223",
+    "#1f1421",
+    "#1c151f",
+    "#1a161c",
+    "#181719"
   ];
   
   const GRADIENT_LOCATIONS: [number, number, ...number[]] = [

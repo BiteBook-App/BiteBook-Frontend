@@ -59,9 +59,18 @@ export default function Home() {
     );
 
   const GRADIENT_COLORS: [string, string, ...string[]] = [
-    "#301818", "#2e181a", "#2c181b", "#2a171d", "#28171d", 
-    "#25181e", "#22181e", "#20181e", "#1e181d", "#1b181c", 
-    "#1a171b", "#181719"
+    "#452020",
+    "#411f22",
+    "#3d1e24",
+    "#391d25",
+    "#351c25",
+    "#301c25",
+    "#2b1b25",
+    "#271b23",
+    "#221a22",
+    "#1e191f",
+    "#1b181c",
+    "#181719"
   ];
   
   const GRADIENT_LOCATIONS: [number, number, ...number[]] = [
