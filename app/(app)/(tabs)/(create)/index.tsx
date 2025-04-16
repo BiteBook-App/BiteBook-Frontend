@@ -339,6 +339,12 @@ export default function CreateRecipe() {
                     </Button>
                   </HStack>
 
+                  {hasCooked === 'No' && (
+                  <Text className="text-lg text-gray-400 font-medium italic">
+                    This recipe will be saved as a draft.
+                  </Text>
+                  )}
+
                   {/* Photo Upload Section*/}
                   {hasCooked === 'Yes' && (
                     <>
