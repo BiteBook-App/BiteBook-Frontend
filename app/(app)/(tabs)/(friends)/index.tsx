@@ -263,7 +263,7 @@ export default function Friends() {
                         ))
                     }
 
-                    {filteredFriends.length === 0 && (
+                    {filteredFriends.length === 0 && searchTerm !== "" && (
                         <VStack className="py-8 items-center justify-center">
                             <Text className="text-gray-400 text-center">
                                 No friends found matching "{searchTerm}"
