@@ -392,10 +392,10 @@ export default function CreateRecipe() {
               className="rounded-xl mt-5" 
               size="xl" 
               variant="solid" 
-              action="primary" 
+              action="secondary" 
               onPress={() => setShowModal(true)}
             >
-              <ButtonText>Clear Recipe</ButtonText>
+              <ButtonText>Clear recipe</ButtonText>
             </Button>
 
             <CustomModal

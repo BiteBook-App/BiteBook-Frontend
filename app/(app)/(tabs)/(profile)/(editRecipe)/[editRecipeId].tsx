@@ -508,18 +508,18 @@ export default function EditRecipe() {
               className="rounded-xl mt-5" 
               size="xl" 
               variant="solid" 
-              action="primary" 
+              action="secondary" 
               onPress={() => setShowModal(true)}
               isDisabled={!hasChanges}
             >
-              <ButtonText>Restore Recipe</ButtonText>
+              <ButtonText>Reset changes</ButtonText>
             </Button>
 
             <CustomModal
               isOpen={showModal}
               onClose={() => setShowModal(false)}
-              modalTitle="Restore recipe"
-              modalBody="Are you sure you want to restore to the original recipe? This action cannot be undone"
+              modalTitle="Reset changes"
+              modalBody="Are you sure you want to reset to the original recipe? This action cannot be undone"
               modalActionText="Restore"
               modalAction={resetForm}
               modalIcon={TrashIcon}

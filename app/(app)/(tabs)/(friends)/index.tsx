@@ -224,7 +224,7 @@ export default function Friends() {
                         <AlertIcon as={ExternalLinkIcon}></AlertIcon>
                     </Alert>
                 </Pressable>
-                <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px] mt-5" size="3xl">
+                <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px] mt-5" size="4xl">
                     Friends
                 </Text>
                 <Input
