@@ -39,7 +39,7 @@ export default function RecipePost({photoUrl, mealName, tastes, createdAt, lastU
           colors={["transparent", "rgba(53, 5, 5, 0.5)"]} // Gradient from transparent to darker
           style={styles.gradient}
         />
-        <HStack space="sm" style={styles.buttonContainer} className="m-2">
+        <HStack space="sm" style={styles.buttonContainer} className="m-2 flex-wrap">
           {tastes.map((taste, index) => (
             <Button key={index} style={styles.taste} className="rounded-full" variant="solid" size={size === "large" ? "sm" : "xs"}>
               <ButtonText>{taste}</ButtonText>
