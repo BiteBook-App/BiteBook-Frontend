@@ -21,17 +21,18 @@ import { useAuth } from "@/configs/authProvider";
 
 interface RecipeId {
   recipeId: String
+  tastePage?: boolean
 }
 
-export default function RecipeComponent({ recipeId }: RecipeId) {
+export default function RecipeComponent({ recipeId, tastePage = false }: RecipeId) {
   const { user } = useAuth();
   const userId = user?.uid;
-  
+
   const { loading, error, data, refetch } = useQuery(GET_RECIPE, {
     variables: { recipeUid: recipeId },
     fetchPolicy: 'network-only'
   });
-
+  
   if (error) {
     console.log(error)
   }
@@ -61,11 +62,21 @@ export default function RecipeComponent({ recipeId }: RecipeId) {
       <VStack space="md">
         {/* Profile, image, and tastes */}
         <VStack space="sm" className="mb-3">
-          <HStack space="sm" className="justify-between">
+          <HStack space="sm" className="justify-between mb-2">
             <HStack space="sm" className="items-center">
-              <Pressable className="flex-row items-center mb-4" 
+              <Pressable
+                className="flex-row items-center"
                 onPress={() => {
-                  data?.getRecipe.user.uid == userId ? router.push(`/(app)/(tabs)/(profile)`) : router.push(`/(app)/(tabs)/(home)/(friend)/${data?.getRecipe.user.uid}`)
+                  if (data?.getRecipe.user.uid === userId) {
+                    router.push("/(app)/(tabs)/(profile)");
+                  } else {
+                    router.push({
+                      pathname: tastePage
+                        ? "/(app)/(tabs)/(taste)/(friend)/[userId]"
+                        : "/(app)/(tabs)/(home)/(friend)/[userId]",
+                      params: { userId: data?.getRecipe.user.uid },
+                    });
+                  }
                 }}
               >
                 <Avatar size="sm">
