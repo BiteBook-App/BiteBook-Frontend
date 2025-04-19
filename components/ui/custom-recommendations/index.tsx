@@ -49,6 +49,7 @@ export default function Recommendations({ recommendations }: { recommendations: 
                     createdAt={post.createdAt}
                     lastUpdatedAt={post.lastUpdatedAt}
                     size="small"
+                    color={"#7781ba"}
                   />
                 </Pressable>
             </View>

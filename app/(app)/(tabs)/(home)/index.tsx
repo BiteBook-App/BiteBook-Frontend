@@ -140,6 +140,7 @@ export default function Home() {
                       mealName={post.name}
                       tastes={post.tastes}
                       createdAt={post.createdAt}
+                      color={"#b3544b"}
                     lastUpdatedAt={post.lastUpdatedAt}
                   />
                   </Pressable>
