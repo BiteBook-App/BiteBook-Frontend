@@ -4,7 +4,6 @@ import Tips from '@/components/ui/custom-taste-tips';
 import BarChart from '@/components/ui/custom-bar-chart';
 import Recommendations from '@/components/ui/custom-recommendations';
 
-
 // Mock user
 jest.mock('@/configs/authProvider', () => ({
   useAuth: () => ({
