@@ -152,7 +152,7 @@ export default function Edit() {
             <VStack space="sm">
               <Text>Username</Text>
               <CustomInputField
-                  placeholder="Test"
+                  placeholder="Username"
                   value={displayName}
                   onChangeText={(text) => {
                     setDisplayName(text);
