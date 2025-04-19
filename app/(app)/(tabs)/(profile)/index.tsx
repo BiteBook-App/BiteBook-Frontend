@@ -5,25 +5,13 @@ import { useAuth } from "@/configs/authProvider";
 import { useRouter } from 'expo-router';
 import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
-import { Feather } from "@expo/vector-icons";
 import Post from "@/components/ui/custom-recipe-post"
 import ProfileInfo from "@/components/ui/custom-profile";
 import { LinearGradient } from "expo-linear-gradient";
-import {
-  Actionsheet,
-  ActionsheetBackdrop,
-  ActionsheetContent,
-  ActionsheetDragIndicator,
-  ActionsheetDragIndicatorWrapper,
-  ActionsheetItem,
-  ActionsheetItemText,
-  ActionsheetIcon,
-} from "@/components/ui/actionsheet"
 import { Pressable } from "react-native";
 import { useQuery } from "@apollo/client";
 import { GET_RECIPE_PREVIEW, GET_PROFILE, GET_DRAFT_PREVIEW } from "@/configs/queries";
 import DraftRecipe from "@/components/ui/custom-draft-recipe";
-import { Tabs, MaterialTabBar, MaterialTabItem } from 'react-native-collapsible-tab-view';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
