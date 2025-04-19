@@ -12,10 +12,11 @@ interface RecipePost {
   tastes: string[]
   createdAt: string,
   lastUpdatedAt: string
-  size?: "small" | "large";
+  size?: "small" | "large",
+  color: string;
 }
 
-export default function RecipePost({photoUrl, mealName, tastes, createdAt, lastUpdatedAt, size = "large"}: RecipePost) {
+export default function RecipePost({photoUrl, mealName, tastes, createdAt, lastUpdatedAt, size = "large", color}: RecipePost) {
   const sizes = {
     small: { height: 200, width: 200},
     large: { height: 350, width: "100%" as DimensionValue}
@@ -52,13 +53,13 @@ export default function RecipePost({photoUrl, mealName, tastes, createdAt, lastU
       <HStack className="flex justify-between w-full pb-2">
         {/* Post time or date */}
         {size === "large" &&
-          <Text className="text-sm text-gray-300 mt-2">
+          <Text style={{ color: color }} className="text-sm mt-2">
             {formatDate(createdAt)}
           </Text>
         }
 
         {lastUpdatedAt && size === "large" && (
-          <Text className="text-sm text-gray-300 mt-2">
+          <Text style={{ color: color }} className="text-sm mt-2">
             Last Updated: {formatDate(lastUpdatedAt)}
           </Text>
         )}

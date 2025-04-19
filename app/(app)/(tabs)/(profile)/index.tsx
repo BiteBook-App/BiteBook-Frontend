@@ -187,6 +187,7 @@ export default function Profile() {
                     tastes={post.tastes}
                     createdAt={post.createdAt}
                     lastUpdatedAt={post.lastUpdatedAt}
+                    color={"#7781ba"}
                   />
                 </Pressable>
               ))}

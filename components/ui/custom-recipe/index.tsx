@@ -107,12 +107,12 @@ export default function RecipeComponent({ recipeId, tastePage = false }: RecipeI
           </View>
             <HStack className="flex justify-between w-full pb-2">
               {/* Post time or date */}
-              <Text className="text-sm text-gray-300">
+              <Text style={{ color: '#7781ba' }} className="text-sm">
                 {formatDate(data?.getRecipe.createdAt)}
               </Text>
 
               {data?.getRecipe.lastUpdatedAt && (
-                <Text className="text-sm text-gray-300">
+                <Text style={{ color: '#7781ba' }} className="text-sm">
                   Last Updated: {formatDate(data?.getRecipe.lastUpdatedAt)}
                 </Text>
               )}
