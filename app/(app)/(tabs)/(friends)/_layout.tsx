@@ -6,14 +6,12 @@ export default function AppLayout() {
     <GluestackUIProvider mode="dark">
       <Stack screenOptions={{
           headerTintColor: '#fff',
+          headerStyle: { backgroundColor: "#181719" },
           headerTitleStyle: {
             fontFamily: 'VVDSRashfield-Normal',
             fontSize: 20
           },
-          headerShadowVisible: false,
-          headerBackButtonDisplayMode: 'minimal',
-          headerTitle: "",
-          headerTransparent: true
+          headerShadowVisible: false
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', headerTitle: 'BiteBook'}}/>

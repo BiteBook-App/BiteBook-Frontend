@@ -22,7 +22,7 @@ import StepsSection, { StepsUtils, StepItem } from "@/components/ui/steps-compon
 import CameraComponent from "@/components/ui/camera-component/camera";
 import IngredientsSection from "@/components/ui/ingredients-component/ingredients";
 import TastesSection from "@/components/ui/tastes-component/tastes";
-import { useImagePicker } from "../../../../../components/ui/camera-component/camera-functionality"
+import { useImagePicker } from "@/components/ui/camera-component/camera-functionality"
 import { EDIT_RECIPE, GET_RECIPE } from "@/configs/queries";
 import { useMutation, useQuery } from "@apollo/client";
 import { deleteObject, ref } from "firebase/storage";

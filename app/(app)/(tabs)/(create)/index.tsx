@@ -389,7 +389,7 @@ export default function CreateRecipe() {
             </Button>
 
             <Button 
-              className="rounded-xl mt-5" 
+              className="rounded-xl mt-2" 
               size="xl" 
               variant="solid" 
               action="secondary" 

@@ -27,9 +27,7 @@ export default function Recommendations({ recommendations }: { recommendations: 
               <View key={index}>
                 {/* Heading with profile picture and display name */}
                 <Pressable className="flex-row items-center mb-2" 
-                  onPress={() => {
-                    post.user.uid == userId ? router.push(`/(app)/(tabs)/(profile)`) : router.push(`/(app)/(tabs)/(home)/(friend)/${post.user.uid}`)
-                  }}
+                  onPress={() => router.push(`/(app)/(tabs)/(taste)/(friend)/${post.user.uid}`)}
                 >
                   <Avatar size="sm">
                     <AvatarFallbackText>{post.user.displayName}</AvatarFallbackText>
@@ -43,7 +41,7 @@ export default function Recommendations({ recommendations }: { recommendations: 
                 </Pressable>
 
                 {/* Render post content */}
-                <Pressable onPress={() => router.push(`/(app)/(tabs)/(home)/${post.uid}`)}>
+                <Pressable onPress={() => router.push(`/(app)/(tabs)/(taste)/${post.uid}`)}>
                   <Post
                     photoUrl={post.photoUrl}
                     mealName={post.name}

@@ -21,79 +21,82 @@ import {
 interface CustomProps {
   showActionsheet: boolean;
   handleClose: () => void;
-  recipeId: String;
+  recipeId: string;
+  homePage?: boolean
 }
 	
-export default function CustomActionsheet({ showActionsheet, handleClose, recipeId }: CustomProps){
+export default function CustomActionsheet({ showActionsheet, handleClose, recipeId, homePage = false }: CustomProps){
   const router = useRouter();
   const { user } = useAuth();
+
   const { loading, error, data, refetch } = useQuery(GET_USER_FROM_RECIPE, {
     variables: { recipeUid: recipeId }
   });
+
   const [deleteRecipeMutation, { loading: mutationLoading, error: mutationError }] = useMutation(DELETE_RECIPE);
   const [showModal, setShowModal] = useState(false);
 
   const toast = useToast()
-    const [toastId, setToastId] = useState("0")
+  const [toastId, setToastId] = useState("0")
 
-    const showNewToast = (status: String, text: String) => {
-        const newId = Math.random().toString()
+  const showNewToast = (status: String, text: String) => {
+    const newId = Math.random().toString()
 
-        setToastId(newId)
+    setToastId(newId)
 
-        if (status == "success") {
-            toast.show({
-                id: newId,
-                placement: "top",
-                duration: 3000,
-                render: ({ id }) => {
-                  const uniqueToastId = "toast-" + id
-                  return (
-                    <Toast nativeID={uniqueToastId} action="success" variant="solid">
-                      <ToastTitle>Success</ToastTitle>
-                      <ToastDescription>
-                        {text}
-                      </ToastDescription>
-                    </Toast>
-                  )
-                },
-            })
-        }
-        else if (status == "error") {
-            toast.show({
-                id: newId,
-                placement: "top",
-                duration: 3000,
-                render: ({ id }) => {
-                  const uniqueToastId = "toast-" + id
-                  return (
-                    <Toast nativeID={uniqueToastId} action="error" variant="solid">
-                      <ToastTitle>Error</ToastTitle>
-                      <ToastDescription>
-                        {text}
-                      </ToastDescription>
-                    </Toast>
-                  )
-                },
-            })
-        }
-      }
-
-    const handleToast = (status: String, text: String) => {
-        if (!toast.isActive(toastId)) {
-            showNewToast(status, text)
-        }
+    if (status == "success") {
+      toast.show({
+        id: newId,
+        placement: "top",
+        duration: 3000,
+        render: ({ id }) => {
+          const uniqueToastId = "toast-" + id
+          return (
+            <Toast nativeID={uniqueToastId} action="success" variant="solid">
+              <ToastTitle>Success</ToastTitle>
+              <ToastDescription>
+                {text}
+              </ToastDescription>
+            </Toast>
+          )
+        },
+      })
     }
-
-  const handleShare = () => {
-    const shareURL = createURL("recipes", {
-      queryParams: {id: recipeId}
-    })
-
-    Share.open({message: "Share a new recipe with friends!", title: "Recipe Sharing", url: shareURL})
-            .then((res) => handleToast('success', "Link was copied to your clipboard!"))
-            .catch((err) => handleToast('error', "Please try again later."));
+    else if (status == "error") {
+      toast.show({
+        id: newId,
+        placement: "top",
+        duration: 3000,
+        render: ({ id }) => {
+          const uniqueToastId = "toast-" + id
+          return (
+            <Toast nativeID={uniqueToastId} action="error" variant="solid">
+              <ToastTitle>Error</ToastTitle>
+              <ToastDescription>
+                {text}
+              </ToastDescription>
+            </Toast>
+          )
+        },
+      })
+    }
   }
+
+  const handleToast = (status: String, text: String) => {
+    if (!toast.isActive(toastId)) {
+      showNewToast(status, text)
+    }
+  }
+
+const handleShare = () => {
+  const shareURL = createURL("recipes", {
+    queryParams: {id: recipeId}
+  })
+
+  Share.open({message: "Share a new recipe with friends!", title: "Recipe Sharing", url: shareURL})
+    .then((res) => handleToast('success', "Link was copied to your clipboard!"))
+    .catch((err) => handleToast('error', "Please try again later."));
+}
 
   return (
     <>
@@ -107,7 +110,8 @@ export default function CustomActionsheet({ showActionsheet, handleClose, recipe
             <ActionsheetItem                 
               onPress={() => {
                 handleClose();
-                router.push(`/(app)/(tabs)/(profile)/(editRecipe)/${recipeId}`);
+                const basePath = homePage ? "/(app)/(tabs)/(home)" : "/(app)/(tabs)/(profile)";
+                router.push(`${basePath}/(editRecipe)/${recipeId}`);
               }}
             >
               <ActionsheetItemText size="md">Edit</ActionsheetItemText>

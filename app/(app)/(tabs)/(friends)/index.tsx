@@ -217,7 +217,7 @@ export default function Friends() {
             />
             <VStack>
                 <Pressable onPress={handleInvitation}>
-                    <Alert className="p-5 flex justify-between mt-28 rounded-xl">
+                    <Alert className="p-5 flex justify-between bg-background-0 rounded-xl">
                         <AlertText size='lg'>
                             Invite friends to join you on BiteBook!
                         </AlertText>

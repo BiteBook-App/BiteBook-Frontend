@@ -55,7 +55,7 @@ export default function Recipe() {
       >
         <RecipeComponent recipeId={recipeId}/>
       </ScrollView>
-      <CustomActionsheet showActionsheet={showActionsheet} handleClose={handleClose} recipeId={recipeId} homePage={true}/>
+      <CustomActionsheet showActionsheet={showActionsheet} handleClose={handleClose} recipeId={recipeId}/>
     </View>
   );
 }
