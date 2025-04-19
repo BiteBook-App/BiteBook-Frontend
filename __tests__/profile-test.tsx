@@ -55,7 +55,9 @@ const mocks = [
           {
             uid: 'draft-1',
             name: 'Draft Meal',
+            photoUrl: 'https://example.com/draft.jpg', // Added
             createdAt: '2024-02-01',
+            lastUpdatedAt: '2024-02-10', // Added
             tastes: ['Sweet'],
           },
         ],
