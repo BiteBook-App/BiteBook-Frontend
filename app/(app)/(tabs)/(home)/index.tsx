@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/avatar"
 import { LinearGradient } from "expo-linear-gradient";
 import NoRecipes from "@/components/ui/custom-no-recipes-display";
-import { HStack } from "@/components/ui/hstack";
+import { LogBox } from 'react-native';
 
 export default function Home() {
   const router = useRouter();
@@ -41,6 +41,7 @@ export default function Home() {
   }, [refetch]);
 
   useEffect(() => {
+    LogBox.ignoreAllLogs();
     refetch();
   }, []);
 
