@@ -89,7 +89,7 @@ export default function CustomActionsheet({ showActionsheet, handleClose, recipe
   }
 
 const handleShare = () => {
-  const shareURL = createURL("recipes", {
+  const shareURL = createURL("expo-development-client/recipes", {
     queryParams: {id: recipeId}
   })
 

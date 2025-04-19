@@ -85,7 +85,7 @@ export default function Profile({ displayName, profilePicture, numPosts, numFrie
     }
 
   const handleShare = () => {
-    const invitationURL = createURL("friends", {
+    const invitationURL = createURL("expo-development-client/friends", {
         queryParams: {id: uid}
     })
 

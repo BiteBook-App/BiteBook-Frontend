@@ -138,7 +138,7 @@ export default function Friends() {
     }
 
     const handleInvitation = () => {
-        const invitationURL = createURL("friends", {
+        const invitationURL = createURL("expo-development-client/friends", {
             queryParams: {id: user.uid}
         })
 
