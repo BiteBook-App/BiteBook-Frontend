@@ -31,11 +31,13 @@ import {
   } from "@/components/ui/toast"
   import { Spinner } from "@/components/ui/spinner";
 import colors from "tailwindcss/colors";
+import { useRouter } from "expo-router";
 
 export default function Friends() {
     const [searchTerm, setSearchTerm] = useState('');
     const {user} = useAuth();
     const {id} = useLocalSearchParams();
+    const router = useRouter();
 
     const [invitationModalOpen, setInvitationModalOpen] = useState(false);
 
@@ -246,20 +248,28 @@ export default function Friends() {
                         friendsLoading ?
                         <Spinner size="large" color={colors.amber[600]} /> :
                         filteredFriends?.map(user => (
-                            <HStack space="md" className="mt-5" key={user.uid} style={{display: "flex", alignItems: "center"}}>
-                                <Avatar>
-                                    <AvatarFallbackText>{user.displayName.substring(0, 2).toUpperCase()}</AvatarFallbackText>
-                                    <AvatarImage
-                                        source={{
-                                            uri: user.profilePicture,
-                                        }}
-                                    />
-                                </Avatar>
-                                <VStack>
-                                    <Heading size="sm">@{user.displayName}</Heading>
-                                    <Text size="sm">Joined on {dayjs(user.createdAt).format('MMMM D, YYYY')}</Text>
-                                </VStack>
-                            </HStack>
+                            <Pressable 
+                                key={user.uid}
+                                className="flex-row items-center mb-4" 
+                                onPress={() => {
+                                    router.push(`/(app)/(tabs)/(friends)/(friend)/${user.uid}`)
+                                }}
+                            >
+                                <HStack space="md" className="mt-5" style={{display: "flex", alignItems: "center"}}>
+                                    <Avatar>
+                                        <AvatarFallbackText>{user.displayName.substring(0, 2).toUpperCase()}</AvatarFallbackText>
+                                        <AvatarImage
+                                            source={{
+                                                uri: user.profilePicture,
+                                            }}
+                                        />
+                                    </Avatar>
+                                    <VStack>
+                                        <Heading size="sm">@{user.displayName}</Heading>
+                                        <Text size="sm">Joined on {dayjs(user.createdAt).format('MMMM D, YYYY')}</Text>
+                                    </VStack>
+                                </HStack>
+                            </Pressable>
                         ))
                     }
 
