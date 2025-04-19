@@ -16,7 +16,7 @@ import { Icon, LinkIcon } from "@/components/ui/icon";
 import { formatDate } from "@/components/ui/custom-data-utils";
 import { Spinner } from "../spinner";
 import colors from "tailwindcss/colors";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { useAuth } from "@/configs/authProvider";
 
 interface RecipeId {
@@ -25,6 +25,7 @@ interface RecipeId {
 }
 
 export default function RecipeComponent({ recipeId, tastePage = false }: RecipeId) {
+  const router = useRouter();
   const { user } = useAuth();
   const userId = user?.uid;
 
@@ -35,9 +36,6 @@ export default function RecipeComponent({ recipeId, tastePage = false }: RecipeI
   
   if (error) {
     console.log(error)
-  }
-  if (!data?.getRecipe.photoUrl) {
-    console.log("undefined")
   }
   
   if (loading) 
@@ -65,6 +63,7 @@ export default function RecipeComponent({ recipeId, tastePage = false }: RecipeI
           <HStack space="sm" className="justify-between mb-2">
             <HStack space="sm" className="items-center">
               <Pressable
+                testID="user-pressable"
                 className="flex-row items-center"
                 onPress={() => {
                   if (data?.getRecipe.user.uid === userId) {
