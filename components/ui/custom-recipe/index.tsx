@@ -22,9 +22,11 @@ import { useAuth } from "@/configs/authProvider";
 interface RecipeId {
   recipeId: String
   tastePage?: boolean
+  friendPage?: boolean
+  homePage?: boolean
 }
 
-export default function RecipeComponent({ recipeId, tastePage = false }: RecipeId) {
+export default function RecipeComponent({ recipeId, tastePage = false, friendPage = false, homePage = false }: RecipeId) {
   const router = useRouter();
   const { user } = useAuth();
   const userId = user?.uid;
@@ -66,13 +68,18 @@ export default function RecipeComponent({ recipeId, tastePage = false }: RecipeI
                 testID="user-pressable"
                 className="flex-row items-center"
                 onPress={() => {
-                  if (data?.getRecipe.user.uid === userId) {
+                  if (friendPage) {
+                    return;
+                  } else if (data?.getRecipe.user.uid === userId) {
                     router.push("/(app)/(tabs)/(profile)");
-                  } else {
+                  } else if (tastePage) {
                     router.push({
-                      pathname: tastePage
-                        ? "/(app)/(tabs)/(taste)/(friend)/[userId]"
-                        : "/(app)/(tabs)/(home)/(friend)/[userId]",
+                      pathname: "/(app)/(tabs)/(taste)/(friend)/[userId]",
+                      params: { userId: data?.getRecipe.user.uid },
+                    });
+                  } else if (homePage) {
+                    router.push({
+                      pathname: "/(app)/(tabs)/(home)/(friend)/[userId]",
                       params: { userId: data?.getRecipe.user.uid },
                     });
                   }
@@ -127,9 +134,9 @@ export default function RecipeComponent({ recipeId, tastePage = false }: RecipeI
                 No link provided
               </Text>
             ) : (
-              <Link href={data.getRecipe.url}>
+              <Link href={data?.getRecipe.url}>
                 <LinkText className="text-primary-950 font-medium" size="md">
-                  {data.getRecipe.name}
+                  {data?.getRecipe.name}
                 </LinkText>
             </Link>
             )}
