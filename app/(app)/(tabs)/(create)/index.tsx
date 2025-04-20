@@ -1,4 +1,4 @@
-import { View, ScrollView, TextInput } from "react-native";
+import { View, ScrollView, TextInput, LogBox } from "react-native";
 import "@/global.css";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -11,7 +11,7 @@ import {
   FormControlErrorText,
   FormControlErrorIcon,
 } from "@/components/ui/form-control"
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { CloseCircleIcon } from "@/components/ui/icon";
 import { useAuth } from '@/configs/authProvider';
@@ -94,6 +94,10 @@ export default function CreateRecipe() {
     setHasCooked("");
     setShowModal(false);
   };
+
+  useEffect(() => {
+      LogBox.ignoreAllLogs();
+    }, []);
 
   // Recipe import function
   const importRecipe = useCallback(async (recipeUrl: string) => {
