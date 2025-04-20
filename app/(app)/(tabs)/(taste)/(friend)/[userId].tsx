@@ -83,6 +83,7 @@ export default function Profile() {
             numPosts={numPosts} 
             numFriends={profile?.getUsers?.[0]?.relationships?.length}
             displayOptions={false}
+            uid={userId}
           />
         </VStack>
         
