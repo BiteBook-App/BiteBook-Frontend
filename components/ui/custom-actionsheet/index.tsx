@@ -93,9 +93,8 @@ const handleShare = () => {
     queryParams: {id: recipeId}
   })
 
-  Share.open({message: "Share a new recipe with friends!", title: "Recipe Sharing", url: shareURL})
+  Share.open({message: shareURL, title: "Recipe Sharing"})
     .then((res) => handleToast('success', "Link was copied to your clipboard!"))
-    .catch((err) => handleToast('error', "Please try again later."));
 }
 
   return (

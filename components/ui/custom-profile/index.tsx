@@ -89,7 +89,7 @@ export default function Profile({ displayName, profilePicture, numPosts, numFrie
         queryParams: {id: uid}
     })
 
-    Share.open({message: "Invite friends to BiteBook!", title: "BiteBook Invitation", url: invitationURL})
+    Share.open({message: invitationURL, title: "BiteBook Invitation"})
         .then((res) => handleToast('success', "Link was copied to your clipboard!"));
   }
 
