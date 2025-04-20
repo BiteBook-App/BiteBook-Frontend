@@ -17,11 +17,13 @@ export default function AppLayout() {
       const actionPage = parsedURL.path;
       const actionID = parsedURL.queryParams?.id;
 
-      if (actionPage == "friends") {
-          router.push( { pathname: '/(app)/(tabs)/(friends)', params: { id: actionID } })
-      }
-      else if (actionPage == "recipes") {
-        router.push( { pathname: '/(app)/(tabs)/(profile)/[recipeId]', params: { recipeId: actionID } })
+      if (typeof actionID === "string") {
+        if (actionPage == "friends") {
+            router.push( { pathname: '/(app)/(tabs)/(friends)', params: { id: actionID } })
+        }
+        else if (actionPage == "recipes") {
+          router.push( { pathname: '/(app)/(tabs)/(home)/[recipeId]', params: { recipeId: actionID } })
+        }
       }
   }
 
