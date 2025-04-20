@@ -16,6 +16,12 @@ jest.mock('@/configs/authProvider', () => ({
   }),
 }));
 
+jest.mock('react-native-share', () => ({
+  default: {
+    open: jest.fn(),
+  },
+}));
+
 // Mock Icons
 jest.mock('@expo/vector-icons', () => ({
     Feather: 'Feather', // Or any other icon you might use
@@ -96,6 +102,7 @@ describe('Profile information component', () => {
     numPosts: 5,
     numFriends: 12,
     displayOptions: true,
+    uid: 'user-123'
   };
 
   it('renders profile info correctly', () => {
