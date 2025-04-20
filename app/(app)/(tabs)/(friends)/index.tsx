@@ -140,13 +140,12 @@ export default function Friends() {
     }
 
     const handleInvitation = () => {
-        const invitationURL = createURL("friends", {
+        const invitationURL = createURL("expo-development-client/friends", {
             queryParams: {id: user.uid}
         })
 
-        Share.open({message: "Invite friends to BiteBook!", title: "BiteBook Invitation", url: invitationURL})
-            .then((res) => handleToast('success', "Link was copied to your clipboard!"))
-            .catch((err) => handleToast('error', "Please try again later."));
+        Share.open({message: invitationURL, title: "BiteBook Invitation"})
+            .then((res) => handleToast('success', "Link was copied to your clipboard!"));
     }
 
     // The search function that filters by name or username - Fixed for React Native

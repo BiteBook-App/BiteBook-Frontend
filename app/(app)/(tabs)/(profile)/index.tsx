@@ -140,6 +140,7 @@ export default function Profile() {
             numPosts={numPosts} 
             numFriends={profile?.getUsers?.[0]?.relationships?.length}
             displayOptions={true}
+            uid={user.uid}
           />
           <HStack>
             <Pressable
