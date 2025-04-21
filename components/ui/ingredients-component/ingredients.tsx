@@ -71,8 +71,11 @@ const IngredientsSection = ({ ingredients, setIngredients }: IngredientsSectionP
               style={{ fontSize: 16 }}
               placeholderTextColor="#8C8C8C"
             />
-            <TouchableOpacity onPress={() => removeIngredient(index)}>
-              <Icon as={CloseIcon}/>
+            <TouchableOpacity
+              onPress={() => removeIngredient(index)}
+              testID={`remove-button-${index}`}
+            >
+              <Icon as={CloseIcon} />
             </TouchableOpacity>
           </View>
         ))}
