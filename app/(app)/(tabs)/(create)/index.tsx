@@ -1,5 +1,5 @@
 import { View, ScrollView, TextInput } from "react-native";
-import "@/global.css";
+// import "@/global.css";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
@@ -376,7 +376,8 @@ export default function CreateRecipe() {
             </FormControl>
 
             {/* Submit Button */}
-            <Button 
+            <Button
+              testID="submit-button"
               className="rounded-xl mt-10" 
               size="xl" 
               variant="solid" 
