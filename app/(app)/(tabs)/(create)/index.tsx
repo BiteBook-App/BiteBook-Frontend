@@ -96,8 +96,10 @@ export default function CreateRecipe() {
   };
 
   useEffect(() => {
+    if (process.env.NODE_ENV !== 'test') {
       LogBox.ignoreAllLogs();
-    }, []);
+    }
+  }, []);
 
   // Recipe import function
   const importRecipe = useCallback(async (recipeUrl: string) => {
