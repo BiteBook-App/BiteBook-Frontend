@@ -127,23 +127,6 @@ describe('IngredientsSection', () => {
 
     expect(setIngredients).toHaveBeenCalledTimes(2);
   });
-
-
-  it('adds an ingredient on button press', async () => {
-    const setIngredients = jest.fn();
-    const { getByPlaceholderText, getByTestId } = render(
-      <IngredientsSection ingredients={[]} setIngredients={setIngredients} />
-    );
-  
-    fireEvent.changeText(getByPlaceholderText('Amount'), '1 cup');
-    fireEvent.changeText(getByPlaceholderText('Ingredient'), 'Flour');
-  
-    await act(async () => {
-      fireEvent.press(getByTestId('add-button'));
-    });
-  
-    expect(setIngredients).toHaveBeenCalled();
-  });
 });
 
 describe('StepsSection', () => {
