@@ -31,7 +31,7 @@ export default function CollapsibleItem({ expanded, text, stepNumber }: Step) {
       {currExpanded && (
         <View className="mt-2 flex-row justify-between items-start">
           <Text
-            className="text-white text-base flex-1 p-2 bg-transparent"
+            className="text-white text-base flex-1 bg-transparent"
           >
             { text }
           </Text>
