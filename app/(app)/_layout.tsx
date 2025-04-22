@@ -6,8 +6,6 @@ import {useURL, parse} from 'expo-linking'
 export default function AppLayout() {
   const { user, signOut } = useAuth();
   const url = useURL();
-
-  console.log("TEST " + url);
   
   // Unauthenticated users are redirected to login page
   if (!user)
@@ -19,8 +17,13 @@ export default function AppLayout() {
       const actionPage = parsedURL.path;
       const actionID = parsedURL.queryParams?.id;
 
-      if (actionPage == "friends") {
-          router.push( { pathname: '/(app)/(tabs)/(friends)', params: { id: actionID } })
+      if (typeof actionID === "string") {
+        if (actionPage == "friends") {
+            router.push( { pathname: '/(app)/(tabs)/(friends)', params: { id: actionID } })
+        }
+        else if (actionPage == "recipes") {
+          router.push( { pathname: '/(app)/(tabs)/(home)/[recipeId]', params: { recipeId: actionID } })
+        }
       }
   }
 

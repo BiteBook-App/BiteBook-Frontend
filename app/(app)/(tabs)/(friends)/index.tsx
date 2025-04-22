@@ -1,4 +1,4 @@
-import {ScrollView, View} from "react-native";
+import {ScrollView, View, RefreshControl} from "react-native";
 import { Text } from "@/components/ui/text";
 import {LinearGradient} from "expo-linear-gradient";
 import {VStack} from "@/components/ui/vstack";
@@ -14,123 +14,59 @@ import { Heading } from "@/components/ui/heading"
 import { HStack } from "@/components/ui/hstack"
 import { Input, InputField, InputSlot, InputIcon } from "@/components/ui/input"
 import { Pressable } from "@/components/ui/pressable"
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import { createURL } from 'expo-linking';
 import {useLocalSearchParams} from "expo-router";
 import {useAuth} from "@/configs/authProvider";
 import Share from 'react-native-share';
 import CustomModal from "@/components/ui/custom-modal";
 import {useLazyQuery, useMutation, useQuery} from "@apollo/client";
-import {CREATE_RELATIONSHIP, GET_PROFILE} from "@/configs/queries";
+import {CREATE_RELATIONSHIP, GET_FRIENDS, GET_PROFILE} from "@/configs/queries";
+import dayjs from 'dayjs';
+import {
+    useToast,
+    Toast,
+    ToastTitle,
+    ToastDescription,
+  } from "@/components/ui/toast"
+  import { Spinner } from "@/components/ui/spinner";
+import colors from "tailwindcss/colors";
+import { useRouter } from "expo-router";
 
 export default function Friends() {
-    const testData = [
-        {
-            name: "Friend One",
-            username: "friendone",
-            profilePhoto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6Hb5xzFZJCTW4cMqmPwsgfw-gILUV7QevvQ&s",
-            uuid: "frienduuid1"
-        },
-        {
-            name: "Friend Two",
-            username: "friendtwo", // Fixed username
-            profilePhoto: "https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg",
-            uuid: "frienduuid2"
-        },
-        {
-            name: "Friend 3",
-            username: "friend3", // Fixed username
-            profilePhoto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6Hb5xzFZJCTW4cMqmPwsgfw-gILUV7QevvQ&s",
-            uuid: "frienduuid3"
-        },
-        {
-            name: "Friend 4",
-            username: "friend4", // Fixed username
-            profilePhoto: "https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg",
-            uuid: "frienduuid4"
-        },
-        {
-            name: "Friend 5",
-            username: "friend5", // Fixed username
-            profilePhoto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6Hb5xzFZJCTW4cMqmPwsgfw-gILUV7QevvQ&s",
-            uuid: "frienduuid5"
-        },
-        {
-            name: "Friend 6",
-            username: "friend6", // Fixed username
-            profilePhoto: "https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg",
-            uuid: "frienduuid6"
-        },
-        {
-            name: "Friend 7",
-            username: "friend7", // Fixed username
-            profilePhoto: "https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg",
-            uuid: "frienduuid7"
-        },
-        {
-            name: "Friend 8",
-            username: "friend8", // Fixed username
-            profilePhoto: "https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg",
-            uuid: "frienduuid8"
-        },
-        {
-            name: "Friend 9",
-            username: "friend9", // Fixed username
-            profilePhoto: "https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg",
-            uuid: "frienduuid9"
-        },
-        {
-            name: "Friend 10",
-            username: "friend10", // Fixed username
-            profilePhoto: "https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg",
-            uuid: "frienduuid10"
-        },
-        {
-            name: "Friend 11",
-            username: "friend11", // Fixed username
-            profilePhoto: "https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg",
-            uuid: "frienduuid11"
-        },
-        {
-            name: "Friend 12",
-            username: "friend12", // Fixed username
-            profilePhoto: "https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg",
-            uuid: "frienduuid12"
-        },
-        {
-            name: "Friend 13",
-            username: "friend13", // Fixed username
-            profilePhoto: "https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg",
-            uuid: "frienduuid13"
-        },
-        {
-            name: "Friend 14",
-            username: "friend14", // Fixed username
-            profilePhoto: "https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg",
-            uuid: "frienduuid14"
-        },
-        {
-            name: "Friend 15",
-            username: "friend15", // Fixed username
-            profilePhoto: "https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg",
-            uuid: "frienduuid15"
-        },
-        {
-            name: "Friend 16",
-            username: "friend16", // Fixed username
-            profilePhoto: "https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg",
-            uuid: "frienduuid16"
-        }
-    ]
-
     const [searchTerm, setSearchTerm] = useState('');
-    const [filteredFriends, setFilteredFriends] = useState(testData);
     const {user} = useAuth();
     const {id} = useLocalSearchParams();
+    const router = useRouter();
 
     const [invitationModalOpen, setInvitationModalOpen] = useState(false);
-    const [getUserData, { loading: profileLoading, error: profileError, data: profile, refetch: refetchProfile }] = useLazyQuery(GET_PROFILE);
+
+    const { loading: friendsLoading, error: friendsError, data: friendsData, refetch: friendsRefetch} = useQuery(GET_FRIENDS, {
+        variables: { userId: user.uid },
+      });
+
     const [addFriend, {loading: friendLoading, error: friendError, data: friendData}] = useMutation(CREATE_RELATIONSHIP);
+
+    const [filteredFriends, setFilteredFriends] = useState([]);
+
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        try {
+          await friendsRefetch();
+        } catch (error) {
+          console.error("Error during refetch:", error);
+        } finally {
+          setRefreshing(false);
+        }
+      }, [friendsRefetch]);
+
+    useEffect(() => {
+        if (friendsData?.getFriends) {
+          setFilteredFriends(friendsData.getFriends);
+        }
+      }, [friendsData]);
 
     useEffect(() => {
         if (id) {
@@ -138,44 +74,98 @@ export default function Friends() {
         }
     }, [id]);
 
+    const toast = useToast()
+    const [toastId, setToastId] = useState("0")
+
+    const showNewToast = (status: String, text: String) => {
+        const newId = Math.random().toString()
+
+        setToastId(newId)
+
+        if (status == "success") {
+            toast.show({
+                id: newId,
+                placement: "top",
+                duration: 3000,
+                render: ({ id }) => {
+                  const uniqueToastId = "toast-" + id
+                  return (
+                    <Toast nativeID={uniqueToastId} action="success" variant="solid">
+                      <ToastTitle>Success</ToastTitle>
+                      <ToastDescription>
+                        {text}
+                      </ToastDescription>
+                    </Toast>
+                  )
+                },
+            })
+        }
+        else if (status == "error") {
+            toast.show({
+                id: newId,
+                placement: "top",
+                duration: 3000,
+                render: ({ id }) => {
+                  const uniqueToastId = "toast-" + id
+                  return (
+                    <Toast nativeID={uniqueToastId} action="error" variant="solid">
+                      <ToastTitle>Error</ToastTitle>
+                      <ToastDescription>
+                        {text}
+                      </ToastDescription>
+                    </Toast>
+                  )
+                },
+            })
+        }
+      }
+
+    const handleToast = (status: String, text: String) => {
+        if (!toast.isActive(toastId)) {
+            showNewToast(status, text)
+        }
+    }
+
     const acceptFriendRequest = () => {
         addFriend({variables: {
                 relationshipData: {firstUserId: user.uid, secondUserId: id}
             }}).then((res) => {
             setInvitationModalOpen(false);
+            friendsRefetch()
+            handleToast('success', "You got a new friend!")
+        }).catch((error) => {
+            setInvitationModalOpen(false);
+            handleToast('error', "Please try again later.")
         })
     }
 
     const handleInvitation = () => {
-        const invitationURL = createURL("friends", {
+        const invitationURL = createURL("expo-development-client/friends", {
             queryParams: {id: user.uid}
         })
 
-        Share.open({message: "Invite friends to BiteBook!", title: "BiteBook Invitation", url: invitationURL})
-            .then((res) => console.log(res))
-            .catch((err) => console.log(err));
+        Share.open({message: invitationURL, title: "BiteBook Invitation"})
+            .then((res) => handleToast('success', "Link was copied to your clipboard!"));
     }
 
     // The search function that filters by name or username - Fixed for React Native
-    const handleSearch = (text) => {
-        // Update the search term state
+    const handleSearch = (text: any) => {
         setSearchTerm(text);
+
+        if (!friendsData?.getFriends) return;
 
         // Filter friends based on the search term
         if (!text.trim()) {
-            setFilteredFriends(testData);
+            setFilteredFriends(friendsData.getFriends);
             return;
         }
 
         const term = text.toLowerCase();
-        const results = testData.filter(friend => {
-            // Check if name exists before calling toLowerCase()
-            const nameMatch = friend.name ? friend.name.toLowerCase().includes(term) : false;
+        const results = friendsData.getFriends.filter(friend => {
+            // Check if username/displayName exists before calling toLowerCase()
+            const usernameMatch = friend.displayName ? friend.displayName.toLowerCase().includes(term) : false;
 
-            // Check if username exists before calling toLowerCase()
-            const usernameMatch = friend.username ? friend.username.toLowerCase().includes(term) : false;
-
-            return nameMatch || usernameMatch;
+            return usernameMatch;
         });
 
         setFilteredFriends(results);
@@ -191,9 +181,20 @@ export default function Friends() {
         >
             <LinearGradient
                 colors={[
-                    "#141f30", "#151d2e", "#161b2c", "#171a2a", "#181928", "#181826", "#1a1923", "#1a1921", "#1a181f", "#1a181d", "#19181b", "#181719"
+                    "#02332b",
+                    "#01312e",
+                    "#032e30",
+                    "#072b31",
+                    "#0d2830",
+                    "#11252f",
+                    "#15222c",
+                    "#182029",
+                    "#1a1d25",
+                    "#1a1b21",
+                    "#1a191d",
+                    "#181719"
                 ]}
-                locations={[0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7]}
+                locations={[0.0, 0.05, 0.09, 0.14, 0.18, 0.23, 0.27, 0.32, 0.36, 0.41, 0.45, 0.5]}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: -0.5 }}
                 style={{
@@ -217,19 +218,19 @@ export default function Friends() {
             />
             <VStack>
                 <Pressable onPress={handleInvitation}>
-                    <Alert className="p-5 flex justify-between mt-28">
+                    <Alert className="p-5 flex justify-between bg-background-0 rounded-xl">
                         <AlertText size='lg'>
-                            Invite friends to join you in BiteBook!
+                            Invite friends to join you on BiteBook!
                         </AlertText>
                         <AlertIcon as={ExternalLinkIcon}></AlertIcon>
                     </Alert>
                 </Pressable>
-                <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px] mt-5" size="3xl">
+                <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px] mt-5" size="4xl">
                     Friends
                 </Text>
                 <Input
                     size="lg"
-                    className="p-3"
+                    className="p-3 rounded-xl"
                 >
                     <InputSlot>
                         <InputIcon as={SearchIcon}></InputIcon>
@@ -241,27 +242,37 @@ export default function Friends() {
                     />
                 </Input>
 
-                <ScrollView className="h-[50vh] max-h-[50vh] w-full mt-3">
+                <ScrollView className="h-[50vh] max-h-[50vh] w-full mt-3" refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
                     {
-                        filteredFriends.map(user => (
-                            <HStack space="md" className="mt-5" key={user.uuid}>
-                                <Avatar>
-                                    <AvatarFallbackText>{user.name.substring(0, 2).toUpperCase()}</AvatarFallbackText>
-                                    <AvatarImage
-                                        source={{
-                                            uri: user.profilePhoto,
-                                        }}
-                                    />
-                                </Avatar>
-                                <VStack>
-                                    <Heading size="sm">{user.name}</Heading>
-                                    <Text size="sm">@{user.username}</Text>
-                                </VStack>
-                            </HStack>
+                        friendsLoading ?
+                        <Spinner size="large" color={colors.amber[600]} /> :
+                        filteredFriends?.map(user => (
+                            <Pressable 
+                                key={user.uid}
+                                className="flex-row items-center" 
+                                onPress={() => {
+                                    router.push(`/(app)/(tabs)/(friends)/(friend)/${user.uid}`)
+                                }}
+                            >
+                                <HStack space="md" className="mt-5" style={{display: "flex", alignItems: "center"}}>
+                                    <Avatar>
+                                        <AvatarFallbackText>{user.displayName.substring(0, 2).toUpperCase()}</AvatarFallbackText>
+                                        <AvatarImage
+                                            source={{
+                                                uri: user.profilePicture,
+                                            }}
+                                        />
+                                    </Avatar>
+                                    <VStack>
+                                        <Heading size="sm">@{user.displayName}</Heading>
+                                        <Text size="sm">Joined on {dayjs(user.createdAt).format('MMMM D, YYYY')}</Text>
+                                    </VStack>
+                                </HStack>
+                            </Pressable>
                         ))
                     }
 
-                    {filteredFriends.length === 0 && (
+                    {filteredFriends.length === 0 && searchTerm !== "" && (
                         <VStack className="py-8 items-center justify-center">
                             <Text className="text-gray-400 text-center">
                                 No friends found matching "{searchTerm}"
@@ -271,7 +282,7 @@ export default function Friends() {
                 </ScrollView>
 
                 <Text className="text-gray-400 text-sm mt-4">
-                    Showing {filteredFriends.length} of {testData.length} friends
+                    Showing {filteredFriends.length} friends
                 </Text>
             </VStack>
         </View>

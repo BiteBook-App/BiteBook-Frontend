@@ -91,7 +91,7 @@ export default function Profile() {
           {posts?.getRecipes?.length === 0 && <NoRecipes displayAction={false}/>}
           {posts?.getRecipes?.map((post: any, index: any) => (
             <Pressable 
-              onPress={() => router.push(`/(app)/(tabs)/(home)/(friend)/(recipe)/${post.uid}`)} 
+              onPress={() => router.push(`/(app)/(tabs)/(taste)/(friend)/(recipe)/${post.uid}`)} 
               key={index}
             >
               <Post

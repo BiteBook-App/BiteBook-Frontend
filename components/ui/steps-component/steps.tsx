@@ -90,6 +90,7 @@ const DraggableStep = memo(({
             onPress={() => onRemove(item.id)}
             className="mr-3 mt-2"
             activeOpacity={0.7}
+            testID={`remove-button-${item.id}`}
           >
             <Icon as={CloseIcon} className="text-white" />
           </TouchableOpacity>

@@ -53,9 +53,9 @@ export default function Recipe() {
         contentContainerStyle={{ flexGrow: 1 }} 
         showsVerticalScrollIndicator={false} 
       >
-        <RecipeComponent recipeId={recipeId} homePage={true}/>
+        <RecipeComponent recipeId={recipeId}/>
       </ScrollView>
-      <CustomActionsheet showActionsheet={showActionsheet} handleClose={handleClose} recipeId={recipeId} homePage={true}/>
+      <CustomActionsheet showActionsheet={showActionsheet} handleClose={handleClose} recipeId={recipeId}/>
     </View>
   );
 }

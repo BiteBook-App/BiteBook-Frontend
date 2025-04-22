@@ -1,4 +1,4 @@
-import { View, Image, StyleSheet } from "react-native";
+import { View, Image, StyleSheet, DimensionValue } from "react-native";
 import { Text } from "@/components/ui/text";
 import { LinearGradient } from "expo-linear-gradient"; // Import LinearGradient
 import { Button, ButtonText } from "@/components/ui/button";
@@ -12,56 +12,65 @@ interface RecipePost {
   tastes: string[]
   createdAt: string,
   lastUpdatedAt: string
+  size?: "small" | "large",
+  color: string;
 }
 
-export default function RecipePost({photoUrl, mealName, tastes, createdAt, lastUpdatedAt}: RecipePost) {
+export default function RecipePost({photoUrl, mealName, tastes, createdAt, lastUpdatedAt, size = "large", color}: RecipePost) {
+  const sizes = {
+    small: { height: 200, width: 200},
+    large: { height: 350, width: "100%" as DimensionValue}
+  }
+
+  const selectedSize = sizes[size];
+
   return (
-    <VStack space="md">
+    <View>
       <View style={styles.container}>
         <Image
           source={{ uri: `${photoUrl}` }}
-          style={styles.image}
+          style={{
+            width: selectedSize.width,
+            height: selectedSize.height,
+            borderRadius: 10,
+          }}
           alt="recipe post"
         />
         <LinearGradient
           colors={["transparent", "rgba(53, 5, 5, 0.5)"]} // Gradient from transparent to darker
           style={styles.gradient}
         />
-        <HStack space="sm" style={styles.buttonContainer} className="m-2">
+        <HStack space="sm" style={styles.buttonContainer} className="m-2 flex-wrap">
           {tastes.map((taste, index) => (
-            <Button key={index} style={styles.taste} className="rounded-full" variant="solid" size="sm">
+            <Button key={index} style={styles.taste} className="rounded-full" variant="solid" size={size === "large" ? "sm" : "xs"}>
               <ButtonText>{taste}</ButtonText>
             </Button>
           ))}
         </HStack>
-        <Text style={styles.overlayText} bold={true} size="3xl" className="m-6">{ mealName }</Text>
+        <Text style={styles.overlayText} bold={true} size={size === "large" ? "3xl" : "2xl"} className="m-6">{ mealName }</Text>
       </View>
 
       <HStack className="flex justify-between w-full pb-2">
         {/* Post time or date */}
-        <Text className="text-sm text-gray-300">
-          {formatDate(createdAt)}
-        </Text>
+        {size === "large" &&
+          <Text style={{ color: color }} className="text-sm mt-2">
+            {formatDate(createdAt)}
+          </Text>
+        }
 
-        {lastUpdatedAt && (
-          <Text className="text-sm text-gray-300">
+        {lastUpdatedAt && size === "large" && (
+          <Text style={{ color: color }} className="text-sm mt-2">
             Last Updated: {formatDate(lastUpdatedAt)}
           </Text>
         )}
       </HStack>
-    </VStack>
-
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     position: "relative", // Ensures the text can be positioned within the container
-  },
-  image: {
-    width: "100%",
-    height: 350,
-    borderRadius: 10,
   },
   overlayText: {
     position: "absolute",

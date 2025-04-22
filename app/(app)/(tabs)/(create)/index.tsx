@@ -1,5 +1,5 @@
-import { View, ScrollView, TextInput, Pressable } from "react-native";
-import "@/global.css";
+import { View, ScrollView, TextInput, LogBox } from "react-native";
+// import "@/global.css";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
@@ -11,7 +11,7 @@ import {
   FormControlErrorText,
   FormControlErrorIcon,
 } from "@/components/ui/form-control"
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { CloseCircleIcon } from "@/components/ui/icon";
 import { useAuth } from '@/configs/authProvider';
@@ -94,6 +94,12 @@ export default function CreateRecipe() {
     setHasCooked("");
     setShowModal(false);
   };
+
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'test') {
+      LogBox.ignoreAllLogs();
+    }
+  }, []);
 
   // Recipe import function
   const importRecipe = useCallback(async (recipeUrl: string) => {
@@ -234,18 +240,6 @@ export default function CreateRecipe() {
                 <Text className="font-[Rashfield] leading-[69px] lg:leading-[55px]" size="5xl">
                   Add a Recipe
                 </Text>
-                <Pressable onPress={() => setShowModal(true)}>
-                  <Feather className="pl-20 pt-2" name="trash-2" size={24} color="white" />
-                </Pressable>
-                <CustomModal
-                  isOpen={showModal}
-                  onClose={() => setShowModal(false)}
-                  modalTitle="Clear changes"
-                  modalBody="Are you sure you want to clear all changes? This action cannot be undone"
-                  modalActionText="Clear"
-                  modalAction={clearForm}
-                  modalIcon={TrashIcon}
-                />
               </HStack>
             </VStack>
 
@@ -339,6 +333,12 @@ export default function CreateRecipe() {
                     </Button>
                   </HStack>
 
+                  {hasCooked === 'No' && (
+                  <Text className="text-lg text-gray-400 font-medium italic">
+                    This recipe will be saved as a draft.
+                  </Text>
+                  )}
+
                   {/* Photo Upload Section*/}
                   {hasCooked === 'Yes' && (
                     <>
@@ -382,7 +382,8 @@ export default function CreateRecipe() {
             </FormControl>
 
             {/* Submit Button */}
-            <Button 
+            <Button
+              testID="submit-button"
               className="rounded-xl mt-10" 
               size="xl" 
               variant="solid" 
@@ -393,6 +394,26 @@ export default function CreateRecipe() {
               {!recipeSubmit && <ButtonText>{hasCooked === 'No' ? 'Save recipe' : 'Share recipe'}</ButtonText>}
               {recipeSubmit && <Spinner />}
             </Button>
+
+            <Button 
+              className="bg-[#1b2f47] rounded-xl mt-2" 
+              size="xl" 
+              variant="solid" 
+              action="secondary" 
+              onPress={() => setShowModal(true)}
+            >
+              <ButtonText>Clear recipe</ButtonText>
+            </Button>
+
+            <CustomModal
+              isOpen={showModal}
+              onClose={() => setShowModal(false)}
+              modalTitle="Clear changes"
+              modalBody="Are you sure you want to clear all changes? This action cannot be undone"
+              modalActionText="Clear"
+              modalAction={clearForm}
+              modalIcon={TrashIcon}
+            />
           </VStack>
         </ScrollView>
       </View>

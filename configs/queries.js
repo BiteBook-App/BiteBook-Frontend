@@ -154,8 +154,43 @@ export const CREATE_RELATIONSHIP = gql`
  }
 `;
 
+export const GET_TASTE_PROFILE = gql`
+  query GetTasteProfile($userId: String!) {
+    getTastePageInfo(userId: $userId) {
+      recommendations {
+        uid
+        photoUrl
+        name
+        tastes
+        user {
+          displayName
+          profilePicture
+          uid
+        }
+      }
+      tastePercentages {
+        percentage
+        taste
+      }
+      numRecipes
+      numTasteProfiles
+    }
+  }
+`;
+
 export const DELETE_RECIPE = gql`
  mutation MyMutation($recipeId: String!) {
   deleteRecipe(recipeId: $recipeId)
  }
+`;
+
+export const GET_FRIENDS = gql`
+  query GetFriends($userId: String!) {
+    getFriends(userId: $userId) {
+      displayName
+      profilePicture
+      uid
+      createdAt
+    }
+  }
 `;

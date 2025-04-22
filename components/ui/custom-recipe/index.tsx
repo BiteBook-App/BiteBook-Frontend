@@ -16,27 +16,28 @@ import { Icon, LinkIcon } from "@/components/ui/icon";
 import { formatDate } from "@/components/ui/custom-data-utils";
 import { Spinner } from "../spinner";
 import colors from "tailwindcss/colors";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { useAuth } from "@/configs/authProvider";
 
 interface RecipeId {
   recipeId: String
+  tastePage?: boolean
+  friendPage?: boolean
+  homePage?: boolean
 }
 
-export default function RecipeComponent({ recipeId }: RecipeId) {
+export default function RecipeComponent({ recipeId, tastePage = false, friendPage = false, homePage = false }: RecipeId) {
+  const router = useRouter();
   const { user } = useAuth();
   const userId = user?.uid;
-  
+
   const { loading, error, data, refetch } = useQuery(GET_RECIPE, {
     variables: { recipeUid: recipeId },
     fetchPolicy: 'network-only'
   });
-
+  
   if (error) {
     console.log(error)
-  }
-  if (!data?.getRecipe.photoUrl) {
-    console.log("undefined")
   }
   
   if (loading) 
@@ -61,11 +62,27 @@ export default function RecipeComponent({ recipeId }: RecipeId) {
       <VStack space="md">
         {/* Profile, image, and tastes */}
         <VStack space="sm" className="mb-3">
-          <HStack space="sm" className="justify-between">
+          <HStack space="sm" className="justify-between mb-2">
             <HStack space="sm" className="items-center">
-              <Pressable className="flex-row items-center mb-4" 
+              <Pressable
+                testID="user-pressable"
+                className="flex-row items-center"
                 onPress={() => {
-                  data?.getRecipe.user.uid == userId ? router.push(`/(app)/(tabs)/(profile)`) : router.push(`/(app)/(tabs)/(home)/(friend)/${data?.getRecipe.user.uid}`)
+                  if (friendPage) {
+                    return;
+                  } else if (data?.getRecipe.user.uid === userId) {
+                    router.push("/(app)/(tabs)/(profile)");
+                  } else if (tastePage) {
+                    router.push({
+                      pathname: "/(app)/(tabs)/(taste)/(friend)/[userId]",
+                      params: { userId: data?.getRecipe.user.uid },
+                    });
+                  } else if (homePage) {
+                    router.push({
+                      pathname: "/(app)/(tabs)/(home)/(friend)/[userId]",
+                      params: { userId: data?.getRecipe.user.uid },
+                    });
+                  }
                 }}
               >
                 <Avatar size="sm">
@@ -96,12 +113,12 @@ export default function RecipeComponent({ recipeId }: RecipeId) {
           </View>
             <HStack className="flex justify-between w-full pb-2">
               {/* Post time or date */}
-              <Text className="text-sm text-gray-300">
+              <Text style={{ color: '#7781ba' }} className="text-sm">
                 {formatDate(data?.getRecipe.createdAt)}
               </Text>
 
               {data?.getRecipe.lastUpdatedAt && (
-                <Text className="text-sm text-gray-300">
+                <Text style={{ color: '#7781ba' }} className="text-sm">
                   Last Updated: {formatDate(data?.getRecipe.lastUpdatedAt)}
                 </Text>
               )}
@@ -117,9 +134,9 @@ export default function RecipeComponent({ recipeId }: RecipeId) {
                 No link provided
               </Text>
             ) : (
-              <Link href={data.getRecipe.url}>
+              <Link href={data?.getRecipe.url}>
                 <LinkText className="text-primary-950 font-medium" size="md">
-                  {data.getRecipe.name}
+                  {data?.getRecipe.name}
                 </LinkText>
             </Link>
             )}

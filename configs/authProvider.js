@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
                     const username = userCredential.user.email.split("@")[0];
                     const profilePicture = userCredential.user.photoURL;
 
-                    await value.createUserDB(username, profilePicture, userCredential.user.uid);
+                    await value.createUserDB(username, userCredential.user.uid, profilePicture);
 
                     console.log("New User from Google Sign In Created.")
                 }

@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import "@/global.css";
+// import "@/global.css";
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
@@ -189,6 +189,7 @@ export default function Login() {
             </VStack>
 
             <Button 
+              testID="sign-in-button"
               className="rounded-xl" 
               size="xl" 
               variant="solid" 

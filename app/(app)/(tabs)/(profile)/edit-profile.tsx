@@ -91,8 +91,15 @@ export default function Edit() {
 
     const profilePictureURL = await uploadImage(profilePicture);
 
+    // Only updates if changes have been detected
+    const hasDisplayNameChanged = displayName !== profile?.getUsers?.[0]?.displayName;
+
+    const variables: Record<string, string> = { userId: user.uid };
+    if (hasDisplayNameChanged) variables.displayName = displayName;
+    if (hasPictureChanged) variables.profilePicture = profilePictureURL;
+
     // Remove the original profile picture
-    if (profile?.getUsers?.[0]?.profilePicture) {
+    if (hasPictureChanged) {
       try {
         const oldImageRef = ref(storage, profile?.getUsers?.[0]?.profilePicture);
         await deleteObject(oldImageRef);
@@ -101,13 +108,6 @@ export default function Edit() {
         console.error("Failed to delete old profile picture:", deleteError);
       }
     }
-
-    // Only updates if changes have been detected
-    const hasDisplayNameChanged = displayName !== profile?.getUsers?.[0]?.displayName;
-
-    const variables: Record<string, string> = { userId: user.uid };
-    if (hasDisplayNameChanged) variables.displayName = displayName;
-    if (hasPictureChanged) variables.profilePicture = profilePictureURL;
 
     try {
       const { data } = await editUser({ variables });
@@ -152,7 +152,7 @@ export default function Edit() {
             <VStack space="sm">
               <Text>Username</Text>
               <CustomInputField
-                  placeholder="Test"
+                  placeholder="Username"
                   value={displayName}
                   onChangeText={(text) => {
                     setDisplayName(text);
