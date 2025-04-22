@@ -1,5 +1,5 @@
 import { View, ScrollView, TextInput, LogBox } from "react-native";
-import "@/global.css";
+// import "@/global.css";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
@@ -96,8 +96,10 @@ export default function CreateRecipe() {
   };
 
   useEffect(() => {
+    if (process.env.NODE_ENV !== 'test') {
       LogBox.ignoreAllLogs();
-    }, []);
+    }
+  }, []);
 
   // Recipe import function
   const importRecipe = useCallback(async (recipeUrl: string) => {
@@ -380,7 +382,8 @@ export default function CreateRecipe() {
             </FormControl>
 
             {/* Submit Button */}
-            <Button 
+            <Button
+              testID="submit-button"
               className="rounded-xl mt-10" 
               size="xl" 
               variant="solid" 
@@ -393,7 +396,7 @@ export default function CreateRecipe() {
             </Button>
 
             <Button 
-              className="rounded-xl mt-2" 
+              className="bg-[#1b2f47] rounded-xl mt-2" 
               size="xl" 
               variant="solid" 
               action="secondary" 

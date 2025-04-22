@@ -41,7 +41,9 @@ export default function Home() {
   }, [refetch]);
 
   useEffect(() => {
-    LogBox.ignoreAllLogs();
+    if (process.env.NODE_ENV !== 'test') {
+      LogBox.ignoreAllLogs();
+    }
     refetch();
   }, []);
 
