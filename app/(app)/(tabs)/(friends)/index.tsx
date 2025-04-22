@@ -249,7 +249,7 @@ export default function Friends() {
                         filteredFriends?.map(user => (
                             <Pressable 
                                 key={user.uid}
-                                className="flex-row items-center mb-4" 
+                                className="flex-row items-center" 
                                 onPress={() => {
                                     router.push(`/(app)/(tabs)/(friends)/(friend)/${user.uid}`)
                                 }}
